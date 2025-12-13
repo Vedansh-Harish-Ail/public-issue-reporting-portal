@@ -1,0 +1,39 @@
+<!-- templates/citizen/report_issue.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Report an issue</h3>
+<form method="post" enctype="multipart/form-data" class="row g-3">
+  <div class="col-md-4">
+    <label class="form-label">Panchayath</label>
+    <select name="panchayath_id" class="form-select" required>
+      <option value="">Select Panchayath</option>
+      {% for p in panchayaths %}
+        <option value="{{ p.id }}">{{ p.name }} ({{ p.district }}, {{ p.state }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Category</label>
+    <select name="category" class="form-select" required>
+      {% for c in categories %}
+        <option value="{{ c }}">{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Location</label>
+    <input type="text" name="location" class="form-control" placeholder="Ward, street, landmark">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="4" required placeholder="Explain the issue briefly"></textarea>
+  </div>
+  <div class="col-12">
+    <label class="form-label">Photo (optional)</label>
+    <input type="file" name="photo" class="form-control" accept="image/*">
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </div>
+</form>
+{% endblock %}

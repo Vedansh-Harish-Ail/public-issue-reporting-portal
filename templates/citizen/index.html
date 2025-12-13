@@ -1,0 +1,53 @@
+<!-- templates/citizen/index.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Find your Panchayath</h3>
+<div class="row g-3">
+  <div class="col-md-4">
+    <label class="form-label">State</label>
+    <select id="state" class="form-select">
+      <option value="">Select State</option>
+      {% for s in states %}
+        <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">District</label>
+    <select id="district" class="form-select"></select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Panchayath</label>
+    <select id="panchayath" class="form-select"></select>
+  </div>
+</div>
+<div class="mt-3">
+  <a class="btn btn-primary" href="{{ url_for('report_issue') }}">Report an issue</a>
+  <a class="btn btn-secondary" href="{{ url_for('track_issue') }}">Track issues</a>
+  <a class="btn btn-success" href="{{ url_for('notices') }}">View notices</a>
+</div>
+<script>
+document.getElementById('state').addEventListener('change', async (e) => {
+  const state = e.target.value;
+  const res = await axios.get('/districts', { params: { state }});
+  const districtSel = document.getElementById('district');
+  districtSel.innerHTML = '';
+  res.data.districts.forEach(d => {
+    const opt = document.createElement('option'); opt.value = d; opt.textContent = d;
+    districtSel.appendChild(opt);
+  });
+  document.getElementById('panchayath').innerHTML = '';
+});
+document.getElementById('district').addEventListener('change', async (e) => {
+  const state = document.getElementById('state').value;
+  const district = e.target.value;
+  const res = await axios.get('/panchayaths', { params: { state, district }});
+  const pSel = document.getElementById('panchayath');
+  pSel.innerHTML = '';
+  res.data.panchayaths.forEach(p => {
+    const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name;
+    pSel.appendChild(opt);
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+<!-- templates/admin/issue_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Issue detail</h3>
+<div class="card">
+  <div class="card-body">
+    <h5>{{ issue.category }} — <span class="badge bg-info">{{ issue.status }}</span></h5>
+    <p>{{ issue.description }}</p>
+    {% if issue.photo_path %}
+    <img src="{{ url_for('static', filename='uploads/' + issue.photo_path.split('/')[-1]) }}" class="img-fluid mb-2">
+    {% endif %}
+    <p class="text-muted">Location: {{ issue.location or '—' }} | Panchayath: {{ issue.panchayath_name }}</p>
+    <form method="post" class="mt-3">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Update status</label>
+          <select name="status" class="form-select">
+            <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
+            <option {% if issue.status=='In Progress' %}selected{% endif %}>In Progress</option>
+            <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Note (optional)</label>
+          <input name="note" class="form-control" placeholder="Internal note">
+        </div>
+      </div>
+      <button class="btn btn-primary mt-3">Save</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

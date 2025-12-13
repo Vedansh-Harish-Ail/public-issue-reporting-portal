@@ -1,0 +1,49 @@
+<!-- templates/citizen/track_issue.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Track issues</h3>
+<form method="get" class="row g-3">
+  <div class="col-md-4">
+    <label class="form-label">Panchayath</label>
+    <select name="panchayath_id" class="form-select">
+      <option value="">All</option>
+      {% for p in panchayaths %}
+        <option value="{{ p.id }}" {% if request.args.get('panchayath_id') == p.id|string %}selected{% endif %}>{{ p.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Status</label>
+    <select name="status" class="form-select">
+      <option value="">All</option>
+      <option>Pending</option>
+      <option>In Progress</option>
+      <option>Completed</option>
+    </select>
+  </div>
+  <div class="col-md-4 d-flex align-items-end">
+    <button class="btn btn-secondary" type="submit">Filter</button>
+  </div>
+</form>
+<div class="mt-4">
+  <div class="row">
+    {% for i in issues %}
+      <div class="col-md-6">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">{{ i.category }} — <span class="badge bg-info">{{ i.status }}</span></h5>
+            <p class="card-text">{{ i.description }}</p>
+            {% if i.photo_path %}
+              <img src="{{ url_for('static', filename='uploads/' + i.photo_path.split('/')[-1]) }}" class="img-fluid mb-2" alt="Issue photo">
+            {% endif %}
+            <p class="text-muted">Location: {{ i.location or '—' }} | Panchayath: {{ i.panchayath_name }}</p>
+            <small class="text-muted">Reported: {{ i.created_at }}</small>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p>No issues found for selected filters.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

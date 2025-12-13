@@ -1,0 +1,40 @@
+<!-- templates/admin/notices.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Manage notices</h3>
+<form method="post" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">Title</label>
+    <input name="title" class="form-control" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Category</label>
+    <select name="category" class="form-select">
+      <option value="">None</option>
+      {% for c in categories %}
+        <option>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="3" required></textarea>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-success">Publish</button>
+  </div>
+</form>
+
+<h5 class="mt-4">Existing notices</h5>
+<ul class="list-group">
+  {% for n in notices %}
+    <li class="list-group-item">
+      <strong>{{ n.title }}</strong> <span class="badge bg-primary">{{ n.category or 'General' }}</span><br>
+      <small class="text-muted">{{ n.created_at }}</small>
+      <div>{{ n.description }}</div>
+    </li>
+  {% else %}
+    <li class="list-group-item">No notices yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,36 @@
+<!-- templates/citizen/notices.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Panchayath notices</h3>
+<form method="get" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">Panchayath</label>
+    <select name="panchayath_id" class="form-select">
+      <option value="">All</option>
+      {% for p in panchayaths %}
+        <option value="{{ p.id }}" {% if request.args.get('panchayath_id') == p.id|string %}selected{% endif %}>{{ p.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6 d-flex align-items-end">
+    <button class="btn btn-success" type="submit">Show</button>
+  </div>
+</form>
+<div class="mt-4">
+  <ul class="list-group">
+    {% for n in notices %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <strong>{{ n.title }}</strong>
+          <small class="text-muted">{{ n.created_at }}</small>
+        </div>
+        {% if n.panchayath_name %}<small class="text-muted">Panchayath: {{ n.panchayath_name }}</small><br>{% endif %}
+        <div>{{ n.description }}</div>
+        {% if n.category %}<span class="badge bg-primary mt-2">{{ n.category }}</span>{% endif %}
+      </li>
+    {% else %}
+      <li class="list-group-item">No notices yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
