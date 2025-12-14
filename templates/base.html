@@ -1,34 +1,64 @@
-<!-- templates/base.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Public Issue Portal</title>
+  <title>Public Issue Reporting Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background-color: #f5f6f7; }
+    .top-bar { background:#0d6efd; color:#fff; font-size:14px; }
+    footer { background:#343a40; color:#ccc; font-size:14px; }
+  </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg bg-light">
+
+<div class="top-bar py-1">
+  <div class="container d-flex justify-content-between">
+    <div>Government of Karnataka</div>
+    <div>Gram Panchayat Portal</div>
+  </div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container">
-    <a class="navbar-brand" href="{{ url_for('home') }}">Public Issues</a>
-    <div class="ms-auto">
-      <a class="btn btn-outline-primary me-2" href="{{ url_for('report_issue') }}">Report</a>
-      <a class="btn btn-outline-secondary me-2" href="{{ url_for('track_issue') }}">Track</a>
-      <a class="btn btn-outline-success" href="{{ url_for('notices') }}">Notices</a>
+    <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
+      Public Issue Portal
+    </a>
+
+    <div class="collapse navbar-collapse show">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('report_issue') }}">Report Issue</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('track_issue') }}">Track Issue</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('notices') }}">Notices</a></li>
+        <li class="nav-item">
+          <a class="btn btn-sm btn-outline-primary ms-2" href="{{ url_for('admin_login') }}">
+            Admin Login
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
+
 <div class="container py-4">
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
   {% endwith %}
   {% block content %}{% endblock %}
 </div>
+
+<footer class="mt-5 py-3 text-center">
+  <div>© 2025 Gram Panchayat</div>
+  <div>Academic Project – MCA</div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </body>
 </html>

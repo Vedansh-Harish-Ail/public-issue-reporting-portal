@@ -1,53 +1,70 @@
 <!-- templates/citizen/index.html -->
 {% extends "base.html" %}
 {% block content %}
-<h3>Find your Panchayath</h3>
-<div class="row g-3">
+
+<!-- HERO / BANNER -->
+<div class="card mb-4 border-0 shadow-sm">
+  <img src="https://via.placeholder.com/1200x350?text=Gram+Panchayat+Public+Services"
+       class="card-img-top" alt="Banner">
+</div>
+
+<!-- SERVICES SECTION -->
+<h5 class="mb-3">Citizen Services</h5>
+<div class="row g-3 mb-4">
+
   <div class="col-md-4">
-    <label class="form-label">State</label>
-    <select id="state" class="form-select">
-      <option value="">Select State</option>
-      {% for s in states %}
-        <option value="{{ s }}">{{ s }}</option>
-      {% endfor %}
-    </select>
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h6>Report Public Issue</h6>
+        <p class="text-muted small">
+          Submit complaints related to sanitation, water, roads, drainage, and street lights.
+        </p>
+        <a href="{{ url_for('report_issue') }}" class="btn btn-sm btn-primary">
+          Report Issue
+        </a>
+      </div>
+    </div>
   </div>
+
   <div class="col-md-4">
-    <label class="form-label">District</label>
-    <select id="district" class="form-select"></select>
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h6>Track Complaint</h6>
+        <p class="text-muted small">
+          Check the current status of issues reported to the Panchayat.
+        </p>
+        <a href="{{ url_for('track_issue') }}" class="btn btn-sm btn-primary">
+          Track Status
+        </a>
+      </div>
+    </div>
   </div>
+
   <div class="col-md-4">
-    <label class="form-label">Panchayath</label>
-    <select id="panchayath" class="form-select"></select>
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h6>Public Notices</h6>
+        <p class="text-muted small">
+          View official notices, announcements, and updates from the Panchayat.
+        </p>
+        <a href="{{ url_for('notices') }}" class="btn btn-sm btn-primary">
+          View Notices
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NOTICE PREVIEW -->
+<h5 class="mb-3">Latest Announcements</h5>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <p class="text-muted mb-0">
+      Visit the Notices section to view important updates related to public services,
+      water supply schedules, and Panchayat announcements.
+    </p>
   </div>
 </div>
-<div class="mt-3">
-  <a class="btn btn-primary" href="{{ url_for('report_issue') }}">Report an issue</a>
-  <a class="btn btn-secondary" href="{{ url_for('track_issue') }}">Track issues</a>
-  <a class="btn btn-success" href="{{ url_for('notices') }}">View notices</a>
-</div>
-<script>
-document.getElementById('state').addEventListener('change', async (e) => {
-  const state = e.target.value;
-  const res = await axios.get('/districts', { params: { state }});
-  const districtSel = document.getElementById('district');
-  districtSel.innerHTML = '';
-  res.data.districts.forEach(d => {
-    const opt = document.createElement('option'); opt.value = d; opt.textContent = d;
-    districtSel.appendChild(opt);
-  });
-  document.getElementById('panchayath').innerHTML = '';
-});
-document.getElementById('district').addEventListener('change', async (e) => {
-  const state = document.getElementById('state').value;
-  const district = e.target.value;
-  const res = await axios.get('/panchayaths', { params: { state, district }});
-  const pSel = document.getElementById('panchayath');
-  pSel.innerHTML = '';
-  res.data.panchayaths.forEach(p => {
-    const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name;
-    pSel.appendChild(opt);
-  });
-});
-</script>
+
 {% endblock %}
