@@ -76,7 +76,7 @@ def seed_data():
     conn.commit()
     conn.close()
 
-# ---------------- CITIZEN ROUTES ----------------
+# ---------------- CITIZEN ROUTES -------------------
 
 @app.route("/")
 def home():
@@ -134,7 +134,7 @@ def track_issue():
     conn.close()
     return render_template("citizen/track_issue.html", issues=issues)
 
-# ---------------- ADMIN ROUTES ----------------
+# ---------------- ADMIN ROUTES ----------------------
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -196,7 +196,7 @@ def admin_logout():
     session.clear()
     return redirect(url_for("admin_login"))
 
-# ---------------- MAIN ----------------
+# ---------------- MAIN -----------------
 
 if __name__ == "__main__":
     init_db()
