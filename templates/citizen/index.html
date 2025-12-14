@@ -4,9 +4,17 @@
 
 <!-- HERO / BANNER -->
 <div class="card mb-4 border-0 shadow-sm">
-  <img src="https://via.placeholder.com/1200x350?text=Gram+Panchayat+Public+Services"
-       class="card-img-top" alt="Banner">
+  <div class="position-relative">
+    <img src="{{ url_for('static', filename='image/banner_1.png') }}"
+     class="card-img-top"
+     style="height:350px; object-fit:cover;">
+    <div class="position-absolute top-50 start-50 translate-middle text-white text-center">
+      <h3>Public Issue Reporting Portal</h3>
+      <p class="mb-0">Gram Panchayat Services</p>
+    </div>
+  </div>
 </div>
+
 
 <!-- SERVICES SECTION -->
 <h5 class="mb-3">Citizen Services</h5>
@@ -65,4 +73,5 @@
     </p>
   </div>
 </div>
+
 {% endblock %}
