@@ -3,18 +3,47 @@
 {% block content %}
 
 <!-- HERO / BANNER -->
-<div class="card mb-4 border-0 shadow-sm">
-  <div class="position-relative">
-    <img src="{{ url_for('static', filename='image/banner_1.png') }}"
-     class="card-img-top"
-     style="height:350px; object-fit:cover;">
-    <div class="position-absolute top-50 start-50 translate-middle text-white text-center">
-      <h3>Public Issue Reporting Portal</h3>
-      <p class="mb-0">Gram Panchayat Services</p>
+<!-- HERO SECTION -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="row g-0 align-items-center" style="min-height:420px;">
+
+    <!-- LEFT SECTION -->
+    <div class="col-md-7 p-5" style="background:#dbe9ff;">
+      <div class="d-flex align-items-center gap-4 mb-4">
+        <img src="{{ url_for('static', filename='image/logo1.png') }}" height="60">
+        <img src="{{ url_for('static', filename='image/logo2.png') }}" height="60">
+        <img src="{{ url_for('static', filename='image/logo3.png') }}" height="60">
+      </div>
+
+      <h2 class="fw-bold text-success">मेरी पंचायत</h2>
+      <h4>Meri Panchayat</h4>
+      <p class="text-muted">
+        Ministry of Panchayati Raj<br>
+        Government of India
+      </p>
     </div>
+
+    <!-- RIGHT SECTION -->
+    <div class="col-md-5 text-center text-white p-4"
+         style="background:linear-gradient(180deg,#2a4fa3,#6c8ee6);">
+
+      <h4 class="mb-3">Download Meri Panchayat<br>Mobile Application</h4>
+
+      <p class="fw-semibold">Scan QR Code</p>
+
+      <img src="{{ url_for('static', filename='image/qr.png') }}"
+           class="mb-3"
+           style="width:160px; background:white; padding:10px;">
+
+      <div>
+        <img src="{{ url_for('static', filename='image/mobile.png') }}"
+             style="max-height:300px;">
+      </div>
+    </div>
+
   </div>
 </div>
-<h1>.</h1>
+
 
 
 <!-- SERVICES SECTION -->
