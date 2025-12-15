@@ -1,9 +1,10 @@
+import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = "dev_secret"
+app.secret_key = os.environ.get("SECRET_KEY", "dev_secret")
 
 DB_NAME = "panchayath.db"
 

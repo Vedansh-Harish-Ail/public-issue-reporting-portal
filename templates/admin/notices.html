@@ -1,40 +1,99 @@
-<!-- templates/admin/notices.html -->
 {% extends "base.html" %}
 {% block content %}
-<h3>Manage notices</h3>
-<form method="post" class="row g-3">
-  <div class="col-md-6">
-    <label class="form-label">Title</label>
-    <input name="title" class="form-control" required>
-  </div>
-  <div class="col-md-6">
-    <label class="form-label">Category</label>
-    <select name="category" class="form-select">
-      <option value="">None</option>
-      {% for c in categories %}
-        <option>{{ c }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-12">
-    <label class="form-label">Description</label>
-    <textarea name="description" class="form-control" rows="3" required></textarea>
-  </div>
-  <div class="col-12">
-    <button class="btn btn-success">Publish</button>
-  </div>
-</form>
 
-<h5 class="mt-4">Existing notices</h5>
-<ul class="list-group">
-  {% for n in notices %}
-    <li class="list-group-item">
-      <strong>{{ n.title }}</strong> <span class="badge bg-primary">{{ n.category or 'General' }}</span><br>
-      <small class="text-muted">{{ n.created_at }}</small>
-      <div>{{ n.description }}</div>
-    </li>
-  {% else %}
-    <li class="list-group-item">No notices yet.</li>
-  {% endfor %}
-</ul>
+<div class="admin-notices">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Manage Public Notices</h2>
+    <p>Create and publish official announcements for citizens</p>
+  </div>
+
+  <!-- Create Notice -->
+  <div class="notice-card">
+    <h4>Create New Notice</h4>
+
+    <form method="post" class="notice-form">
+
+      <div class="form-row">
+
+        <div class="form-group">
+          <label>Notice Title</label>
+          <input type="text"
+                 name="title"
+                 placeholder="Enter notice title"
+                 required>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            <option value="">Select category</option>
+
+            <option>General Announcement</option>
+            <option>Water Supply</option>
+            <option>Electricity / Power</option>
+            <option>Roads & Infrastructure</option>
+            <option>Sanitation & Waste Management</option>
+            <option>Health & Public Safety</option>
+            <option>Education & Anganwadi</option>
+            <option>Agriculture & Farmers</option>
+            <option>Government Schemes</option>
+            <option>Meetings & Gram Sabha</option>
+            <option>Tenders & Public Works</option>
+            <option>Office Timings / Holidays</option>
+            <option>Disaster / Emergency Alert</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label>Notice Description</label>
+        <textarea name="description"
+                  rows="4"
+                  placeholder="Enter notice details clearly for citizens"
+                  required></textarea>
+      </div>
+
+      <button type="submit" class="primary-btn">
+        Publish Notice
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Existing Notices -->
+  <div class="notice-card">
+    <h4>Published Notices</h4>
+
+    <ul class="notice-list">
+      {% for n in notices %}
+        <li class="notice-item">
+
+          <div class="notice-header">
+            <strong>{{ n.title }}</strong>
+            <span class="notice-tag">{{ n.category or 'General' }}</span>
+          </div>
+
+          <small class="notice-date">
+            Published on {{ n.created_at }}
+          </small>
+
+          <p class="notice-text">
+            {{ n.description }}
+          </p>
+
+        </li>
+      {% else %}
+        <li class="empty-text">
+          No notices published yet.
+        </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+
+</div>
+
 {% endblock %}
