@@ -2,10 +2,8 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_moment import Moment
-
 app = Flask(__name__)
-moment = Moment(app)
+# moment = Moment(app) # Removed as package install was cancelled
 app.secret_key = os.environ.get("SECRET_KEY", "dev_secret")
 
 DB_NAME = "panchayath.db"
