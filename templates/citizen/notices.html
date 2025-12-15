@@ -3,10 +3,22 @@
 
 <!-- PAGE TITLE -->
 <div class="mb-3">
-  <h4 class="fw-semibold mb-0">Panchayat Notices</h4>
-  <small class="text-muted">Official announcements issued by Panchayats
+  <h4 class="fw-semibold mb-0">
+    Panchayat Notices
+    <span class="badge bg-secondary">{{ notices|length }}</span>
+  </h4>
+  <small class="text-muted">
+    Official announcements issued by Panchayats
   </small>
 </div>
+
+<!-- LATEST NOTICE HIGHLIGHT -->
+{% if notices %}
+<div class="alert alert-info small mb-3">
+  <strong>Latest Notice:</strong>
+  {{ notices[0].title }} ({{ notices[0].created_at }})
+</div>
+{% endif %}
 
 <!-- FILTER BAR -->
 <div class="card shadow-sm mb-3">
@@ -34,6 +46,13 @@
 
     </form>
   </div>
+</div>
+
+<!-- PRINT BUTTON -->
+<div class="text-end mb-2">
+  <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+    Print Notices
+  </button>
 </div>
 
 <!-- NOTICE BOARD -->
@@ -70,11 +89,12 @@
         {% else %}
         <tr>
           <td colspan="3" class="text-center text-muted py-3">
-            No notices available.
+            No notices have been published by the Panchayats yet.
           </td>
         </tr>
         {% endfor %}
       </tbody>
+
     </table>
 
   </div>
