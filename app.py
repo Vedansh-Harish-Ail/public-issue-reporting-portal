@@ -2,6 +2,7 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 app = Flask(__name__)
 # moment = Moment(app) # Removed as package install was cancelled
 app.secret_key = os.environ.get("SECRET_KEY", "dev_secret")
@@ -14,6 +15,17 @@ def connect_db():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
+
+# ---------------- SECURITY UTILS ----------------
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "admin_id" not in session:
+            flash("Please login to access this page.", "warning")
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # ---------------- INITIALIZE DATABASE ----------------
 
@@ -157,10 +169,9 @@ def admin_login():
     return render_template("admin/login.html")
 
 @app.route("/admin")
+@login_required
 def admin_dashboard():
-    if "admin_id" not in session:
-        return redirect(url_for("admin_login"))
-
+    # if "admin_id" not in session: check handled by decorator
     pid = session["panchayath_id"]
     conn = connect_db()
 
@@ -176,10 +187,9 @@ def admin_dashboard():
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 
 @app.route("/admin/notices", methods=["GET", "POST"])
+@login_required
 def admin_notices():
-    if "admin_id" not in session:
-        return redirect(url_for("admin_login"))
-
+    # if "admin_id" not in session: check handled by decorator
     pid = session["panchayath_id"]
     conn = connect_db()
 
@@ -204,9 +214,9 @@ def admin_notices():
     return render_template("admin/notices.html", notices=notices)
 
 @app.route("/admin/issue/<int:issue_id>")
+@login_required
 def admin_issue_detail(issue_id):
-    if "admin_id" not in session:
-        return redirect(url_for("admin_login"))
+    # Authorization check handled by decorator
 
     conn = connect_db()
     issue = conn.execute("SELECT * FROM issues WHERE id = ?", (issue_id,)).fetchone()
@@ -219,9 +229,9 @@ def admin_issue_detail(issue_id):
     return render_template("admin/issue_detail.html", issue=issue)
 
 @app.route("/admin/update/<int:issue_id>", methods=["POST"])
+@login_required
 def update_issue(issue_id):
-    if "admin_id" not in session:
-        return redirect(url_for("admin_login"))
+    # Authorization check handled by decorator
 
     status = request.form["status"]
     conn = connect_db()
