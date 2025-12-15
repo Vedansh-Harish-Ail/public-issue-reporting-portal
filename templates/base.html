@@ -53,6 +53,7 @@
 
 {% block content %}{% endblock %}
 
+<<<<<<< HEAD
 <!-- BANNER SLIDER JS -->
 <script>
   let currentSlide = 0;
@@ -66,6 +67,47 @@
     }, 2500);
   }
 </script>
+=======
+<!-- GOVERNMENT FOOTER -->
+<footer class="gov-footer mt-5">
+  <div class="container-fluid">
+    <div class="row align-items-center text-center text-md-start">
+
+      <!-- LEFT: NIC LOGO -->
+      <div class="col-md-2 mb-3 mb-md-0 text-center">
+        <img src="{{ url_for('static', filename='image/nic_logo.png') }}"
+             alt="NIC Logo"
+             class="footer-logo">
+      </div>
+
+      <!-- CENTER: DISCLAIMER TEXT -->
+      <div class="col-md-8 text-center footer-text">
+        <p class="mb-1">
+          Data, Information and Other content on this Webportal is Entered, Managed
+          and Owned by the concerned Panchayati Raj Institution and other registered
+          users of different departments and ministries.
+        </p>
+        <p class="mb-0">
+          The Portal has been Designed and Developed by
+          <span class="highlight">
+            National Informatics Centre for Ministry of Panchayati Raj, Government of India
+          </span>.
+        </p>
+      </div>
+
+      <!-- RIGHT: MERI PANCHAYAT LOGO -->
+      <div class="col-md-2 mt-3 mt-md-0 text-center">
+        <img src="{{ url_for('static', filename='image/meri_panchayat_logo.png') }}"
+             alt="Meri Panchayat Logo"
+             class="footer-logo rounded-circle">
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+
+>>>>>>> 6f57f0ec9215a364647bcb92de600707112705a6
 
 </body>
 </html>
