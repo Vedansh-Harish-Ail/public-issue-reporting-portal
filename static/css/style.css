@@ -85,3 +85,23 @@
     height: 250px;
   }
 }
+/* GOVERNMENT FOOTER */
+.gov-footer {
+  background-color: #1e2f4f; /* Dark govt blue */
+  color: #ffffff;
+  padding: 25px 15px;
+  font-size: 14px;
+}
+
+.gov-footer .footer-text {
+  line-height: 1.6;
+}
+
+.gov-footer .highlight {
+  color: #ffcc00; /* NIC yellow highlight */
+  font-weight: 500;
+}
+
+.gov-footer .footer-logo {
+  max-height: 70px;
+}
