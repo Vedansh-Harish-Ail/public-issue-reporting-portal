@@ -11,7 +11,7 @@
     style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content;">
     <div style="text-align: center; margin-bottom: 30px;">
       <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
-      <small style="color: #777;">Manage Notices</small>
+      <small style="color: #666;">Manage Notices</small>
     </div>
 
     <nav class="admin-nav">
@@ -49,17 +49,20 @@
 
       <form method="post">
         <div class="form-group">
-          <label>Notice Title</label>
-          <input type="text" name="title" required placeholder="Ex. Gram Sabha Meeting...">
+          <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">Notice
+            Title</label>
+          <input type="text" name="title" required placeholder="Ex. Gram Sabha Meeting..."
+            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
         </div>
 
         <div class="form-group">
-          <label>Notice Details</label>
+          <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">Notice
+            Details</label>
           <textarea name="description" rows="6" required placeholder="Enter full notice content here..."
-            style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-family: inherit;"></textarea>
+            style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-family: inherit; box-sizing: border-box;"></textarea>
         </div>
 
-        <button type="submit" class="primary-btn" style="width: 100%;">Publish Now</button>
+        <button type="submit" class="primary-btn" style="width: 100%; justify-content: center;">Publish Now</button>
       </form>
     </div>
 
@@ -72,13 +75,13 @@
         {% for n in notices %}
         <div class="notice-item" style="border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <strong style="font-size: 16px;">{{ n.title }}</strong>
-            <small style="color: #888;">{{ n.created_at[:10] }}</small>
+            <strong style="font-size: 16px; color: var(--primary-color);">{{ n.title }}</strong>
+            <small style="color: #888; font-size: 12px;">{{ n.created_at[:10] }}</small>
           </div>
           <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">{{ n.description }}</p>
         </div>
         {% else %}
-        <p class="text-muted">No notices found.</p>
+        <p class="text-muted" style="text-align: center; padding: 20px;">No public notices have been published yet.</p>
         {% endfor %}
       </div>
     </div>
