@@ -1,45 +1,74 @@
-<!-- templates/admin/dashboard.html -->
 {% extends "base.html" %}
 {% block content %}
-<h3>Admin dashboard</h3>
-<div class="mb-3">
-  <a class="btn btn-outline-danger" href="{{ url_for('admin_logout') }}">Logout</a>
-</div>
-<div class="row">
-  <div class="col-md-4">
-    <div class="card mb-3"><div class="card-body">
-      <h6>Status summary</h6>
-      <ul class="list-group list-group-flush">
-        {% for s in stats %}
-          <li class="list-group-item d-flex justify-content-between">
-            <span>{{ s.status }}</span><span class="badge bg-secondary">{{ s.total }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div></div>
+
+<div class="admin-dashboard">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h2>Admin Dashboard</h2>
+    <a href="{{ url_for('admin_logout') }}" class="logout-btn">Logout</a>
   </div>
-  <div class="col-md-8">
-    <div class="card mb-3"><div class="card-body">
-      <h6>Recent issues</h6>
-      <ul class="list-group">
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    {% for s in stats %}
+      <div class="stat-card">
+        <span class="stat-title">{{ s.status }}</span>
+        <span class="stat-count">{{ s.total }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Main Content -->
+  <div class="dashboard-content">
+
+    <!-- Issues -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h4>Recent Issues</h4>
+      </div>
+
+      <div class="issue-list">
         {% for i in issues %}
-          <li class="list-group-item">
-            <strong>{{ i.category }}</strong> — <span class="badge bg-info">{{ i.status }}</span><br>
-            <small class="text-muted">{{ i.location or '—' }} | {{ i.created_at }}</small><br>
-            <a href="{{ url_for('admin_issue_detail', issue_id=i.id) }}">Open</a>
-          </li>
+          <div class="issue-item">
+            <div>
+              <strong>{{ i.category }}</strong>
+              <span class="issue-status {{ i.status|lower }}">{{ i.status }}</span>
+              <div class="issue-meta">
+                {{ i.location or '—' }} | {{ i.created_at }}
+              </div>
+            </div>
+            <a href="{{ url_for('admin_issue_detail', issue_id=i.id) }}" class="open-link">Open</a>
+          </div>
+        {% else %}
+          <p class="empty-text">No issues reported.</p>
         {% endfor %}
-      </ul>
-    </div></div>
-    <div class="card"><div class="card-body">
-      <h6>Notices</h6>
-      <a class="btn btn-sm btn-success mb-2" href="{{ url_for('admin_notices') }}">Manage notices</a>
-      <ul class="list-group">
+      </div>
+    </div>
+
+    <!-- Notices -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h4>Notices</h4>
+        <a href="{{ url_for('admin_notices') }}" class="primary-btn">
+          Manage Notices
+        </a>
+      </div>
+
+      <ul class="notice-list">
         {% for n in notices %}
-          <li class="list-group-item"><strong>{{ n.title }}</strong><br><small class="text-muted">{{ n.created_at }}</small></li>
+          <li>
+            <strong>{{ n.title }}</strong>
+            <small>{{ n.created_at }}</small>
+          </li>
+        {% else %}
+          <li class="empty-text">No notices available.</li>
         {% endfor %}
       </ul>
-    </div></div>
+    </div>
+
   </div>
+
 </div>
+
 {% endblock %}
