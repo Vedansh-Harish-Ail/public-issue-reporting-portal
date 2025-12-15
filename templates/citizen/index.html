@@ -4,47 +4,68 @@
 
 <!-- HERO / BANNER -->
 <!-- HERO SECTION -->
-<div class="card border-0 shadow-sm mb-4">
-  <div class="row g-0 align-items-center" style="min-height:420px;">
+<div class="banner-wrapper">
+  <div id="bannerCarousel"
+       class="carousel slide"
+       data-bs-ride="carousel"
+       data-bs-interval="2000">
 
-    <!-- LEFT SECTION -->
-    <div class="col-md-7 p-5" style="background:#dbe9ff;">
-      <div class="d-flex align-items-center gap-4 mb-4">
-        <img src="{{ url_for('static', filename='image/logo1.png') }}" height="60">
-        <img src="{{ url_for('static', filename='image/logo2.png') }}" height="60">
-        <img src="{{ url_for('static', filename='image/logo3.png') }}" height="60">
+    <div class="carousel-inner">
+
+      <!-- Slide 1 -->
+      <div class="carousel-item active">
+        <img src="{{ url_for('static', filename='image/banner_1.png') }}"
+             class="banner-img"
+             alt="Banner 1">
       </div>
 
-      <h2 class="fw-bold text-success">मेरी पंचायत</h2>
-      <h4>Meri Panchayat</h4>
-      <p class="text-muted">
-        Ministry of Panchayati Raj<br>
-        Government of India
-      </p>
+      <!-- Slide 2 -->
+      <div class="carousel-item">
+        <img src="{{ url_for('static', filename='image/ghibliglimmers_157322503.jpg') }}"
+             class="banner-img"
+             alt="Banner 2">
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="carousel-item">
+        <img src="{{ url_for('static', filename='image/ghibliglimmers_157322542.jpg') }}"
+             class="banner-img"
+             alt="Banner 3">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT SECTION -->
+<div class="container my-5">
+  <div class="about-card">
+
+    <!-- Left Image -->
+    <div class="about-image">
+      <img src="{{ url_for('static', filename='image/about_panchayat.jpg') }}" alt="Panchayat Building">
     </div>
 
-    <!-- RIGHT SECTION -->
-    <div class="col-md-5 text-center text-white p-4"
-         style="background:linear-gradient(180deg,#2a4fa3,#6c8ee6);">
+    <!-- Right Content -->
+    <div class="about-content">
+      <h3>About Meri Panchayat</h3>
+      <h6>The m-Governance Platform of Ministry of Panchayati Raj, Government of India</h6>
 
-      <h4 class="mb-3">Download Meri Panchayat<br>Mobile Application</h4>
+      <p>
+        The app functions as an integrated m-governance platform designed and developed
+        by National Informatics Centre (NIC) to empower rural communities by enhancing
+        transparency, accountability, and citizen participation in Panchayat affairs.
+      </p>
 
-      <p class="fw-semibold">Scan QR Code</p>
-
-      <img src="{{ url_for('static', filename='image/qr.png') }}"
-           class="mb-3"
-           style="width:160px; background:white; padding:10px;">
-
-      <div>
-        <img src="{{ url_for('static', filename='image/mobile.png') }}"
-             style="max-height:300px;">
-      </div>
+      <p>
+        This initiative aligns with the government’s commitment to strengthening local
+        self-governance and achieving Sustainable Development Goals (SDGs) by 2030.
+        The app is powered by e-Gram Swaraj and other portals of the Ministry of Panchayati Raj (MoPR).
+      </p>
     </div>
 
   </div>
 </div>
-
-
 
 <!-- SERVICES SECTION -->
 <h5 class="mb-3">Citizen Services</h5>

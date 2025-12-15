@@ -54,7 +54,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-
 # ---------------- SEED DEFAULT DATA ----------------
 
 def seed_data():
@@ -76,7 +75,7 @@ def seed_data():
     conn.commit()
     conn.close()
 
-# ---------------- CITIZEN ROUTES -------------------
+# ---------------- CITIZEN ROUTES ----------------
 
 @app.route("/")
 def home():
@@ -109,19 +108,6 @@ def report_issue():
     conn.close()
     return render_template("citizen/report_issue.html", panchayaths=panchayaths)
 
-@app.route("/notices")
-def notices():
-    conn = connect_db()
-    notices = conn.execute("""
-        SELECT n.*, p.name AS panchayath_name
-        FROM notices n
-        JOIN panchayath p ON p.id = n.panchayath_id
-        ORDER BY n.created_at DESC
-    """).fetchall()
-    conn.close()
-    return render_template("citizen/notices.html", notices=notices)
-
-
 @app.route("/track")
 def track_issue():
     conn = connect_db()
@@ -134,7 +120,19 @@ def track_issue():
     conn.close()
     return render_template("citizen/track_issue.html", issues=issues)
 
-# ---------------- ADMIN ROUTES ----------------------
+@app.route("/notices")
+def notices():
+    conn = connect_db()
+    notices = conn.execute("""
+        SELECT n.*, p.name AS panchayath_name
+        FROM notices n
+        JOIN panchayath p ON p.id = n.panchayath_id
+        ORDER BY n.created_at DESC
+    """).fetchall()
+    conn.close()
+    return render_template("citizen/notices.html", notices=notices)
+
+# ---------------- ADMIN ROUTES ----------------
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -174,6 +172,36 @@ def admin_dashboard():
     conn.close()
     return render_template("admin/dashboard.html", issues=issues)
 
+# ---------------- ADMIN NOTICES (FIXED PART) ----------------
+
+@app.route("/admin/notices", methods=["GET", "POST"])
+def admin_notices():
+    if "admin_id" not in session:
+        return redirect(url_for("admin_login"))
+
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    if request.method == "POST":
+        title = request.form["title"]
+        description = request.form["description"]
+
+        conn.execute("""
+            INSERT INTO notices (panchayath_id, title, description)
+            VALUES (?, ?, ?)
+        """, (pid, title, description))
+        conn.commit()
+        flash("Notice published successfully", "success")
+
+    notices = conn.execute("""
+        SELECT * FROM notices
+        WHERE panchayath_id = ?
+        ORDER BY created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/notices.html", notices=notices)
+
 @app.route("/admin/update/<int:issue_id>", methods=["POST"])
 def update_issue(issue_id):
     if "admin_id" not in session:
@@ -196,7 +224,7 @@ def admin_logout():
     session.clear()
     return redirect(url_for("admin_login"))
 
-# ---------------- MAIN -----------------
+# ---------------- MAIN ----------------
 
 if __name__ == "__main__":
     init_db()

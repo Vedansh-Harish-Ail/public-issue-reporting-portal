@@ -1,0 +1,87 @@
+/* BANNER CSS */
+
+/* FULL WIDTH HERO */
+.banner-wrapper {
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Banner image */
+.banner-img {
+  width: 100%;
+  height: 420px;        /* increase/decrease height here */
+  object-fit: cover;
+  object-position: center top; /* IMPORTANT */
+  display: block;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .banner-img {
+    height: 260px;
+    object-position: center;
+  }
+}
+
+
+/*about page..../*
+/* ---------------- ABOUT SECTION ---------------- */
+
+.about-card {
+  display: flex;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Left image */
+.about-image {
+  flex: 1;
+}
+
+.about-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Right content */
+.about-content {
+  flex: 1;
+  padding: 40px;
+}
+
+.about-content h3 {
+  color: #0b5ed7;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.about-content h6 {
+  color: #555;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.about-content p {
+  color: #333;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-card {
+    flex-direction: column;
+  }
+
+  .about-content {
+    padding: 25px;
+  }
+
+  .about-image img {
+    height: 250px;
+  }
+}
