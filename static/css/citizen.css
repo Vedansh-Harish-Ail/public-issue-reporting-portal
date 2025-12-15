@@ -1,0 +1,162 @@
+/* ================= BANNER SLIDER ================= */
+.banner-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 60px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.banner-slider {
+    position: relative;
+    height: 500px;
+}
+
+.banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.banner-img.active {
+    opacity: 1;
+}
+
+/* ================= ABOUT SECTION ================= */
+.about-card {
+    display: flex;
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s;
+}
+
+.about-card:hover {
+    transform: translateY(-5px);
+}
+
+.about-image {
+    flex: 1;
+    position: relative;
+}
+
+.about-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.about-content {
+    flex: 1;
+    padding: 60px;
+}
+
+.about-content h3 {
+    color: var(--primary-color);
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.about-content h6 {
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 12px;
+}
+
+.about-content p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+/* ================= SERVICES SECTION ================= */
+.section-title {
+    text-align: center;
+    color: var(--primary-color);
+    font-family: var(--font-serif);
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.service-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-decoration: none;
+    color: inherit;
+    border-top: 5px solid transparent;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-top-color: var(--secondary-color);
+}
+
+.service-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.service-card h4 {
+    font-size: 20px;
+    margin: 10px 0;
+    color: #222;
+}
+
+.service-card p {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ================= STATS SECTION ================= */
+.stats-section {
+    background: linear-gradient(135deg, var(--primary-color), #2c5aa0);
+    padding: 60px 0;
+    color: var(--white);
+    border-radius: 12px;
+    margin-bottom: 60px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    text-align: center;
+}
+
+.stat-item h2 {
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--secondary-color);
+}
+
+.stat-item p {
+    margin: 10px 0 0;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.9;
+}

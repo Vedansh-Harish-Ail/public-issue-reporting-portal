@@ -1,5 +1,10 @@
 <!-- templates/citizen/report_issue.html -->
 {% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/citizen.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Reusing admin-login-card -->
+{% endblock %}
+
 {% block content %}
 
 <div class="container my-5">

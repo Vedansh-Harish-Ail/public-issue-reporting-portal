@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 app = Flask(__name__)
 # moment = Moment(app) # Removed as package install was cancelled
-app.secret_key = os.environ.get("SECRET_KEY", "dev_secret")
+app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
 
 DB_NAME = "panchayath.db"
 
