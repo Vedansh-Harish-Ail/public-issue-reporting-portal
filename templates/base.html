@@ -5,106 +5,115 @@
   <title>Public Issue Reporting Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+  <style>
+    body {
+      background-color: #f5f6f7;
+    }
+
+    /* Top govt strip */
+    .gov-strip {
+      background: #e5e5e5;
+      font-size: 14px;
+      padding: 5px 0;
+    }
+
+    /* Logo bar */
+    .logo-bar {
+      background: white;
+      padding: 10px 0;
+    }
+
+    .logo-bar img {
+      height: 55px;
+    }
+
+    /* Main nav */
+    .main-nav {
+      background: #1f3f6d;
+    }
+
+    .main-nav .nav-link {
+      color: white !important;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+
+    .search-box {
+      max-width: 220px;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- GOV STRIP -->
-<div class="gov-strip">
+<!-- 1️⃣ TOP GOVERNMENT STRIP -->
+<div class="gov-strip text-center">
   भारत सरकार | पंचायती राज मंत्रालय
 </div>
 
-<!-- LOGO BAR -->
+<!-- 2️⃣ LOGO BAR -->
 <div class="logo-bar">
-  <div class="container">
-    <div class="logo-left">
-      <img src="{{ url_for('static', filename='image/logo_left.png') }}">
+  <div class="container d-flex justify-content-between align-items-center">
+
+    <!-- Left logos + text -->
+    <div class="d-flex align-items-center gap-3">
+      <img src="{{ url_for('static', filename='image/logo_left.png') }}" alt="Logo">
       <div>
         <strong>मेरी पंचायत</strong><br>
         <small>Meri Panchayat<br>Ministry of Panchayati Raj</small>
       </div>
     </div>
 
-    <div class="logo-right">
-      <img src="{{ url_for('static', filename='image/logo_right1.png') }}">
-      <img src="{{ url_for('static', filename='image/logo_right2.png') }}">
+    <!-- Right logos -->
+    <div class="d-flex align-items-center gap-3">
+      <img src="{{ url_for('static', filename='image/logo_right1.png') }}" alt="Logo">
+      <img src="{{ url_for('static', filename='image/logo_right2.png') }}" alt="Logo">
     </div>
+
   </div>
 </div>
 
-<!-- NAVBAR -->
-<nav class="main-nav">
+<!-- 3️⃣ MAIN NAVIGATION BAR -->
+<nav class="navbar navbar-expand-lg main-nav">
   <div class="container">
-    <ul class="nav-links">
-      <li><a href="{{ url_for('home') }}">Home</a></li>
-      <li><a href="#">About</a></li>
-      <li><a href="{{ url_for('report_issue') }}">Report Issue</a></li>
-      <li><a href="{{ url_for('track_issue') }}">Track Issue</a></li>
-      <li><a href="{{ url_for('notices') }}">Notices</a></li>
-    </ul>
 
-    <div class="nav-actions">
-      <input type="search" class="search-box" placeholder="Search gram panchayat">
-      <a href="{{ url_for('admin_login') }}" class="login-btn">Login</a>
+    <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('report_issue') }}">Report Issue</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('track_issue') }}">Track Issue</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('notices') }}">Notices</a></li>
+      </ul>
+
+      <!-- Search -->
+      <form class="d-flex me-2">
+        <input class="form-control form-control-sm search-box"
+               type="search"
+               placeholder="Search gram panchayat">
+      </form>
+
+      <!-- Login -->
+      <a href="{{ url_for('admin_login') }}" class="btn btn-light btn-sm">
+        Login
+      </a>
     </div>
+
   </div>
 </nav>
 
+<!-- PAGE CONTENT -->
 {% block content %}{% endblock %}
 
-<!-- BANNER SLIDER JS -->
-<script>
-  let currentSlide = 0;
-  const slides = document.querySelectorAll(".banner-img");
 
-  if (slides.length > 0) {
-    setInterval(() => {
-      slides[currentSlide].classList.remove("active");
-      currentSlide = (currentSlide + 1) % slides.length;
-      slides[currentSlide].classList.add("active");
-    }, 2500);
-  }
-</script>
-
-<!-- GOVERNMENT FOOTER -->
-<footer class="gov-footer mt-5">
-  <div class="container-fluid">
-    <div class="row align-items-center text-center text-md-start">
-
-      <!-- LEFT: NIC LOGO -->
-      <div class="col-md-2 mb-3 mb-md-0 text-center">
-        <img src="{{ url_for('static', filename='image/nic_logo.png') }}"
-             alt="NIC Logo"
-             class="footer-logo">
-      </div>
-
-      <!-- CENTER: DISCLAIMER TEXT -->
-      <div class="col-md-8 text-center footer-text">
-        <p class="mb-1">
-          Data, Information and Other content on this Webportal is Entered, Managed
-          and Owned by the concerned Panchayati Raj Institution and other registered
-          users of different departments and ministries.
-        </p>
-        <p class="mb-0">
-          The Portal has been Designed and Developed by
-          <span class="highlight">
-            National Informatics Centre for Ministry of Panchayati Raj, Government of India
-          </span>.
-        </p>
-      </div>
-
-      <!-- RIGHT: MERI PANCHAYAT LOGO -->
-      <div class="col-md-2 mt-3 mt-md-0 text-center">
-        <img src="{{ url_for('static', filename='image/meri_panchayat_logo.png') }}"
-             alt="Meri Panchayat Logo"
-             class="footer-logo rounded-circle">
-      </div>
-
-    </div>
-  </div>
-</footer>
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

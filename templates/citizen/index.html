@@ -1,7 +1,9 @@
+<!-- templates/citizen/index.html -->
 {% extends "base.html" %}
 {% block content %}
 
 <!-- HERO / BANNER -->
+<!-- HERO SECTION -->
 <div class="banner-wrapper">
   <div id="bannerCarousel"
        class="carousel slide"
@@ -10,18 +12,21 @@
 
     <div class="carousel-inner">
 
+      <!-- Slide 1 -->
       <div class="carousel-item active">
         <img src="{{ url_for('static', filename='image/banner_1.png') }}"
              class="banner-img"
              alt="Banner 1">
       </div>
 
+      <!-- Slide 2 -->
       <div class="carousel-item">
         <img src="{{ url_for('static', filename='image/ghibliglimmers_157322503.jpg') }}"
              class="banner-img"
              alt="Banner 2">
       </div>
 
+      <!-- Slide 3 -->
       <div class="carousel-item">
         <img src="{{ url_for('static', filename='image/ghibliglimmers_157322542.jpg') }}"
              class="banner-img"
@@ -32,26 +37,33 @@
   </div>
 </div>
 
-<!-- ABOUT -->
-<div class="container about-section">
+<!-- ABOUT SECTION -->
+<div class="container my-5">
   <div class="about-card">
 
+    <!-- Left Image -->
     <div class="about-image">
-      <img src="{{ url_for('static', filename='image/image.png') }}">
+      <img src="{{ url_for('static', filename='image/about_panchayat.jpg') }}" alt="Panchayat Building">
     </div>
 
+    <!-- Right Content -->
     <div class="about-content">
       <h3>About Meri Panchayat</h3>
       <h6>The m-Governance Platform of Ministry of Panchayati Raj, Government of India</h6>
 
       <p>
-        The platform is developed by National Informatics Centre (NIC) to empower rural
-        communities by enhancing transparency, accountability and citizen participation.
-      
+        The app functions as an integrated m-governance platform designed and developed
+        by National Informatics Centre (NIC) to empower rural communities by enhancing
+        transparency, accountability, and citizen participation in Panchayat affairs.
+      </p>
+
+      <p>
         This initiative aligns with the government’s commitment to strengthening local
-        self-governance and achieving Sustainable Development Goals (SDGs).
+        self-governance and achieving Sustainable Development Goals (SDGs) by 2030.
+        The app is powered by e-Gram Swaraj and other portals of the Ministry of Panchayati Raj (MoPR).
       </p>
     </div>
+
   </div>
 </div>
 
@@ -100,12 +112,11 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- NOTICE PREVIEW -->
 <h5 class="mb-3">Latest Announcements</h5>
-<div class="card shadow-sm mb-5">
+<div class="card shadow-sm">
   <div class="card-body">
     <p class="text-muted mb-0">
       Visit the Notices section to view important updates related to public services,
@@ -113,6 +124,5 @@
     </p>
   </div>
 </div>
-
 
 {% endblock %}
