@@ -2,8 +2,10 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_moment import Moment
 
 app = Flask(__name__)
+moment = Moment(app)
 app.secret_key = os.environ.get("SECRET_KEY", "dev_secret")
 
 DB_NAME = "panchayath.db"
@@ -202,6 +204,21 @@ def admin_notices():
 
     conn.close()
     return render_template("admin/notices.html", notices=notices)
+
+@app.route("/admin/issue/<int:issue_id>")
+def admin_issue_detail(issue_id):
+    if "admin_id" not in session:
+        return redirect(url_for("admin_login"))
+
+    conn = connect_db()
+    issue = conn.execute("SELECT * FROM issues WHERE id = ?", (issue_id,)).fetchone()
+    conn.close()
+
+    if not issue:
+        flash("Issue not found", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+    return render_template("admin/issue_detail.html", issue=issue)
 
 @app.route("/admin/update/<int:issue_id>", methods=["POST"])
 def update_issue(issue_id):

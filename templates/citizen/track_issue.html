@@ -1,49 +1,55 @@
 <!-- templates/citizen/track_issue.html -->
 {% extends "base.html" %}
+
 {% block content %}
-<h3>Track issues</h3>
-<form method="get" class="row g-3">
-  <div class="col-md-4">
-    <label class="form-label">Panchayath</label>
-    <select name="panchayath_id" class="form-select">
-      <option value="">All</option>
-      {% for p in panchayaths %}
-        <option value="{{ p.id }}" {% if request.args.get('panchayath_id') == p.id|string %}selected{% endif %}>{{ p.name }}</option>
-      {% endfor %}
-    </select>
+
+<div class="container my-5">
+  <h2 class="section-title">Track Issue Status</h2>
+
+  <!-- Filter Section (Simplified) -->
+  <div class="about-card mb-5" style="padding: 20px; align-items: center; gap: 20px;">
+
+    <div style="flex: 1;">
+      <h5 style="margin: 0; color: var(--primary-color);">Recent Reports</h5>
+      <p style="margin: 0; font-size: 14px; color: #666;">View the status of issues reported by citizens.</p>
+    </div>
+
+    <!-- Optional: Add filter form here if needed later -->
   </div>
-  <div class="col-md-4">
-    <label class="form-label">Status</label>
-    <select name="status" class="form-select">
-      <option value="">All</option>
-      <option>Pending</option>
-      <option>In Progress</option>
-      <option>Completed</option>
-    </select>
-  </div>
-  <div class="col-md-4 d-flex align-items-end">
-    <button class="btn btn-secondary" type="submit">Filter</button>
-  </div>
-</form>
-<div class="mt-4">
-  <div class="row">
+
+  <!-- Issues Grid -->
+  <div class="services-grid">
     {% for i in issues %}
-      <div class="col-md-6">
-        <div class="card mb-3">
-          <div class="card-body">
-            <h5 class="card-title">{{ i.category }} — <span class="badge bg-info">{{ i.status }}</span></h5>
-            <p class="card-text">{{ i.description }}</p>
-            {% if i.photo_path %}
-              <img src="{{ url_for('static', filename='uploads/' + i.photo_path.split('/')[-1]) }}" class="img-fluid mb-2" alt="Issue photo">
-            {% endif %}
-            <p class="text-muted">Location: {{ i.location or '—' }} | Panchayath: {{ i.panchayath_name }}</p>
-            <small class="text-muted">Reported: {{ i.created_at }}</small>
-          </div>
-        </div>
+    <div class="service-card" style="text-align: left;">
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <h4 style="margin-top: 0;">{{ i.category }}</h4>
+
+        <!-- Status Badge -->
+        <span class="issue-status {{ i.status|lower|replace(' ', '-') }}">
+          {{ i.status }}
+        </span>
       </div>
+
+      <p style="margin: 10px 0; color: #444; min-height: 40px;">
+        {{ i.description }}
+      </p>
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+      <div style="font-size: 12px; color: #888; display: flex; justify-content: space-between;">
+        <span>📍 {{ i.location }}</span>
+        <span>📅 {{ i.created_at }}</span>
+      </div>
+
+    </div>
     {% else %}
-      <p>No issues found for selected filters.</p>
+    <div class="col-12 text-center text-muted">
+      <p>No issues found.</p>
+    </div>
     {% endfor %}
   </div>
+
 </div>
+
 {% endblock %}

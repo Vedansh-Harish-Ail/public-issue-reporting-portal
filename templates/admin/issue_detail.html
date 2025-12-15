@@ -1,32 +1,75 @@
 <!-- templates/admin/issue_detail.html -->
 {% extends "base.html" %}
+
 {% block content %}
-<h3>Issue detail</h3>
-<div class="card">
-  <div class="card-body">
-    <h5>{{ issue.category }} — <span class="badge bg-info">{{ issue.status }}</span></h5>
-    <p>{{ issue.description }}</p>
-    {% if issue.photo_path %}
-    <img src="{{ url_for('static', filename='uploads/' + issue.photo_path.split('/')[-1]) }}" class="img-fluid mb-2">
-    {% endif %}
-    <p class="text-muted">Location: {{ issue.location or '—' }} | Panchayath: {{ issue.panchayath_name }}</p>
-    <form method="post" class="mt-3">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Update status</label>
-          <select name="status" class="form-select">
+
+<div class="admin-dashboard">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h2>Issue Details</h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="logout-btn" style="background: var(--primary-color);">Back to
+      Dashboard</a>
+  </div>
+
+  <div class="dashboard-content" style="grid-template-columns: 1fr;">
+
+    <div class="dashboard-card" style="padding: 30px;">
+
+      <!-- TopRow: Category & Status -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+        <div>
+          <h3 style="margin: 0; color: var(--primary-color);">{{ issue.category }}</h3>
+          <p class="issue-meta">Reported on {{ issue.created_at }}</p>
+        </div>
+        <span class="issue-status {{ issue.status|lower|replace(' ', '-') }}"
+          style="font-size: 14px; padding: 6px 14px;">
+          {{ issue.status }}
+        </span>
+      </div>
+
+      <!-- Description -->
+      <label
+        style="font-weight: 600; font-size: 13px; color: #666; display: block; margin-bottom: 5px;">DESCRIPTION</label>
+      <p style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        {{ issue.description }}
+      </p>
+
+      <!-- Location -->
+      <label
+        style="font-weight: 600; font-size: 13px; color: #666; display: block; margin-bottom: 5px;">LOCATION</label>
+      <p style="margin-bottom: 20px;">📍 {{ issue.location }}</p>
+
+      {% if issue.photo_path %}
+      <label
+        style="font-weight: 600; font-size: 13px; color: #666; display: block; margin-bottom: 5px;">ATTACHMENT</label>
+      <img src="{{ url_for('static', filename='uploads/' + issue.photo_path.split('/')[-1]) }}"
+        style="max-width: 100%; max-height: 400px; border-radius: 8px; margin-bottom: 20px;">
+      {% endif %}
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+      <!-- Action Form -->
+      <h4 style="margin-bottom: 20px;">Update Status</h4>
+
+      <form method="post" action="{{ url_for('update_issue', issue_id=issue.id) }}" style="max-width: 500px;">
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
             <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
             <option {% if issue.status=='In Progress' %}selected{% endif %}>In Progress</option>
-            <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
+            <option {% if issue.status=='Resolved' %}selected{% endif %}>Resolved</option>
+            <option {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
           </select>
         </div>
-        <div class="col-md-8">
-          <label class="form-label">Note (optional)</label>
-          <input name="note" class="form-control" placeholder="Internal note">
-        </div>
-      </div>
-      <button class="btn btn-primary mt-3">Save</button>
-    </form>
+
+        <button type="submit" class="primary-btn">Save Changes</button>
+      </form>
+
+    </div>
+
   </div>
+
 </div>
+
 {% endblock %}
