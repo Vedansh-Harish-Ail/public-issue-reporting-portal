@@ -19,6 +19,23 @@ body {
     background: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    font-size: 16px;
+    /* Increased base size */
+    -webkit-font-smoothing: antialiased;
+    /* Crisp text */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-serif);
+    /* Consistent Premium Headings */
+    font-weight: 700;
+    margin-top: 0;
 }
 
 .container {
