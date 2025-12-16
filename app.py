@@ -99,6 +99,10 @@ def home():
 
 @app.route("/report", methods=["GET", "POST"])
 def report_issue():
+    if "admin_id" in session:
+        flash("Admins cannot report issues. Please use the dashboard.", "warning")
+        return redirect(url_for("admin_dashboard"))
+
     conn = connect_db()
 
     if request.method == "POST":
