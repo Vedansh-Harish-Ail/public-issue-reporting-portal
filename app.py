@@ -49,7 +49,7 @@ def init_db():
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE IF NOT EXISTS notices (
+    CREATE TABLE IF NOT EXISTS notices ( 
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         panchayath_id INTEGER,
         title TEXT,
