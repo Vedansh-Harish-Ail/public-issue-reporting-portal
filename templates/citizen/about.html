@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="about-card" style="flex-direction: column; max-width: 900px; margin: auto;">
+
+        <div class="about-image" style="height: 300px;">
+            <!-- Placeholder or generic image if available, or just use a nice gradient/pattern -->
+            <img src="{{ url_for('static', filename='image/about_banner.jpg') }}"
+                onerror="this.src='https://placehold.co/900x300?text=Meri+Panchayat+Scheme'" alt="About Scheme"
+                style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div class="about-content">
+            <h3 class="text-center">About Meri Panchayat</h3>
+            <h6 class="text-center">Empowering Rural India through Digital Governance</h6>
+
+            <p>
+                The <strong>Meri Panchayat</strong> initiative is a flagship program by the Ministry of Panchayati Raj,
+                Government of India, aimed at bringing transparency, accountability, and efficiency to rural governance.
+            </p>
+
+            <p>
+                Our mission is to bridge the gap between citizens and local administration by providing a unified
+                platform
+                for reporting issues, tracking public works, and accessing important notices. By leveraging technology,
+                we ensure that every voice in the village is heard and every grievance is addressed in a time-bound
+                manner.
+            </p>
+
+            <div class="row" style="display: flex; gap: 20px; margin-top: 30px; flex-wrap: wrap;">
+                <div class="col" style="flex: 1; min-width: 250px;">
+                    <h5 style="color: var(--primary-color);">Vision</h5>
+                    <p style="font-size: 14px;">To create a digitally empowered rural society where governance is
+                        accessible to the last mile.</p>
+                </div>
+                <div class="col" style="flex: 1; min-width: 250px;">
+                    <h5 style="color: var(--primary-color);">Mission</h5>
+                    <p style="font-size: 14px;">To implement e-Governance solutions that simplify administrative
+                        processes and enhance citizen engagement.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

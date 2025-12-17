@@ -193,6 +193,10 @@ main {
 }
 
 /* ================= ABOUT SECTION ================= */
+html {
+  scroll-behavior: smooth;
+}
+
 .about-card {
   display: flex;
   background: var(--white);

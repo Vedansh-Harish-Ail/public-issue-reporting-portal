@@ -78,34 +78,40 @@
 </div>
 
 <!-- ABOUT SECTION -->
-<div class="container my-5">
+<div class="container my-5" id="about-scheme">
   <div class="about-card">
 
     <!-- Left Image -->
     <div class="about-image">
-      <img src="{{ url_for('static', filename='image/image.png') }}" alt="Panchayat Meeting">
+      <img src="{{ url_for('static', filename='image/image.png') }}"
+           alt="Panchayat Building">
+    </div>
+
+    <!-- ABOUT SECTION -->
+<div class="container my-5" id="about-scheme">
+  <div class="about-card">
+
+    <!-- Left Image -->
+    <div class="about-image">
+      <img src="{{ url_for('static', filename='image/image.png') }}"
+           alt="Panchayat Building">
     </div>
 
     <!-- Right Content -->
     <div class="about-content">
       <h3>About Meri Panchayat</h3>
-      <h6>The m-Governance Platform of Ministry of Panchayati Raj, Government of India</h6>
+      <h6>
+        The m-Governance Platform of Ministry of Panchayati Raj,
+        Government of India
+      </h6>
 
       <p>
-        <strong>Meri Panchayat</strong> is an integrated m-governance platform designed to empower rural India.
-        It facilitates transparency, accountability, and active citizen participation in local self-governance.
+        Meri Panchayat is an integrated digital governance platform designed
+        and developed by National Informatics Centre (NIC) to empower rural
+        communities through transparency, accountability, and citizen participation.
       </p>
-
-      <p>
-        The platform enables citizens to report civic issues directly to their Gram Panchayat, track resolution status,
-        and stay informed about development activities. It envisions a <strong>Digital Gram Swaraj</strong> where
-        technology bridges the gap between administration and the people.
-      </p>
-
-      <a href="#" class="primary-btn">Read More</a>
+      <a href="{{ url_for('about') }}" class="primary-btn">Read More</a>
     </div>
-
   </div>
 </div>
-
 {% endblock %}

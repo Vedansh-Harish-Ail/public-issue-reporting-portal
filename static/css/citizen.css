@@ -160,3 +160,126 @@
     font-weight: 500;
     opacity: 0.9;
 }
+
+/* ================= REPORT ISSUE FORM ================= */
+.report-form-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+    min-height: 80vh;
+    /* Ensure it takes good height */
+}
+
+.report-form-card {
+    background: var(--white);
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    /* Soft, deep shadow */
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.report-form-card .section-title {
+    margin-bottom: 30px;
+    font-size: 28px;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    background-color: #fcfcfc;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-sizing: border-box;
+    font-family: inherit;
+    color: var(--text-color);
+}
+
+.form-control:hover {
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(31, 63, 109, 0.1);
+    /* Based on primary color */
+    outline: none;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+/* Custom File Upload */
+.file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-input {
+    width: 100%;
+    padding: 12px;
+    background: #f8fbff;
+    border: 2px dashed #d1d9e6;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #555;
+}
+
+.file-input:hover {
+    border-color: var(--primary-color);
+    background: #fff;
+}
+
+/* Button */
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary-color), #2c5aa0);
+    color: var(--white);
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 10px 20px rgba(31, 63, 109, 0.2);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(31, 63, 109, 0.3);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}

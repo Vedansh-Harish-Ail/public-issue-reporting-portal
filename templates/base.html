@@ -32,7 +32,6 @@
     <!-- LOGO BAR -->
     <div class="logo-bar">
         <div class="container logo-container">
-
             <div class="logo-left">
                 <img src="{{ url_for('static', filename='image/logo_left.png') }}" alt="Meri Panchayat Logo">
                 <div class="logo-text">
@@ -40,29 +39,35 @@
                     <small>Meri Panchayat<br>Empowering Rural India</small>
                 </div>
             </div>
-
             <div class="logo-right">
                 <img src="{{ url_for('static', filename='image/logo_right1.png') }}" alt="Digital India">
                 <img src="{{ url_for('static', filename='image/logo_right2.png') }}" alt="Azadi Ka Amrit Mahotsav">
             </div>
-
         </div>
     </div>
-
     <!-- NAVIGATION BAR -->
     <nav class="main-nav">
         <div class="container nav-container">
-
             <ul class="nav-links">
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="#">About Scheme</a></li>
-                {% if not session.get('admin_id') %}
-                <li><a href="{{ url_for('report_issue') }}">Report Issue</a></li>
-                {% endif %}
-                <li><a href="{{ url_for('track_issue') }}">Track Status</a></li>
-                <li><a href="{{ url_for('notices') }}">Public Notices</a></li>
-            </ul>
-
+    <li>
+        <a href="{{ url_for('home') }}">Home</a>
+    </li>
+    <li>
+        <!-- Scrolls to About section on home page -->
+        <a href="{{ url_for('home') }}#about-scheme">About Scheme</a>
+    </li>
+    {% if not session.get('admin_id') %}
+    <li>
+        <a href="{{ url_for('report_issue') }}">Report Issue</a>
+    </li>
+    {% endif %}
+    <li>
+        <a href="{{ url_for('track_issue') }}">Track Status</a>
+    </li>
+    <li>
+        <a href="{{ url_for('notices') }}">Public Notices</a>
+    </li>
+</ul>
             <div class="nav-actions">
                 <input type="search" class="search-box" placeholder="Search...">
                 {% if session.get('admin_id') %}
@@ -74,7 +79,6 @@
 
         </div>
     </nav>
-
     <!-- PAGE CONTENT -->
     <main>
         <div class="container">
@@ -100,7 +104,7 @@
             <div class="footer-col">
                 <h5>Information</h5>
                 <ul>
-                    <li><a href="#">About Us</a></li>
+                    <li><a href="{{ url_for('about') }}">About Us</a></li>
                     <li><a href="#">Terms of Use</a></li>
                     <li><a href="#">Privacy Policy</a></li>
                     <li><a href="#">Contact Us</a></li>
@@ -146,8 +150,8 @@
                 }, 1000);
             }
         });
+        
     </script>
-
 </body>
 
 </html>

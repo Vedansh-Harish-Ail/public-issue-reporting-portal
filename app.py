@@ -7,7 +7,7 @@ app = Flask(__name__)
 # moment = Moment(app) # Removed as package install was cancelled
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
 
-DB_NAME = "panchayath.db"
+DB_NAME = "database/panchayath.db"
 
 # ---------------- DATABASE CONNECTION ----------------
 
@@ -45,6 +45,7 @@ def init_db():
         category TEXT,
         description TEXT,
         location TEXT,
+        photo_path TEXT,
         status TEXT DEFAULT 'Pending',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -105,16 +106,37 @@ def report_issue():
 
     conn = connect_db()
 
+    # Check/Add photo_path column if not exists
+    try:
+        conn.execute("SELECT photo_path FROM issues LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE issues ADD COLUMN photo_path TEXT")
+        conn.commit()
+
     if request.method == "POST":
         panchayath_id = request.form["panchayath_id"]
         category = request.form["category"]
         description = request.form["description"]
         location = request.form["location"]
+        
+        image = request.files.get("image")
+        image_filename = None
+        
+        if image and image.filename != "":
+            upload_folder = os.path.join("static", "uploads")
+            os.makedirs(upload_folder, exist_ok=True)
+            # Simple secure filename or timestamp based
+            import time
+            from werkzeug.utils import secure_filename
+            ext = os.path.splitext(image.filename)[1]
+            filename = f"issue_{int(time.time())}{ext}"
+            image.save(os.path.join(upload_folder, filename))
+            image_filename = f"uploads/{filename}"
 
         conn.execute("""
-            INSERT INTO issues (panchayath_id, category, description, location)
-            VALUES (?, ?, ?, ?)
-        """, (panchayath_id, category, description, location))
+            INSERT INTO issues (panchayath_id, category, description, location, photo_path)
+            VALUES (?, ?, ?, ?, ?)
+        """, (panchayath_id, category, description, location, image_filename))
 
         conn.commit()
         conn.close()
@@ -136,6 +158,10 @@ def track_issue():
     """).fetchall()
     conn.close()
     return render_template("citizen/track_issue.html", issues=issues)
+
+@app.route("/about")
+def about():
+    return render_template("citizen/about.html")
 
 @app.route("/notices")
 def notices():

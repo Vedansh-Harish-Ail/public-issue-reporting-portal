@@ -1,23 +1,21 @@
-<!-- templates/citizen/report_issue.html -->
 {% extends "base.html" %}
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> <!-- Reusing admin-login-card -->
 {% endblock %}
 
 {% block content %}
 
-<div class="container my-5">
-  <div class="admin-login-card mx-auto" style="max-width: 600px;">
+<div class="report-form-wrapper">
+  <div class="report-form-card">
 
-    <h2 class="section-title" style="font-size: 24px; margin-bottom: 20px;">Lodge a Public Grievance</h2>
+    <h2 class="section-title">Lodge a Public Grievance</h2>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
 
       <!-- Panchayath Selection (Required for logic) -->
       <div class="form-group">
         <label>Select Your Panchayath</label>
-        <select name="panchayath_id" required>
+        <select name="panchayath_id" class="form-control" required>
           <option value="">-- Select Panchayat --</option>
           {% for p in panchayaths %}
           <option value="{{ p.id }}">{{ p.name }}</option>
@@ -28,7 +26,7 @@
       <!-- Category -->
       <div class="form-group">
         <label>Issue Category</label>
-        <select name="category" required>
+        <select name="category" class="form-control" required>
           <option value="">-- Select Category --</option>
           <option>Garbage Collection</option>
           <option>Water Supply</option>
@@ -42,18 +40,23 @@
       <!-- Description -->
       <div class="form-group">
         <label>Detailed Description</label>
-        <textarea name="description" rows="5" required
-          style="width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px;"></textarea>
+        <textarea name="description" rows="5" class="form-control" required></textarea>
       </div>
 
       <!-- Location -->
       <div class="form-group">
         <label>Location / Landmark</label>
-        <input type="text" name="location" required>
+        <input type="text" name="location" class="form-control" required>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label>Upload Image (Optional)</label>
+        <input type="file" name="image" accept="image/*" class="file-input">
       </div>
 
       <!-- Submit -->
-      <button type="submit" class="login-btn-primary">Submit Complaint</button>
+      <button type="submit" class="btn-submit">Submit Complaint</button>
 
     </form>
   </div>
