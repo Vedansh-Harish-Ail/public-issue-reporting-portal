@@ -7,55 +7,76 @@
 {% block content %}
 
 <div class="container my-5">
-  <h2 class="section-title">Track Issue Status</h2>
+  <h2 class="section-title">{{ title or 'Track Issue Status' }}</h2>
 
-  <!-- Filter Section (Simplified) -->
-  <div class="about-card mb-5" style="padding: 20px; align-items: center; gap: 20px;">
+  <!-- Info Section -->
+  <div class="about-card mb-5"
+    style="padding: 20px; align-items: center; gap: 20px; flex-direction: row; border-top: 5px solid var(--primary-color);">
 
     <div style="flex: 1;">
-      <h5 style="margin: 0; color: var(--primary-color);">Recent Reports</h5>
-      <p style="margin: 0; font-size: 14px; color: #666;">View the status of issues reported by citizens.</p>
+      <h5 style="margin: 0; color: var(--primary-color);">
+        {% if is_public %}All Panchayat Issues{% else %}My Reported Issues{% endif %}
+      </h5>
+      <p style="margin: 0; font-size: 14px; color: #666;">
+        {% if is_public %}Transparency and accountability for every reported concern.{% else %}Track the progress of
+        your submitted reports.{% endif %}
+      </p>
     </div>
 
-    <!-- Optional: Add filter form here if needed later -->
   </div>
 
   <!-- Issues Grid -->
   <div class="services-grid">
     {% for i in issues %}
-    <div class="service-card" style="text-align: left;">
+    <div class="service-card" style="text-align: left; position: relative;">
 
       <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <h4 style="margin-top: 0;">{{ i.category }}</h4>
+        <h4 style="margin-top: 0; color: var(--primary-color); font-size: 18px;">{{ i.category }}</h4>
 
-        <!-- Status Badge -->
-        <span class="issue-status {{ i.status|lower|replace(' ', '-') }}">
+        <span class="issue-status {{ i.status|lower|replace(' ', '-') }}"
+          style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
           {{ i.status }}
         </span>
       </div>
 
-      <p style="margin: 10px 0; color: #444; min-height: 40px;">
+      {% if is_public and i.user_name %}
+      <div style="font-size: 13px; color: var(--secondary-color); font-weight: 600; margin-bottom: 5px;">
+        👤 Reported by: {{ i.user_name }}
+      </div>
+      {% endif %}
+
+      <p style="margin: 10px 0; color: #444; min-height: 40px; font-size: 14px;">
         {{ i.description }}
       </p>
 
       {% if i.photo_path %}
-      <div style="margin: 10px 0; height: 150px; border-radius: 8px; overflow: hidden;">
+      <div style="margin: 15px 0; height: 180px; border-radius: 12px; overflow: hidden; border: 1px solid #eee;">
         <img src="{{ url_for('static', filename=i.photo_path) }}" alt="Issue Image"
           style="width: 100%; height: 100%; object-fit: cover;">
       </div>
       {% endif %}
 
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-
-      <div style="font-size: 12px; color: #888; display: flex; justify-content: space-between;">
-        <span>📍 {{ i.location }}</span>
-        <span>📅 {{ i.created_at }}</span>
+      <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-top: 15px;">
+        <div style="font-size: 12px; color: #666; display: flex; flex-direction: column; gap: 5px;">
+          <span style="display: flex; align-items: center; gap: 5px;">
+            <strong>📍 Location:</strong> {{ i.location }}
+          </span>
+          <span style="display: flex; align-items: center; gap: 5px;">
+            <strong>📅 Date:</strong> {{ i.created_at }}
+          </span>
+          <span style="display: flex; align-items: center; gap: 5px;">
+            <strong>🏘️ Panchayat:</strong> {{ i.panchayath_name }}
+          </span>
+        </div>
       </div>
 
     </div>
     {% else %}
-    <div class="col-12 text-center text-muted">
-      <p>No issues found.</p>
+    <div
+      style="grid-column: 1/-1; text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+      <div style="font-size: 50px; margin-bottom: 20px;">📋</div>
+      <h3 style="color: #999;">No issues found</h3>
+      <p style="color: #bbb;">There are no issues to display at the moment.</p>
     </div>
     {% endfor %}
   </div>

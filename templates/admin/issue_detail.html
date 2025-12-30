@@ -62,18 +62,30 @@
 
         <!-- Left: Description -->
         <div>
-          <h5 style="margin-top: 0; color: #444; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">
+          <h5 style="margin-top: 0; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
+            Reporter Details</h5>
+          <div
+            style="background: #fff; padding: 15px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 25px;">
+            <p style="margin: 0; font-size: 16px; font-weight: 700; color: var(--primary-color);">{{ issue.reporter_name
+              or 'Anonymous' }}</p>
+            <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 14px; color: #666;">
+              <span>📧 {{ issue.reporter_email or 'N/A' }}</span>
+              <span>📱 {{ issue.reporter_mobile or 'N/A' }}</span>
+            </div>
+          </div>
+
+          <h5 style="margin-top: 0; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
             Category</h5>
           <p style="font-size: 18px; font-weight: 600; color: #222; margin-top: 5px;">{{ issue.category }}</p>
 
-          <h5 style="margin-top: 30px; color: #444; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">
+          <h5 style="margin-top: 30px; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
             Description</h5>
           <div
             style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #eef2f6; line-height: 1.7; color: #333;">
             {{ issue.description }}
           </div>
 
-          <h5 style="margin-top: 30px; color: #444; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">
+          <h5 style="margin-top: 30px; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
             Location</h5>
           <p style="font-size: 16px; color: #222; margin-top: 5px;">📍 {{ issue.location }}</p>
         </div>

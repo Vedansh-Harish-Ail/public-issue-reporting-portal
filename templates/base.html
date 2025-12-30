@@ -49,31 +49,58 @@
     <nav class="main-nav">
         <div class="container nav-container">
             <ul class="nav-links">
-    <li>
-        <a href="{{ url_for('home') }}">Home</a>
-    </li>
-    <li>
-        <!-- Scrolls to About section on home page -->
-        <a href="{{ url_for('home') }}#about-scheme">About Scheme</a>
-    </li>
-    {% if not session.get('admin_id') %}
-    <li>
-        <a href="{{ url_for('report_issue') }}">Report Issue</a>
-    </li>
-    {% endif %}
-    <li>
-        <a href="{{ url_for('track_issue') }}">Track Status</a>
-    </li>
-    <li>
-        <a href="{{ url_for('notices') }}">Public Notices</a>
-    </li>
-</ul>
+                {% if session.get('admin_id') %}
+
+                <li>
+                    <a href="{{ url_for('admin_dashboard') }}#recent-complaints">Manage Issues</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_notices') }}">Manage Notices</a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{{ url_for('home') }}">Home</a>
+                </li>
+                <li>
+                    <!-- Scrolls to About section on home page -->
+                    <a href="{{ url_for('home') }}#about-scheme">About Scheme</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('report_issue') }}">Report Issue</a>
+                </li>
+                {% if session.get('user_id') %}
+                <li>
+                    <a href="{{ url_for('track_issue') }}">My Issues</a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('public_track') }}">Public Issues</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('notices') }}">Public Notices</a>
+                </li>
+                {% endif %}
+            </ul>
             <div class="nav-actions">
                 <input type="search" class="search-box" placeholder="Search...">
+
                 {% if session.get('admin_id') %}
                 <a href="{{ url_for('admin_dashboard') }}" class="login-btn">Dashboard</a>
+                <a href="{{ url_for('admin_logout') }}" class="login-btn" style="background: #dc3545;">Logout</a>
+                {% elif session.get('user_id') %}
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <a href="{{ url_for('user_profile') }}"
+                        style="color: white; font-size: 14px; font-weight: 500; text-decoration: none;">Hi, {{
+                        session.get('user_name') }}</a>
+                    <a href="{{ url_for('user_logout') }}" class="login-btn" style="background: #e07d1e;">Logout</a>
+                </div>
                 {% else %}
-                <a href="{{ url_for('admin_login') }}" class="login-btn">Official Login</a>
+                <a href="{{ url_for('admin_login') }}" class="login-btn"
+                    style="background: transparent; border: 1px solid rgba(255,255,255,0.3); font-size: 12px; padding: 6px 15px;">Official
+                    Login</a>
+                <a href="{{ url_for('user_login') }}" class="login-btn">Login</a>
+                <a href="{{ url_for('user_register') }}" class="login-btn"
+                    style="background: transparent; border: 1px solid white;">Register</a>
                 {% endif %}
             </div>
 
@@ -127,6 +154,11 @@
                     Government of India<br>
                     Krishi Bhawan, Padubidri - 110001
                 </p>
+                <div style="margin-top: 15px;">
+                    <a href="{{ url_for('admin_login') }}"
+                        style="color: var(--secondary-color); font-size: 14px; text-decoration: none; font-weight: 600;">➔
+                        Official / Admin Login</a>
+                </div>
             </div>
 
         </div>
@@ -150,7 +182,7 @@
                 }, 1000);
             }
         });
-        
+
     </script>
 </body>
 

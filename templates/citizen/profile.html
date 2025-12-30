@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="profile-card"
+        style="max-width: 600px; margin: auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 5px 25px rgba(0,0,0,0.05);">
+        <h2
+            style="color: var(--primary-color); font-family: var(--font-serif); margin-bottom: 20px; text-align: center;">
+            Citizen Profile</h2>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div
+                style="width: 80px; height: 80px; background: #eef2f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 32px; color: var(--primary-color);">
+                👤
+            </div>
+            <h4 style="margin: 0; color: #333;">{{ user.name }}</h4>
+            <p style="color: #666; margin: 5px 0 0;">Registered Citizen</p>
+        </div>
+
+        <div class="profile-details">
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Full
+                    Name</label>
+                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.name }}</div>
+            </div>
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Email
+                    Address</label>
+                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.email }}</div>
+            </div>
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Mobile
+                    Number</label>
+                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.mobile }}</div>
+            </div>
+            <div style="margin-bottom: 0;">
+                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Member
+                    Since</label>
+                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.created_at[:10] }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center;">
+            <a href="{{ url_for('home') }}" class="primary-btn" style="text-decoration: none;">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

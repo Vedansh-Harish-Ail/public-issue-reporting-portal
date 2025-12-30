@@ -54,22 +54,22 @@
     <div class="container stats-grid">
 
       <div class="stat-item">
-        <h2>250+</h2>
+        <h2>{{ stats.panchayaths }}+</h2>
         <p>Active Panchayats</p>
       </div>
 
       <div class="stat-item">
-        <h2>1,240+</h2>
+        <h2>{{ stats.issues }}+</h2>
         <p>Issues Reported</p>
       </div>
 
       <div class="stat-item">
-        <h2>98%</h2>
+        <h2>{{ stats.resolution }}%</h2>
         <p>Resolution Rate</p>
       </div>
 
       <div class="stat-item">
-        <h2>50k+</h2>
+        <h2>{{ stats.citizens }}</h2>
         <p>Citizens Connected</p>
       </div>
 
@@ -83,18 +83,7 @@
 
     <!-- Left Image -->
     <div class="about-image">
-      <img src="{{ url_for('static', filename='image/image.png') }}"
-           alt="Panchayat Building">
-    </div>
-
-    <!-- ABOUT SECTION -->
-<div class="container my-5" id="about-scheme">
-  <div class="about-card">
-
-    <!-- Left Image -->
-    <div class="about-image">
-      <img src="{{ url_for('static', filename='image/image.png') }}"
-           alt="Panchayat Building">
+      <img src="{{ url_for('static', filename='image/image.png') }}" alt="Panchayat Building">
     </div>
 
     <!-- Right Content -->

@@ -13,15 +13,31 @@
 
     <ul style="list-style: none; padding: 0; margin: 0;">
       {% for n in notices %}
-      <li style="border-bottom: 1px solid #eee; padding: 25px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <strong style="font-size: 18px; color: var(--primary-color);">{{ n.title }}</strong>
-          <small style="color: #666;">{{ n.created_at }}</small>
+      <li
+        style="border-bottom: 1px solid #eee; padding: 0; overflow: hidden; margin-bottom: 30px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+        {% if n.banner_path %}
+        <div
+          style="height: 200px; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('/static/{{ n.banner_path }}'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; color: white;">
+          <strong style="font-size: 24px;">{{ n.title }}</strong>
+          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at[:10] }} | Issued by: {{ n.panchayath_name
+            }}</small>
         </div>
-        <p style="color: #444; margin: 0;">{{ n.description }}</p>
-        <div style="margin-top: 10px;">
-          <small class="text-muted">Issued by: {{ n.panchayath_name }}</small>
+        <div style="padding: 25px;">
+          <p style="color: #444; line-height: 1.6; font-size: 16px;">{{ n.description }}</p>
         </div>
+        {% else %}
+        <div style="padding: 30px;">
+          <div
+            style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;">
+            <strong style="font-size: 20px; color: var(--primary-color);">{{ n.title }}</strong>
+            <small style="color: #666;">{{ n.created_at[:10] }}</small>
+          </div>
+          <p style="color: #444; line-height: 1.6; font-size: 16px;">{{ n.description }}</p>
+          <div style="margin-top: 20px; border-top: 1px solid #f9f9f9; padding-top: 10px;">
+            <small class="text-muted" style="font-weight: 500;">Issued by: {{ n.panchayath_name }}</small>
+          </div>
+        </div>
+        {% endif %}
       </li>
       {% else %}
       <li style="padding: 30px; text-align: center; color: #777;">
