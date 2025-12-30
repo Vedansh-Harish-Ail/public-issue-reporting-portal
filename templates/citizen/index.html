@@ -6,100 +6,117 @@
 
 {% block content %}
 
-<!-- HERO / BANNER -->
-<div class="banner-wrapper">
-  <div class="banner-slider">
-    <!-- Primary Banner -->
-    <img src="{{ url_for('static', filename='image/banner_main.png') }}" class="banner-img active"
-      alt="Panchayat Banner 1">
+<!-- HERO SECTION -->
+<div class="hero-section" style="background-image: url('{{ url_for('static', filename='image/banner_main.png') }}');">
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <div class="hero-content">
+      <h1>Empowering Rural India Through Digital Governance</h1>
+      <p>A unified platform for transparent communication, grievance reporting, and citizen empowerment at the
+        grassroots level.</p>
+      <div style="display: flex; gap: 15px;">
+        <a href="{{ url_for('report_issue') }}" class="login-btn" style="padding: 12px 30px; border-radius: 30px;">Lodge
+          Grievance</a>
+        <a href="{{ url_for('public_track') }}" class="login-btn"
+          style="background: transparent; border: 2px solid white; padding: 12px 30px; border-radius: 30px;">Track
+          Progress</a>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- SERVICES SECTION -->
-<div class="container my-5">
-  <h2 class="section-title">Citizen Services</h2>
+<div class="section-padding">
+  <div class="container text-center">
+    <div class="section-header">
+      <h2>Citizen Services</h2>
+      <p>Direct access to essential panchayat services designed for efficiency and transparency.</p>
+    </div>
 
-  <div class="services-grid">
+    <div class="services-grid">
+      <a href="{{ url_for('report_issue') }}" class="service-card hover-float">
+        <div class="service-icon">📝</div>
+        <h4>Report an Issue</h4>
+        <p>Lodge a complaint regarding water, roads, electricity, or other civic amenities.</p>
+      </a>
 
-    <a href="{{ url_for('report_issue') }}" class="service-card">
-      <div class="service-icon">📝</div>
-      <h4>Report an Issue</h4>
-      <p>Lodge a complaint regarding water, roads, electricity, or other civic amenities.</p>
-    </a>
+      <a href="{{ url_for('track_issue') }}" class="service-card hover-float">
+        <div class="service-icon">🔍</div>
+        <h4>Track Status</h4>
+        <p>Check the real-time status of your reported grievances and actions taken.</p>
+      </a>
 
-    <a href="{{ url_for('track_issue') }}" class="service-card">
-      <div class="service-icon">🔍</div>
-      <h4>Track Status</h4>
-      <p>Check the real-time status of your reported grievances and actions taken.</p>
-    </a>
+      <a href="{{ url_for('notices') }}" class="service-card hover-float">
+        <div class="service-icon">📢</div>
+        <h4>Public Notices</h4>
+        <p>View latest circulars, schemes, and announcements from the Gram Panchayat.</p>
+      </a>
 
-    <a href="{{ url_for('notices') }}" class="service-card">
-      <div class="service-icon">📢</div>
-      <h4>Public Notices</h4>
-      <p>View latest circulars, schemes, and announcements from the Gram Panchayat.</p>
-    </a>
-
-    <a href="#" class="service-card">
-      <div class="service-icon">💡</div>
-      <h4>Schemes</h4>
-      <p>Explore government schemes available for rural welfare and development.</p>
-    </a>
-
+      <a href="#" class="service-card hover-float">
+        <div class="service-icon">💡</div>
+        <h4>Schemes</h4>
+        <p>Explore government schemes available for rural welfare and development.</p>
+      </a>
+    </div>
   </div>
 </div>
 
 <!-- STATISTICS SECTION -->
-<div class="container">
-  <div class="stats-section">
-    <div class="container stats-grid">
-
-      <div class="stat-item">
-        <h2>{{ stats.panchayaths }}+</h2>
-        <p>Active Panchayats</p>
+<div style="background: var(--primary-color); padding: 80px 0; color: white;">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item" style="border: none;">
+        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.panchayaths }}+</div>
+        <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
+          Active Panchayats</p>
       </div>
 
-      <div class="stat-item">
-        <h2>{{ stats.issues }}+</h2>
-        <p>Issues Reported</p>
+      <div class="stat-item" style="border: none;">
+        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.issues }}+</div>
+        <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
+          Issues Reported</p>
       </div>
 
-      <div class="stat-item">
-        <h2>{{ stats.resolution }}%</h2>
-        <p>Resolution Rate</p>
+      <div class="stat-item" style="border: none;">
+        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.resolution }}%</div>
+        <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
+          Resolution Rate</p>
       </div>
 
-      <div class="stat-item">
-        <h2>{{ stats.citizens }}</h2>
-        <p>Citizens Connected</p>
+      <div class="stat-item" style="border: none;">
+        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.citizens }}</div>
+        <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
+          Citizens Connected</p>
       </div>
-
     </div>
   </div>
 </div>
 
 <!-- ABOUT SECTION -->
-<div class="container my-5" id="about-scheme">
-  <div class="about-card">
+<div class="section-padding" id="about-scheme">
+  <div class="container">
+    <div class="about-card glass-card"
+      style="display: flex; gap: 50px; align-items: center; border: none; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+      <!-- Left Image -->
+      <div class="about-image" style="flex: 1; border-radius: 12px; overflow: hidden; height: 400px;">
+        <img src="{{ url_for('static', filename='image/image.png') }}" alt="Panchayat Building"
+          style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
 
-    <!-- Left Image -->
-    <div class="about-image">
-      <img src="{{ url_for('static', filename='image/image.png') }}" alt="Panchayat Building">
-    </div>
-
-    <!-- Right Content -->
-    <div class="about-content">
-      <h3>About Meri Panchayat</h3>
-      <h6>
-        The m-Governance Platform of Ministry of Panchayati Raj,
-        Government of India
-      </h6>
-
-      <p>
-        Meri Panchayat is an integrated digital governance platform designed
-        and developed by National Informatics Centre (NIC) to empower rural
-        communities through transparency, accountability, and citizen participation.
-      </p>
-      <a href="{{ url_for('about') }}" class="primary-btn">Read More</a>
+      <!-- Right Content -->
+      <div class="about-content" style="flex: 1.2;">
+        <div
+          style="color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+          Discover the Vision</div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 25px;">Institutional Messaging System for Rural India</h2>
+        <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 30px;">
+          Meri Panchayat is an integrated digital governance platform designed to bridge the gap between citizens and
+          administration. Built by NIC, it brings transparency, real-time accountability, and streamlined service
+          delivery to the very heart of rural governance.
+        </p>
+        <a href="{{ url_for('about') }}" class="login-btn" style="padding: 12px 35px; border-radius: 30px;">Explore Our
+          Mission</a>
+      </div>
     </div>
   </div>
 </div>

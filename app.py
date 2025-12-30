@@ -123,8 +123,8 @@ def seed_data():
     conn.commit()
     conn.close()
 
+
 # ---------------- CITIZEN ROUTES --------------
-# --
 
 @app.route("/")
 def home():

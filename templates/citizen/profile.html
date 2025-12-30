@@ -1,46 +1,79 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="profile-card"
-        style="max-width: 600px; margin: auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 5px 25px rgba(0,0,0,0.05);">
-        <h2
-            style="color: var(--primary-color); font-family: var(--font-serif); margin-bottom: 20px; text-align: center;">
-            Citizen Profile</h2>
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div
-                style="width: 80px; height: 80px; background: #eef2f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 32px; color: var(--primary-color);">
-                👤
-            </div>
-            <h4 style="margin: 0; color: #333;">{{ user.name }}</h4>
-            <p style="color: #666; margin: 5px 0 0;">Registered Citizen</p>
-        </div>
+<!-- HERO SECTION -->
+<div class="hero-section"
+    style="background-image: linear-gradient(rgba(31, 63, 109, 0.9), rgba(31, 63, 109, 0.9)); height: 120px; padding: 40px 0; margin-bottom: 0; border-radius: 0;">
+    <div class="container">
+        <h1 style="font-size: 2.2rem; margin: 0; text-align: center;">Citizen Profile</h1>
+    </div>
+</div>
 
-        <div class="profile-details">
-            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Full
-                    Name</label>
-                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.name }}</div>
-            </div>
-            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Email
-                    Address</label>
-                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.email }}</div>
-            </div>
-            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Mobile
-                    Number</label>
-                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.mobile }}</div>
-            </div>
-            <div style="margin-bottom: 0;">
-                <label style="font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase;">Member
-                    Since</label>
-                <div style="font-size: 16px; color: #333; margin-top: 5px;">{{ user.created_at[:10] }}</div>
-            </div>
-        </div>
+<div class="section-padding bg-light" style="padding: 60px 0;">
+    <div class="container">
+        <div class="profile-card glass-card"
+            style="max-width: 650px; margin: auto; background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
 
-        <div style="margin-top: 40px; text-align: center;">
-            <a href="{{ url_for('home') }}" class="primary-btn" style="text-decoration: none;">Back to Home</a>
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div
+                    style="width: 100px; height: 100px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 40px; color: var(--primary-color); border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    👤
+                </div>
+                <h3 style="margin: 0; color: #1a202c; font-size: 28px;">{{ user.name }}</h3>
+                <div
+                    style="display: inline-block; background: #e6fffa; color: #047857; padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px;">
+                    Verified Citizen</div>
+            </div>
+
+            <div class="profile-details" style="display: grid; gap: 25px;">
+                <div class="hover-float"
+                    style="padding: 20px; background: #fcfcfc; border-radius: 12px; border: 1px solid #f0f0f0;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px; opacity: 0.7;">📧</span>
+                        <div>
+                            <label
+                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">Email
+                                Address</label>
+                            <div style="font-size: 16px; color: #2d3748; font-weight: 500;">{{ user.email }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-float"
+                    style="padding: 20px; background: #fcfcfc; border-radius: 12px; border: 1px solid #f0f0f0;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px; opacity: 0.7;">📱</span>
+                        <div>
+                            <label
+                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">Mobile
+                                Number</label>
+                            <div style="font-size: 16px; color: #2d3748; font-weight: 500;">{{ user.mobile }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-float"
+                    style="padding: 20px; background: #fcfcfc; border-radius: 12px; border: 1px solid #f0f0f0;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px; opacity: 0.7;">🗓️</span>
+                        <div>
+                            <label
+                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">Member
+                                Since</label>
+                            <div style="font-size: 16px; color: #2d3748; font-weight: 500;">{{ user.created_at[:10] }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; text-align: center; display: flex; gap: 15px; justify-content: center;">
+                <a href="{{ url_for('home') }}" class="login-btn"
+                    style="padding: 12px 30px; border-radius: 30px; background: var(--primary-color);">Return to
+                    Home</a>
+                <a href="{{ url_for('user_logout') }}" class="login-btn"
+                    style="padding: 12px 30px; border-radius: 30px; background: transparent; border: 2px solid #e2e8f0; color: #4a5568;">Logout</a>
+            </div>
         </div>
     </div>
 </div>
