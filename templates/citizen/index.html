@@ -6,24 +6,45 @@
 
 {% block content %}
 
-<!-- HERO SECTION -->
-<div class="hero-section" style="background-image: url('{{ url_for('static', filename='image/banner_main.png') }}');">
-  <div class="hero-overlay"></div>
-  <div class="container">
-    <div class="hero-content">
-      <h1>Empowering Rural India Through Digital Governance</h1>
-      <p>A unified platform for transparent communication, grievance reporting, and citizen empowerment at the
-        grassroots level.</p>
-      <div style="display: flex; gap: 15px;">
-        <a href="{{ url_for('report_issue') }}" class="login-btn" style="padding: 12px 30px; border-radius: 30px;">Lodge
-          Grievance</a>
-        <a href="{{ url_for('public_track') }}" class="login-btn"
-          style="background: transparent; border: 2px solid white; padding: 12px 30px; border-radius: 30px;">Track
-          Progress</a>
-      </div>
+<!-- HERO CAROUSEL -->
+<div class="hero-slider-wrapper">
+  <!-- Slide 1 -->
+  <div class="hero-slide active"
+    style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('{{ url_for('static', filename='image/banner_main.png') }}');">
+  </div>
+  <!-- Slide 2 -->
+  <div class="hero-slide"
+    style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('{{ url_for('static', filename='image/banner_digital.png') }}');">
+  </div>
+  <!-- Slide 3 -->
+  <div class="hero-slide"
+    style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('{{ url_for('static', filename='image/banner_community.png') }}');">
+  </div>
+
+  <div class="hero-slider-content">
+    <div class="container" style="text-align: center;">
+      <h1
+        style="font-size: 4rem; color: white; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.1; text-shadow: 0 4px 20px rgba(0,0,0,0.7); margin: 0; font-family: var(--font-serif); font-weight: 800;">
+        Empowering Rural India <!--<br> Through Digital Governance</h1>-->
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
+
+    function nextSlide() {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+
+    // Initialize auto-play
+    setInterval(nextSlide, 5000); // Cycle every 5 seconds
+  });
+</script>
 
 <!-- SERVICES SECTION -->
 <div class="section-padding">

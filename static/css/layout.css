@@ -273,46 +273,67 @@ main {
 
 /* ================= PREMIUM UTILITIES ================= */
 
-/* Hero Section Base */
-.hero-section {
+/* Hero Slider Container */
+.hero-slider-wrapper {
     position: relative;
-    padding: 100px 0;
-    color: white;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 20px;
+    height: 550px;
+    width: 100%;
     overflow: hidden;
     margin-bottom: 50px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.hero-overlay {
+.hero-slide {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(31, 63, 109, 0.9) 0%, rgba(31, 63, 109, 0.6) 100%);
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
     z-index: 1;
 }
 
-.hero-content {
-    position: relative;
+.hero-slide.active {
+    opacity: 1;
     z-index: 2;
-    max-width: 800px;
 }
 
-.hero-content h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    margin-bottom: 20px;
-    line-height: 1.1;
+.hero-slider-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    /* Let clicks pass through if needed, though usually not for hero */
 }
 
-.hero-content p {
-    font-size: 1.25rem;
-    opacity: 0.9;
-    margin-bottom: 30px;
+/* Justified Title Utility */
+.justified-title {
+    width: 100%;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    text-align: justify;
+    text-align-last: center;
+    /* Center the last line or single line */
+}
+
+.justified-title h1 {
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    color: white;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
 }
 
 /* Glassmorphism Card */
