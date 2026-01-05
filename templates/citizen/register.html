@@ -8,40 +8,41 @@
 <div class="auth-wrapper">
     <div class="auth-card">
         <div class="auth-header">
-            <h2 class="auth-title">Create Account</h2>
-            <p class="auth-subtitle">Join Meri Panchayat to report and track issues</p>
+            <h2 class="auth-title">{{ get_text('create_account') }}</h2>
+            <p class="auth-subtitle">{{ get_text('register_subtitle') }}</p>
         </div>
 
         <form method="post" class="auth-form">
             <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name"
-                    required>
+                <label for="name">{{ get_text('full_name') }}</label>
+                <input type="text" name="name" id="name" class="form-control"
+                    placeholder="{{ get_text('fullname_placeholder') }}" required>
             </div>
 
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="name@example.com"
-                    required>
+                <label for="email">{{ get_text('email_address') }}</label>
+                <input type="email" name="email" id="email" class="form-control"
+                    placeholder="{{ get_text('email_placeholder') }}" required>
             </div>
 
             <div class="form-group">
-                <label for="mobile">Mobile Number</label>
-                <input type="tel" name="mobile" id="mobile" class="form-control" placeholder="Enter 10-digit number"
-                    required>
+                <label for="mobile">{{ get_text('mobile_number') }}</label>
+                <input type="tel" name="mobile" id="mobile" class="form-control"
+                    placeholder="{{ get_text('mobile_placeholder') }}" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">{{ get_text('password') }}</label>
                 <input type="password" name="password" id="password" class="form-control"
-                    placeholder="Choose a secure password" required>
+                    placeholder="{{ get_text('choose_password') }}" required>
             </div>
 
-            <button type="submit" class="btn-submit">Register Now</button>
+            <button type="submit" class="btn-submit">{{ get_text('register_now') }}</button>
         </form>
 
         <div class="auth-footer">
-            <p>Already have an account? <a href="{{ url_for('user_login') }}">Login here</a></p>
+            <p>{{ get_text('already_have_account') }} <a href="{{ url_for('user_login') }}">{{ get_text('login_here')
+                    }}</a></p>
         </div>
     </div>
 </div>

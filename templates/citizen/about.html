@@ -7,9 +7,8 @@
     style="background-image: linear-gradient(rgba(15, 36, 68, 0.85), rgba(15, 36, 68, 0.85)), url('{{ url_for('static', filename='image/about_banner.jpg') }}'); margin-bottom: 0; border-radius: 0;">
     <div class="container text-center">
         <div class="hero-content mx-auto">
-            <h1 style="font-size: 3.5rem;">Our Mission & Vision</h1>
-            <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 30px;">Empowering rural communities through
-                digital transparency, accountability, and unified governance.</p>
+            <h1 style="font-size: 3.5rem;">{{ get_text('about_mission_vision') }}</h1>
+            <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 30px;">{{ get_text('about_hero_desc') }}</p>
         </div>
     </div>
 </div>
@@ -21,41 +20,33 @@
             <div class="about-content">
                 <div
                     style="color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 15px;">
-                    Who We Are</div>
+                    {{ get_text('who_we_are') }}</div>
                 <h2 class="text-center" style="font-size: 2.5rem; margin-bottom: 40px; color: var(--primary-color);">
-                    Institutionalizing Rural Digitalization</h2>
+                    {{ get_text('inst_rural_digitalization') }}</h2>
 
                 <div style="max-width: 800px; margin: 0 auto;">
                     <p style="font-size: 1.1rem; line-height: 1.8; color: #444; margin-bottom: 25px;">
-                        The <strong>Meri Panchayat</strong> initiative is a flagship program by the Ministry of
-                        Panchayati Raj,
-                        Government of India. It serves as the primary m-Governance platform, designed to bring
-                        institutional transparency and real-time efficiency to the very heart of rural administration.
+                        {{ get_text('meri_panchayat_desc_1')|safe }}
                     </p>
 
                     <p style="font-size: 1.1rem; line-height: 1.8; color: #444; margin-bottom: 40px;">
-                        Our mission is to bridge the gap between citizens and local administration. By providing a
-                        unified
-                        platform for reporting issues, tracking public works, and accessing critical notices, we ensure
-                        that every voice in the village is heard and every grievance is addressed through a streamlined,
-                        time-bound process.
+                        {{ get_text('meri_panchayat_desc_2')|safe }}
                     </p>
                 </div>
 
                 <div class="row" style="display: flex; gap: 30px; margin-top: 50px; flex-wrap: wrap;">
                     <div class="col hover-float"
                         style="flex: 1; min-width: 300px; background: #f8fafc; padding: 40px; border-radius: 12px; border-left: 5px solid var(--secondary-color);">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 22px;">The Vision</h4>
-                        <p style="font-size: 16px; color: #555; line-height: 1.6;">To create a digitally empowered rural
-                            society where governance is not just a service, but a collaborative ecosystem accessible to
-                            every citizen, down to the last mile.</p>
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 22px;">{{
+                            get_text('the_vision') }}</h4>
+                        <p style="font-size: 16px; color: #555; line-height: 1.6;">{{ get_text('vision_desc') }}</p>
                     </div>
                     <div class="col hover-float"
                         style="flex: 1; min-width: 300px; background: #f8fafc; padding: 40px; border-radius: 12px; border-left: 5px solid var(--accent-color);">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 22px;">The Mission</h4>
-                        <p style="font-size: 16px; color: #555; line-height: 1.6;">To implement state-of-the-art
-                            e-Governance solutions that simplify complex administrative processes, enhance citizen
-                            engagement, and foster a culture of data-driven local governance.</p>
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 22px;">{{
+                            get_text('the_mission') }}</h4>
+                        <p style="font-size: 16px; color: #555; line-height: 1.6;">{{ get_text('mission_full_desc') }}
+                        </p>
                     </div>
                 </div>
             </div>

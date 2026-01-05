@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ session.get('lang', 'en') }}">
 
 <head>
     <meta charset="utf-8">
@@ -19,7 +19,7 @@
     {% block css %}{% endblock %}
 </head>
 
-<body>
+<body class="lang-{{ session.get('lang', 'en') }}">
     <!--
          TOP GOVERNMENT STRIP 
 
@@ -50,66 +50,115 @@
     <!-- NAVIGATION BAR -->
     <nav class="main-nav">
         <div class="container nav-container">
-            <ul class="nav-links">
-                {% if session.get('admin_id') %}
+            <!-- Hamburger Button -->
+            <button class="burger-btn" id="burgerBtn" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
 
-                <li>
-                    <a href="{{ url_for('admin_dashboard') }}#recent-complaints">Manage Issues</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('admin_notices') }}">Manage Notices</a>
-                </li>
-                {% else %}
-                <li>
-                    <a href="{{ url_for('home') }}">Home</a>
-                </li>
-                <li>
-                    <!-- Scrolls to About section on home page -->
-                    <a href="{{ url_for('home') }}#about-scheme">About Scheme</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('report_issue') }}">Report Issue</a>
-                </li>
-                {% if session.get('user_id') %}
-                <li>
-                    <a href="{{ url_for('track_issue') }}">My Issues</a>
-                </li>
-                {% endif %}
-                <li>
-                    <a href="{{ url_for('public_track') }}">Public Issues</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('notices') }}">Public Notices</a>
-                </li>
-                {% endif %}
-            </ul>
-            <div class="nav-actions">
-                <input type="search" class="search-box" placeholder="Search...">
-
-                {% if session.get('admin_id') %}
-                <a href="{{ url_for('admin_dashboard') }}" class="login-btn">Dashboard</a>
-                <a href="{{ url_for('admin_logout') }}" class="login-btn" style="background: #dc3545;">Logout</a>
-                {% elif session.get('user_id') %}
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <a href="{{ url_for('user_profile') }}"
-                        style="color: white; font-size: 14px; font-weight: 500; text-decoration: none;">Hi, {{
-                        session.get('user_name') }}</a>
-                    <a href="{{ url_for('user_logout') }}" class="login-btn" style="background: #e07d1e;">Logout</a>
+            <!-- Navigation Content (Links + Actions) -->
+            <div class="nav-content-wrapper" id="navContent">
+                <div class="mobile-menu-header">
+                    <span class="mobile-menu-title">{{ get_text('menu') }}</span>
+                    <button class="close-menu-btn" id="closeBtn">&times;</button>
                 </div>
-                {% else %}
-                <a href="{{ url_for('admin_login') }}" class="login-btn"
-                    style="background: transparent; border: 1px solid rgba(255,255,255,0.3); font-size: 12px; padding: 6px 15px;">Official
-                    Login</a>
-                <a href="{{ url_for('user_login') }}" class="login-btn">Login</a>
-                <a href="{{ url_for('user_register') }}" class="login-btn"
-                    style="background: transparent; border: 1px solid white;">Register</a>
-                {% endif %}
+
+                <ul class="nav-links">
+                    {% if session.get('admin_id') %}
+
+                    <li>
+                        <a href="{{ url_for('admin_dashboard') }}#recent-complaints">{{ get_text('manage_issues') }}</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('admin_notices') }}">{{ get_text('manage_notices') }}</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="{{ url_for('home') }}">{{ get_text('home') }}</a>
+                    </li>
+                    <li>
+                        <!-- Scrolls to About section on home page -->
+                        <a href="{{ url_for('home') }}#about-scheme">{{ get_text('about_scheme') }}</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('report_issue') }}">{{ get_text('report_issue') }}</a>
+                    </li>
+                    {% if session.get('user_id') %}
+                    <li>
+                        <a href="{{ url_for('track_issue') }}">{{ get_text('my_issues') }}</a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ url_for('public_track') }}">{{ get_text('public_issues') }}</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('notices') }}">{{ get_text('public_notices') }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <div class="nav-actions">
+                    <input type="search" class="search-box" placeholder="{{ get_text('search_placeholder') }}">
+
+                    {% if session.get('admin_id') %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="login-btn">{{ get_text('dashboard') }}</a>
+                    <a href="{{ url_for('admin_logout') }}" class="login-btn" style="background: #dc3545;">{{
+                        get_text('logout') }}</a>
+                    {% elif session.get('user_id') %}
+                    <div class="user-profile-group">
+                        <a href="{{ url_for('user_profile') }}" class="user-greet-link">
+                            {{ get_text('hi') }}, {{ session.get('user_name') }}
+                        </a>
+                        <a href="{{ url_for('user_logout') }}" class="login-btn logout-btn">{{
+                            get_text('logout') }}</a>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('admin_login') }}" class="login-btn official-btn">{{
+                        get_text('official_login') }}</a>
+                    <a href="{{ url_for('user_login') }}" class="login-btn">{{ get_text('login') }}</a>
+                    <a href="{{ url_for('user_register') }}" class="login-btn register-outline-btn">{{
+                        get_text('register') }}</a>
+                    {% endif %}
+                </div>
             </div>
 
+            <!-- Overlay -->
+            <div class="nav-overlay" id="navOverlay"></div>
         </div>
     </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerBtn = document.getElementById('burgerBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const navContent = document.getElementById('navContent');
+            const navOverlay = document.getElementById('navOverlay');
+
+            function toggleMenu() {
+                navContent.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                document.body.classList.toggle('no-scroll');
+            }
+
+            if (burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
+            if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
+            if (navOverlay) navOverlay.addEventListener('click', toggleMenu);
+
+            // Close menu when clicking a link
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (navContent.classList.contains('active')) {
+                        toggleMenu();
+                    }
+                });
+            });
+        });
+    </script>
+    </nav>
     <!-- PAGE CONTENT -->
-    <main>
+    <main class="{% block main_class %}{% endblock %}">
         <div class="container">
             <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -131,45 +180,92 @@
         <div class="container footer-container">
 
             <div class="footer-col">
-                <h5>Information</h5>
+                <h5>{{ get_text('information') }}</h5>
                 <ul>
-                    <li><a href="{{ url_for('about') }}">About Us</a></li>
-                    <li><a href="#">Terms of Use</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="{{ url_for('about') }}">{{ get_text('about_us') }}</a></li>
+                    <li><a href="#">{{ get_text('terms_use') }}</a></li>
+                    <li><a href="#">{{ get_text('privacy_policy') }}</a></li>
+                    <li><a href="#">{{ get_text('contact_us') }}</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h5>Important Links</h5>
+                <h5>{{ get_text('important_links') }}</h5>
                 <ul>
-                    <li><a href="https://panchayat.gov.in" target="_blank">Ministry of Panchayati Raj</a></li>
+                    <li><a href="https://panchayat.gov.in" target="_blank">{{ get_text('ministry_name') }}</a></li>
                     <li><a href="https://egramswaraj.gov.in" target="_blank">eGramSwaraj</a></li>
                     <li><a href="https://serviceonline.gov.in" target="_blank">ServicePlus</a></li>
                 </ul>
             </div>
 
             <div class="footer-col footer-contact">
-                <h5>Contact</h5>
+                <h5>{{ get_text('contact') }}</h5>
                 <p>
-                    <strong>Ministry of Panchayati Raj</strong><br>
-                    Government of India<br>
-                    Krishi Bhawan, Padubidri - 110001
+                    <strong>{{ get_text('ministry_name') }}</strong><br>
+                    {{ get_text('govt_india') }}<br>
+                    {{ get_text('address_line') }}
                 </p>
                 <div style="margin-top: 15px;">
                     <a href="{{ url_for('admin_login') }}"
                         style="color: var(--secondary-color); font-size: 14px; text-decoration: none; font-weight: 600;">➔
-                        Official / Admin Login</a>
+                        {{ get_text('official_admin_login') }}</a>
                 </div>
             </div>
 
         </div>
         <div class="sub-footer">
             <div class="container text-center">
-                <p>Designed & Developed by National Informatics Centre (NIC) | &copy; 2025 All Rights Reserved.</p>
+                <p>{{ get_text('designed_by')|safe }}</p>
             </div>
         </div>
     </footer>
+
+    <!-- Floating Language Selector -->
+    <div class="language-selector-widget">
+        <button class="lang-toggle-btn" id="langToggleBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" />
+            </svg>
+            <span id="currentLangText">
+                {% if session.get('lang') == 'kn' %}ಕನ್ನಡ{% else %}English{% endif %}
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <a href="{{ url_for('set_language', lang_code='en') }}"
+                class="lang-option {% if session.get('lang', 'en') == 'en' %}active{% endif %}">
+                English
+            </a>
+            <a href="{{ url_for('set_language', lang_code='kn') }}"
+                class="lang-option {% if session.get('lang') == 'kn' %}active{% endif %}">
+                ಕನ್ನಡ (Kannada)
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Language selector toggle
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        const langDropdown = document.getElementById('langDropdown');
+
+        langToggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            langDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function () {
+            langDropdown.classList.remove('show');
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        langDropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    </script>
 
     <script>
         // Banner Slider Script

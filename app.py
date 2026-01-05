@@ -3,6 +3,8 @@ import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from translations import TRANSLATIONS # Import translations
+
 app = Flask(__name__)
 # moment = Moment(app) # Removed as package install was cancelled
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
@@ -15,6 +17,21 @@ def connect_db():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
+
+# ---------------- I18N UTILS ----------------
+
+@app.context_processor
+def inject_get_text():
+    def get_text(key):
+        lang = session.get("lang", "en")
+        return TRANSLATIONS.get(lang, TRANSLATIONS["en"]).get(key, key)
+    return dict(get_text=get_text)
+
+@app.route("/set_language/<lang_code>")
+def set_language(lang_code):
+    if lang_code in TRANSLATIONS:
+        session["lang"] = lang_code
+    return redirect(request.referrer or url_for("home"))
 
 # ---------------- SECURITY UTILS ----------------
 

@@ -5,7 +5,7 @@
 <div class="hero-section"
     style="background-image: linear-gradient(rgba(31, 63, 109, 0.9), rgba(31, 63, 109, 0.9)); height: 120px; padding: 40px 0; margin-bottom: 0; border-radius: 0;">
     <div class="container">
-        <h1 style="font-size: 2.2rem; margin: 0; text-align: center;">Citizen Profile</h1>
+        <h1 style="font-size: 2.2rem; margin: 0; text-align: center;">{{ get_text('citizen_profile') }}</h1>
     </div>
 </div>
 
@@ -22,7 +22,7 @@
                 <h3 style="margin: 0; color: #1a202c; font-size: 28px;">{{ user.name }}</h3>
                 <div
                     style="display: inline-block; background: #e6fffa; color: #047857; padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 10px; letter-spacing: 1px;">
-                    Verified Citizen</div>
+                    {{ get_text('verified_citizen') }}</div>
             </div>
 
             <div class="profile-details" style="display: grid; gap: 25px;">
@@ -32,8 +32,8 @@
                         <span style="font-size: 20px; opacity: 0.7;">📧</span>
                         <div>
                             <label
-                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">Email
-                                Address</label>
+                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">{{
+                                get_text('email_address') }}</label>
                             <div style="font-size: 16px; color: #2d3748; font-weight: 500;">{{ user.email }}</div>
                         </div>
                     </div>
@@ -45,8 +45,8 @@
                         <span style="font-size: 20px; opacity: 0.7;">📱</span>
                         <div>
                             <label
-                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">Mobile
-                                Number</label>
+                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">{{
+                                get_text('mobile_number') }}</label>
                             <div style="font-size: 16px; color: #2d3748; font-weight: 500;">{{ user.mobile }}</div>
                         </div>
                     </div>
@@ -58,8 +58,8 @@
                         <span style="font-size: 20px; opacity: 0.7;">🗓️</span>
                         <div>
                             <label
-                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">Member
-                                Since</label>
+                                style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; display: block;">{{
+                                get_text('member_since') }}</label>
                             <div style="font-size: 16px; color: #2d3748; font-weight: 500;">{{ user.created_at[:10] }}
                             </div>
                         </div>
@@ -69,10 +69,11 @@
 
             <div style="margin-top: 50px; text-align: center; display: flex; gap: 15px; justify-content: center;">
                 <a href="{{ url_for('home') }}" class="login-btn"
-                    style="padding: 12px 30px; border-radius: 30px; background: var(--primary-color);">Return to
-                    Home</a>
-                <a href="{{ url_for('user_logout') }}" class="login-btn"
-                    style="padding: 12px 30px; border-radius: 30px; background: transparent; border: 2px solid #e2e8f0; color: #4a5568;">Logout</a>
+                    style="padding: 12px 30px; border-radius: 30px; background: var(--primary-color);">{{
+                    get_text('return_to_home') }}</a>
+                <a href="{{ url_for('user_logout') }}" class="login-btn logout-btn"
+                    style="padding: 12px 30px; border-radius: 30px; background: transparent; border: 2px solid #e2e8f0; color: #4a5568;">{{
+                    get_text('logout') }}</a>
             </div>
         </div>
     </div>

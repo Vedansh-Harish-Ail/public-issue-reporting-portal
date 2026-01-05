@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block main_class %}main-no-padding{% endblock %}
+
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen.css') }}">
 {% endblock %}
@@ -25,7 +27,7 @@
     <div class="container" style="text-align: center;">
       <h1
         style="font-size: 4rem; color: white; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.1; text-shadow: 0 4px 20px rgba(0,0,0,0.7); margin: 0; font-family: var(--font-serif); font-weight: 800;">
-        Empowering Rural India <!--<br> Through Digital Governance</h1>-->
+        {{ get_text('hero_title') }} <!--<br> Through Digital Governance</h1>-->
     </div>
   </div>
 </div>
@@ -50,64 +52,64 @@
 <div class="section-padding">
   <div class="container text-center">
     <div class="section-header">
-      <h2>Citizen Services</h2>
-      <p>Direct access to essential panchayat services designed for efficiency and transparency.</p>
+      <h2>{{ get_text('citizen_services') }}</h2>
+      <p>{{ get_text('citizen_services_desc') }}</p>
     </div>
 
     <div class="services-grid">
       <a href="{{ url_for('report_issue') }}" class="service-card hover-float">
         <div class="service-icon">📝</div>
-        <h4>Report an Issue</h4>
-        <p>Lodge a complaint regarding water, roads, electricity, or other civic amenities.</p>
+        <h4>{{ get_text('report_issue') }}</h4>
+        <p>{{ get_text('lodge_complaint') }}</p>
       </a>
 
       <a href="{{ url_for('track_issue') }}" class="service-card hover-float">
         <div class="service-icon">🔍</div>
-        <h4>Track Status</h4>
-        <p>Check the real-time status of your reported grievances and actions taken.</p>
+        <h4>{{ get_text('track_status') }}</h4>
+        <p>{{ get_text('track_status_desc') }}</p>
       </a>
 
       <a href="{{ url_for('notices') }}" class="service-card hover-float">
         <div class="service-icon">📢</div>
-        <h4>Public Notices</h4>
-        <p>View latest circulars, schemes, and announcements from the Gram Panchayat.</p>
+        <h4>{{ get_text('latest_notices') }}</h4>
+        <p>{{ get_text('latest_notices_desc') }}</p>
       </a>
 
       <a href="#" class="service-card hover-float">
         <div class="service-icon">💡</div>
-        <h4>Schemes</h4>
-        <p>Explore government schemes available for rural welfare and development.</p>
+        <h4>{{ get_text('schemes') }}</h4>
+        <p>{{ get_text('schemes_desc') }}</p>
       </a>
     </div>
   </div>
 </div>
 
 <!-- STATISTICS SECTION -->
-<div style="background: var(--primary-color); padding: 80px 0; color: white;">
+<div style="background: var(--primary-color); padding: 40px 0; color: white;">
   <div class="container">
     <div class="stats-grid">
       <div class="stat-item" style="border: none;">
         <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.panchayaths }}+</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
-          Active Panchayats</p>
+          {{ get_text('active_panchayats') }}</p>
       </div>
 
       <div class="stat-item" style="border: none;">
         <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.issues }}+</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
-          Issues Reported</p>
+          {{ get_text('issues_reported') }}</p>
       </div>
 
       <div class="stat-item" style="border: none;">
         <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.resolution }}%</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
-          Resolution Rate</p>
+          {{ get_text('resolution_rate') }}</p>
       </div>
 
       <div class="stat-item" style="border: none;">
         <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.citizens }}</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
-          Citizens Connected</p>
+          {{ get_text('citizens_connected') }}</p>
       </div>
     </div>
   </div>
@@ -128,15 +130,13 @@
       <div class="about-content" style="flex: 1.2;">
         <div
           style="color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
-          Discover the Vision</div>
-        <h2 style="font-size: 2.5rem; margin-bottom: 25px;">Institutional Messaging System for Rural India</h2>
+          {{ get_text('discover_vision') }}</div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 25px;">{{ get_text('mission_title') }}</h2>
         <p style="font-size: 1.1rem; color: #555; line-height: 1.8; margin-bottom: 30px;">
-          Meri Panchayat is an integrated digital governance platform designed to bridge the gap between citizens and
-          administration. Built by NIC, it brings transparency, real-time accountability, and streamlined service
-          delivery to the very heart of rural governance.
+          {{ get_text('mission_desc') }}
         </p>
-        <a href="{{ url_for('about') }}" class="login-btn" style="padding: 12px 35px; border-radius: 30px;">Explore Our
-          Mission</a>
+        <a href="{{ url_for('about') }}" class="login-btn" style="padding: 12px 35px; border-radius: 30px;">{{
+          get_text('explore_mission') }}</a>
       </div>
     </div>
   </div>

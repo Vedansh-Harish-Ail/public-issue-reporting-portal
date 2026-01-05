@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="container my-5">
-  <h2 class="section-title">Public Notices & Announcements</h2>
+  <h2 class="section-title">{{ get_text('public_notices_announcements') }}</h2>
 
   <div class="admin-login-card mx-auto" style="max-width: 900px; text-align: left; padding: 0;">
 
@@ -19,7 +19,8 @@
         <div
           style="height: 200px; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('/static/{{ n.banner_path }}'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; color: white;">
           <strong style="font-size: 24px;">{{ n.title }}</strong>
-          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at[:10] }} | Issued by: {{ n.panchayath_name
+          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at[:10] }} | {{ get_text('issued_by') }}: {{
+            n.panchayath_name
             }}</small>
         </div>
         <div style="padding: 25px;">
@@ -34,14 +35,15 @@
           </div>
           <p style="color: #444; line-height: 1.6; font-size: 16px;">{{ n.description }}</p>
           <div style="margin-top: 20px; border-top: 1px solid #f9f9f9; padding-top: 10px;">
-            <small class="text-muted" style="font-weight: 500;">Issued by: {{ n.panchayath_name }}</small>
+            <small class="text-muted" style="font-weight: 500;">{{ get_text('issued_by') }}: {{ n.panchayath_name
+              }}</small>
           </div>
         </div>
         {% endif %}
       </li>
       {% else %}
       <li style="padding: 30px; text-align: center; color: #777;">
-        No public notices available at the moment.
+        {{ get_text('no_notices') }}
       </li>
       {% endfor %}
     </ul>

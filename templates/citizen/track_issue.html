@@ -7,7 +7,7 @@
 {% block content %}
 
 <div class="container my-5">
-  <h2 class="section-title">{{ title or 'Track Issue Status' }}</h2>
+  <h2 class="section-title">{{ title or get_text('track_issue_status') }}</h2>
 
   <!-- Info Section -->
   <div class="about-card mb-5"
@@ -15,11 +15,11 @@
 
     <div style="flex: 1;">
       <h5 style="margin: 0; color: var(--primary-color);">
-        {% if is_public %}All Panchayat Issues{% else %}My Reported Issues{% endif %}
+        {% if is_public %}{{ get_text('all_panchayat_issues') }}{% else %}{{ get_text('my_reported_issues') }}{% endif
+        %}
       </h5>
       <p style="margin: 0; font-size: 14px; color: #666;">
-        {% if is_public %}Transparency and accountability for every reported concern.{% else %}Track the progress of
-        your submitted reports.{% endif %}
+        {% if is_public %}{{ get_text('public_issues_desc') }}{% else %}{{ get_text('my_issues_desc') }}{% endif %}
       </p>
     </div>
 
@@ -41,7 +41,7 @@
 
       {% if is_public and i.user_name %}
       <div style="font-size: 13px; color: var(--secondary-color); font-weight: 600; margin-bottom: 5px;">
-        👤 Reported by: {{ i.user_name }}
+        👤 {{ get_text('reported_by') }}: {{ i.user_name }}
       </div>
       {% endif %}
 
@@ -59,13 +59,13 @@
       <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-top: 15px;">
         <div style="font-size: 12px; color: #666; display: flex; flex-direction: column; gap: 5px;">
           <span style="display: flex; align-items: center; gap: 5px;">
-            <strong>📍 Location:</strong> {{ i.location }}
+            <strong>📍 {{ get_text('location') }}:</strong> {{ i.location }}
           </span>
           <span style="display: flex; align-items: center; gap: 5px;">
-            <strong>📅 Date:</strong> {{ i.created_at }}
+            <strong>📅 {{ get_text('date') }}:</strong> {{ i.created_at }}
           </span>
           <span style="display: flex; align-items: center; gap: 5px;">
-            <strong>🏘️ Panchayat:</strong> {{ i.panchayath_name }}
+            <strong>🏘️ {{ get_text('panchayat') }}:</strong> {{ i.panchayath_name }}
           </span>
         </div>
       </div>
@@ -75,8 +75,8 @@
     <div
       style="grid-column: 1/-1; text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
       <div style="font-size: 50px; margin-bottom: 20px;">📋</div>
-      <h3 style="color: #999;">No issues found</h3>
-      <p style="color: #bbb;">There are no issues to display at the moment.</p>
+      <h3 style="color: #999;">{{ get_text('no_issues_found') }}</h3>
+      <p style="color: #bbb;">{{ get_text('no_issues_desc') }}</p>
     </div>
     {% endfor %}
   </div>
