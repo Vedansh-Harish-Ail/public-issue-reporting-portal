@@ -656,6 +656,18 @@ main {
         display: flex;
     }
 
+    .justified-title {
+        padding: 15px;
+        /* Reduce padding on mobile */
+    }
+
+    .justified-title h1 {
+        font-size: clamp(1.1rem, 5vw, 2rem);
+        letter-spacing: 0.02em;
+        /* Tighten spacing */
+        line-height: 1.3;
+    }
+
     /* Overlay Backdrop */
     .nav-overlay {
         display: block;
@@ -688,7 +700,8 @@ main {
         flex-direction: column;
         justify-content: flex-start;
         align-items: flex-start;
-        z-index: 1002;
+        z-index: 10002;
+        /* Ensure it covers language widget (z-index 9999) */
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.77, 0.2, 0.05, 1.0);
         box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
@@ -964,4 +977,27 @@ main {
 /* Prevent scrolling when menu is open */
 body.no-scroll {
     overflow: hidden;
+}
+
+/* ================= FORCE MOBILE BANNER FIX ================= */
+@media (max-width: 600px) {
+
+    .justified-title h1,
+    .hero-slider-content h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0.05em !important;
+        word-wrap: break-word;
+        /* Ensure long words break if absolutely necessary */
+        word-break: break-word;
+    }
+
+    .justified-title {
+        padding: 10px !important;
+    }
+
+    /* Also ensure container doesn't have excess padding */
+    .hero-slider-content {
+        padding: 0 10px;
+    }
 }

@@ -139,6 +139,16 @@
                 navContent.classList.toggle('active');
                 navOverlay.classList.toggle('active');
                 document.body.classList.toggle('no-scroll');
+
+                // Hide language selector when menu is open to prevent overlap
+                const langWidget = document.querySelector('.language-selector-widget');
+                if (langWidget) {
+                    if (navContent.classList.contains('active')) {
+                        langWidget.style.display = 'none';
+                    } else {
+                        langWidget.style.display = 'block';
+                    }
+                }
             }
 
             if (burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
