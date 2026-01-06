@@ -296,29 +296,187 @@ main {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ================= FLASH MESSAGES ================= */
-.flash-messages {
-    margin-bottom: 20px;
+/* ================= TOAST NOTIFICATIONS ================= */
+/* ================= MODAL POPUP NOTIFICATIONS ================= */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
 }
 
-.alert {
-    padding: 12px 16px;
+.popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-card {
+    background: #fff;
+    width: 90%;
+    max-width: 320px;
     border-radius: 8px;
+    /* Standard pop-up look */
+    padding: 40px 30px 30px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: scale(0.8);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 20px;
+    /* Space for icon overlap */
+}
+
+.popup-overlay.active .popup-card {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.popup-card.closing {
+    transform: scale(0.9);
+    opacity: 0;
+}
+
+/* Floating Icon Wrapper */
+.popup-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+/* Specific styling for the SVG inside to be white */
+.popup-icon-wrapper svg {
+    color: white;
+    stroke: white;
+}
+
+/* Popup Variants - Backgrounds */
+.popup-icon-wrapper.popup-success {
+    background-color: #7ac142;
+}
+
+.popup-icon-wrapper.popup-error {
+    background-color: #e53935;
+}
+
+.popup-icon-wrapper.popup-warning {
+    background-color: #fb8c00;
+}
+
+.popup-icon-wrapper.popup-info {
+    background-color: #1e88e5;
+}
+
+/* Colors for Button Backgrounds (Moved logic here for clarity if needed, or just let btn handles it) */
+
+/* Text Colors */
+.popup-success .popup-title {
+    color: #333;
+    /* Reset title color */
+}
+
+.popup-title {
+    margin-top: 25px;
     margin-bottom: 10px;
+    font-family: var(--font-main);
+    font-weight: 300;
+    /* Thin look from image */
+    font-size: 28px;
+    color: #444;
+}
+
+.popup-message {
     font-size: 14px;
-    font-weight: 500;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
 }
 
-.alert-success {
-    background: #e6fffa;
-    color: #047857;
-    border: 1px solid #b7ead8;
+.popup-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    /* Matches square-ish button */
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
 
-.alert-danger {
-    background: #fff5f5;
-    color: #c53030;
-    border: 1px solid #fed7d7;
+.popup-btn:hover {
+    opacity: 0.9;
+}
+
+.popup-btn.popup-success {
+    background: #7ac142;
+    /* Override text color for bg */
+    color: white;
+}
+
+.popup-btn.popup-error {
+    background: #e53935;
+    color: white;
+}
+
+.popup-btn.popup-warning {
+    background: #fb8c00;
+    color: white;
+}
+
+.popup-btn.popup-info {
+    background: #1e88e5;
+    color: white;
+}
+
+/* Remove previous toast styles if present below... */
+.toast-container {
+    display: none;
+}
+
+/* Quick fix just in case */
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .toast-container {
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        width: auto;
+    }
+
+    .toast {
+        width: 100%;
+        margin-left: 0;
+        transform: translateY(100%);
+    }
+
+    .toast.show {
+        transform: translateY(0);
+    }
 }
 
 /* ================= BUTTONS & FLUSH ================= */

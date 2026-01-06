@@ -161,15 +161,7 @@
     <main class="{% block main_class %}{% endblock %}">
         <div class="container">
             <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endwith %}
+
         </div>
 
         {% block content %}{% endblock %}
@@ -281,6 +273,87 @@
             }
         });
 
+    </script>
+    <!-- Popup Overlay Container -->
+    <div id="popup-overlay" class="popup-overlay"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get messages from Flask
+            const messages = {{ get_flashed_messages(with_categories = true) | tojson | safe
+        }};
+
+        if (messages && messages.length > 0) {
+            // Show first message immediately for now
+            messages.forEach(([category, message]) => {
+                createPopup(message, category);
+            });
+        }
+        });
+
+        function createPopup(message, type = 'info') {
+            const container = document.getElementById('popup-overlay');
+
+            // Map flask categories to design
+            let title = 'Info';
+            let iconPath = '';
+            let colorClass = '';
+
+            if (type === 'success') {
+                title = 'Success';
+                colorClass = 'popup-success';
+                // Checkmark
+                iconPath = '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path>';
+            } else if (type === 'danger' || type === 'error') {
+                title = 'Error';
+                colorClass = 'popup-error';
+                // X Icon
+                iconPath = '<path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>';
+            } else if (type === 'warning') {
+                title = 'Warning';
+                colorClass = 'popup-warning';
+                // Exclamation
+                iconPath = '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"></path>';
+            } else {
+                title = 'Notice';
+                colorClass = 'popup-info';
+                // Info
+                iconPath = '<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>';
+            }
+
+            const popup = document.createElement('div');
+            popup.className = 'popup-card';
+
+            popup.innerHTML = `
+                <div class="popup-icon-wrapper ${colorClass}">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        ${iconPath}
+                    </svg>
+                </div>
+                <h3 class="popup-title">${title}</h3>
+                <p class="popup-message">${message}</p>
+                <button class="popup-btn ${colorClass}" onclick="closePopup(this)">OK</button>
+            `;
+
+            container.appendChild(popup);
+            container.classList.add('active'); // Show overlay
+        }
+
+        function closePopup(btn) {
+            const popup = btn.closest('.popup-card');
+            popup.classList.add('closing');
+
+            // Remove after animation
+            setTimeout(() => {
+                popup.remove();
+
+                // If no more popups, hide overlay
+                const container = document.getElementById('popup-overlay');
+                if (container.children.length === 0) {
+                    container.classList.remove('active');
+                }
+            }, 300);
+        }
     </script>
 </body>
 

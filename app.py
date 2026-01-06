@@ -140,7 +140,6 @@ def seed_data():
     conn.commit()
     conn.close()
 
-
 # ---------------- CITIZEN ROUTES --------------
 
 @app.route("/")
@@ -336,6 +335,7 @@ def admin_login():
         if admin and check_password_hash(admin["password_hash"], password):
             session["admin_id"] = admin["id"]
             session["panchayath_id"] = admin["panchayath_id"]
+            flash(f"Welcome back, Admin {admin['username']}!", "success")
             return redirect(url_for("admin_dashboard"))
 
         flash("Invalid credentials", "danger")
@@ -474,6 +474,7 @@ def update_issue(issue_id):
 @app.route("/admin/logout")
 def admin_logout():
     session.clear()
+    flash("Admin logged out successfully.", "success")
     return redirect(url_for("admin_login"))
 
 # ---------------- MAIN ----------------
