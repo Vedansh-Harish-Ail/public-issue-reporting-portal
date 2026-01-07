@@ -28,10 +28,22 @@
             <div class="form-group">
                 <label for="mobile">{{ get_text('mobile_number') }}</label>
                 <input type="tel" name="mobile" id="mobile" class="form-control"
-                    placeholder="{{ get_text('mobile_placeholder') }}"
-                    pattern="[6-9]{1}[0-9]{9}"
-                    title="Enter a valid 10-digit mobile number"
-                    required>
+                    placeholder="{{ get_text('mobile_placeholder') }}" pattern="[6-9]{1}[0-9]{9}"
+                    title="Enter a valid 10-digit mobile number" required>
+            </div>
+
+            <div class="form-group">
+                <label>OTP Verification Method</label>
+                <div style="display: flex; gap: 20px; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="otp_method" value="email" checked>
+                        <span>Email</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: not-allowed; opacity: 0.5;">
+                        <input type="radio" name="otp_method" value="sms" disabled>
+                        <span>SMS (Coming Soon)</span>
+                    </label>
+                </div>
             </div>
 
             <div class="form-group">
@@ -46,7 +58,7 @@
 
             <!-- OTP Info Message -->
             <p style="font-size: 13px; color: #777; margin-top: 12px; text-align: center;">
-                An OTP will be sent to your mobile number for verification.
+                An OTP will be sent to your email address for verification.
             </p>
         </form>
 

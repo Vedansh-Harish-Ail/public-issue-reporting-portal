@@ -365,6 +365,39 @@
             }, 300);
         }
     </script>
+
+    <!-- Image Modal -->
+    <div id="imageModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; cursor: pointer; align-items: center; justify-content: center;">
+        <img id="modalImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px;">
+    </div>
+
+    <script>
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = imageSrc;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on click or ESC key
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.addEventListener('click', closeImageModal);
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') closeImageModal();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

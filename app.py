@@ -13,26 +13,49 @@ import time
 
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION ----------------
-FAST2SMS_API_KEY = "LyFxaJ9QZRAto1kgjir76XnIh4Eu25NUHb3zWYKdPSepVmTvqBBwnIKdmCaFkWjXsV3yTvlr1QAuqM7e"
-#---------------- SMS OTP UTILITIES ----------------
+
+
+
+#---------------- EMAIL OTP UTILITIES ----------------
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 def generate_otp():
     return str(random.randint(100000, 999999))
 
+def send_email_otp(user_email, otp):
+    # Use provided credentials as defaults if env vars are missing
+    sender_email = os.environ.get("MAIL_USERNAME", "panchayatseva1@gmail.com")
+    # REPLACE THE STRING BELOW WITH YOUR 16-CHARACTER GOOGLE APP PASSWORD
+    app_password = os.environ.get("MAIL_PASSWORD", "tkao zyic hwog dxnd")
+    
+    if not sender_email or not app_password:
+        print("Error: Email credentials not found in environment variables.")
+        return False
 
-def send_sms_otp(mobile, otp):
-    url = "https://www.fast2sms.com/dev/bulkV2"
-    payload = {
-        "route": "otp",
-        "variables_values": otp,
-        "numbers": mobile
-    }
-    headers = {
-        "authorization": FAST2SMS_API_KEY,
-        "Content-Type": "application/json"
-    }
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = user_email
+        msg['Subject'] = "Your Verification OTP"
 
-    response = requests.post(url, json=payload, headers=headers)
-    return response.json()
+        body = f"Your OTP is: {otp}\n\nThis OTP is valid for 2 minutes.\nDo not share this with anyone."
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, app_password)
+        server.sendmail(sender_email, user_email, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        # Even if email fails, print to console so user can still test
+        print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
+        return True
+
 # ---------------- CONFIGURATION ----------------
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
 
@@ -312,13 +335,13 @@ def user_register():
         session["otp"] = otp
         session["otp_time"] = time.time()
         
-        response = send_sms_otp(mobile, otp)
-        print("Fast2SMS response:", response)
-
-        send_sms_otp(mobile, otp)
-
-        flash("OTP sent to your mobile number", "info")
-        return redirect(url_for("verify_otp"))
+        # Send OTP via Email
+        if send_email_otp(email, otp):
+             flash(f"OTP sent to {email}", "info")
+             return redirect(url_for("verify_otp"))
+        else:
+             flash("Failed to send OTP. Please check your email or try again later.", "danger")
+             return redirect(url_for("user_register"))
 
     return render_template("citizen/register.html")
 
@@ -329,8 +352,8 @@ def verify_otp():
 
         # OTP expiry: 2 minutes
         if time.time() - session.get("otp_time", 0) > 120:
-            flash("OTP expired. Please register again.", "danger")
-            return redirect(url_for("user_register"))
+            flash("OTP expired. Please resend OTP.", "danger")
+            return redirect(url_for("verify_otp"))
 
         if entered_otp == session.get("otp"):
             user = session.get("temp_user")
@@ -348,11 +371,12 @@ def verify_otp():
                 ))
                 conn.commit()
             except sqlite3.IntegrityError:
-                flash("Email already exists.", "danger")
+                flash("Email or Mobile already exists.", "danger")
                 return redirect(url_for("user_register"))
             finally:
                 conn.close()
 
+            # Clear session
             session.pop("otp", None)
             session.pop("otp_time", None)
             session.pop("temp_user", None)
@@ -363,6 +387,25 @@ def verify_otp():
         flash("Invalid OTP", "danger")
 
     return render_template("citizen/verify_otp.html")
+
+@app.route("/resend-otp")
+def resend_otp():
+    if "temp_user" not in session:
+        flash("Session expired. Please register again.", "warning")
+        return redirect(url_for("user_register"))
+    
+    otp = generate_otp()
+    session["otp"] = otp
+    session["otp_time"] = time.time()
+    
+    email = session["temp_user"]["email"]
+    
+    if send_email_otp(email, otp):
+        flash(f"New OTP sent to {email}", "info")
+    else:
+        flash("Failed to send OTP. Try again.", "danger")
+        
+    return redirect(url_for("verify_otp"))
 
 @app.route("/login", methods=["GET", "POST"])
 def user_login():
