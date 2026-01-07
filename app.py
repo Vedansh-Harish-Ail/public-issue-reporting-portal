@@ -1,12 +1,39 @@
 import os
 import sqlite3
+from urllib import response
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from translations import TRANSLATIONS # Import translations
 
+import requests
+import random
+import time
+
+
 app = Flask(__name__)
-# moment = Moment(app) # Removed as package install was cancelled
+#---------------- SMS OTP CONFIGURATION ----------------
+FAST2SMS_API_KEY = "LyFxaJ9QZRAto1kgjir76XnIh4Eu25NUHb3zWYKdPSepVmTvqBBwnIKdmCaFkWjXsV3yTvlr1QAuqM7e"
+#---------------- SMS OTP UTILITIES ----------------
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+
+def send_sms_otp(mobile, otp):
+    url = "https://www.fast2sms.com/dev/bulkV2"
+    payload = {
+        "route": "otp",
+        "variables_values": otp,
+        "numbers": mobile
+    }
+    headers = {
+        "authorization": FAST2SMS_API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    return response.json()
+# ---------------- CONFIGURATION ----------------
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
 
 DB_NAME = "database/panchayath.db"
@@ -272,24 +299,70 @@ def user_register():
         email = request.form["email"]
         mobile = request.form["mobile"]
         password = request.form["password"]
+
+        # store data temporarily
+        session["temp_user"] = {
+            "name": name,
+            "email": email,
+            "mobile": mobile,
+            "password": generate_password_hash(password)
+        }
+
+        otp = generate_otp()
+        session["otp"] = otp
+        session["otp_time"] = time.time()
         
-        hashed_password = generate_password_hash(password)
-        
-        conn = connect_db()
-        try:
-            conn.execute("""
-                INSERT INTO users (name, email, mobile, password_hash)
-                VALUES (?, ?, ?, ?)
-            """, (name, email, mobile, hashed_password))
-            conn.commit()
-            flash("Registration successful! Please login.", "success")
-            return redirect(url_for("user_login"))
-        except sqlite3.IntegrityError:
-            flash("Email already exists. Please use a different one.", "danger")
-        finally:
-            conn.close()
-            
+        response = send_sms_otp(mobile, otp)
+        print("Fast2SMS response:", response)
+
+        send_sms_otp(mobile, otp)
+
+        flash("OTP sent to your mobile number", "info")
+        return redirect(url_for("verify_otp"))
+
     return render_template("citizen/register.html")
+
+@app.route("/verify-otp", methods=["GET", "POST"])
+def verify_otp():
+    if request.method == "POST":
+        entered_otp = request.form["otp"]
+
+        # OTP expiry: 2 minutes
+        if time.time() - session.get("otp_time", 0) > 120:
+            flash("OTP expired. Please register again.", "danger")
+            return redirect(url_for("user_register"))
+
+        if entered_otp == session.get("otp"):
+            user = session.get("temp_user")
+
+            conn = connect_db()
+            try:
+                conn.execute("""
+                    INSERT INTO users (name, email, mobile, password_hash)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    user["name"],
+                    user["email"],
+                    user["mobile"],
+                    user["password"]
+                ))
+                conn.commit()
+            except sqlite3.IntegrityError:
+                flash("Email already exists.", "danger")
+                return redirect(url_for("user_register"))
+            finally:
+                conn.close()
+
+            session.pop("otp", None)
+            session.pop("otp_time", None)
+            session.pop("temp_user", None)
+
+            flash("Registration successful. Please login.", "success")
+            return redirect(url_for("user_login"))
+
+        flash("Invalid OTP", "danger")
+
+    return render_template("citizen/verify_otp.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def user_login():

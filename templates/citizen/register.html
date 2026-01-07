@@ -28,21 +28,35 @@
             <div class="form-group">
                 <label for="mobile">{{ get_text('mobile_number') }}</label>
                 <input type="tel" name="mobile" id="mobile" class="form-control"
-                    placeholder="{{ get_text('mobile_placeholder') }}" required>
+                    placeholder="{{ get_text('mobile_placeholder') }}"
+                    pattern="[6-9]{1}[0-9]{9}"
+                    title="Enter a valid 10-digit mobile number"
+                    required>
             </div>
 
             <div class="form-group">
                 <label for="password">{{ get_text('password') }}</label>
                 <input type="password" name="password" id="password" class="form-control"
-                    placeholder="{{ get_text('choose_password') }}" required>
+                    placeholder="{{ get_text('choose_password') }}" minlength="6" required>
             </div>
 
-            <button type="submit" class="btn-submit">{{ get_text('register_now') }}</button>
+            <button type="submit" class="btn-submit">
+                {{ get_text('register_now') }}
+            </button>
+
+            <!-- OTP Info Message -->
+            <p style="font-size: 13px; color: #777; margin-top: 12px; text-align: center;">
+                An OTP will be sent to your mobile number for verification.
+            </p>
         </form>
 
         <div class="auth-footer">
-            <p>{{ get_text('already_have_account') }} <a href="{{ url_for('user_login') }}">{{ get_text('login_here')
-                    }}</a></p>
+            <p>
+                {{ get_text('already_have_account') }}
+                <a href="{{ url_for('user_login') }}">
+                    {{ get_text('login_here') }}
+                </a>
+            </p>
         </div>
     </div>
 </div>
