@@ -76,3 +76,71 @@
 .login-btn-primary:hover {
     box-shadow: 0 5px 15px rgba(31, 63, 109, 0.3);
 }
+
+/* ================= PASSWORD TOGGLE EYE ICON ================= */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrapper input {
+    padding-right: 45px !important;
+}
+
+.password-toggle-container {
+    --color: #a5a5b0;
+    --size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: var(--size);
+    user-select: none;
+    fill: var(--color);
+    z-index: 10;
+}
+
+.password-toggle-container .eye {
+    position: absolute;
+    animation: keyframes-fill .5s;
+}
+
+.password-toggle-container .eye-slash {
+    position: absolute;
+    animation: keyframes-fill .5s;
+    display: none;
+}
+
+/* ------ On check event ------ */
+.password-toggle-container input:checked~.eye {
+    display: none;
+}
+
+.password-toggle-container input:checked~.eye-slash {
+    display: block;
+}
+
+/* ------ Hide the default checkbox ------ */
+.password-toggle-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* ------ Animation ------ */
+@keyframes keyframes-fill {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
