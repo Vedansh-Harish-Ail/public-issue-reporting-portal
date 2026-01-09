@@ -335,3 +335,21 @@ textarea.form-control {
 .auth-footer a:hover {
     text-decoration: underline;
 }
+
+.password-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-password {
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    user-select: none;
+}
+
+.toggle-password:hover {
+    color: #000;
+}
+/* ================= MEDIA QUERIES ================= */

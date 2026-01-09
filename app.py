@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 
 
-#---------------- EMAIL OTP UTILITIES ----------------
+#---------------- EMAIL OTP UTILITIES ------------------
 import smtplib
 import random
 from email.mime.text import MIMEText

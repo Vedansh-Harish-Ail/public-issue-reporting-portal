@@ -20,10 +20,16 @@
             </div>
 
             <div class="form-group">
-                <label for="password">{{ get_text('password') }}</label>
-                <input type="password" name="password" id="password" class="form-control"
+                <label class="password-label">
+                    {{ get_text('password') }}
+                    <span class="toggle-password" onclick="togglePassword(this)" title="Show / Hide Password">
+                    </span>
+                </label>
+
+                <input type="password" name="password" class="form-control password-input"
                     placeholder="{{ get_text('enter_password') }}" required>
             </div>
+
 
             <button type="submit" class="btn-submit">{{ get_text('sign_in') }}</button>
         </form>

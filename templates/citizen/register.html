@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen.css') }}">
 {% endblock %}
-
 {% block content %}
 <div class="auth-wrapper">
     <div class="auth-card">
@@ -58,7 +56,7 @@
 
             <!-- OTP Info Message -->
             <p style="font-size: 13px; color: #777; margin-top: 12px; text-align: center;">
-                An OTP will be sent to your email address for verification.
+                An OTP will be sent to your email and sms for verification.
             </p>
         </form>
 
