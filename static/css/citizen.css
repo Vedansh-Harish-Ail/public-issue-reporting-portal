@@ -359,25 +359,33 @@ textarea.form-control {
     width: 100%;
 }
 
+/* Hide browser default password reveal button (Edge/IE) */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+
+
 .password-input-wrapper .form-control {
-    padding-right: 45px;
+    padding-right: 50px;
 }
 
 .password-toggle-container {
-    --color: #a5a5b0;
-    --size: 20px;
+    --color: #666;
+    --size: 26px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: absolute;
-    right: 12px;
-    top: 50%;
+    right: 50px;
+    top: 42%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: var(--size);
     user-select: none;
     fill: var(--color);
     z-index: 10;
+    margin-top: -1px;
 }
 
 .password-toggle-container .eye {
@@ -392,11 +400,11 @@ textarea.form-control {
 }
 
 /* ------ On check event ------ */
-.password-toggle-container input:checked ~ .eye {
+.password-toggle-container input:checked~.eye {
     display: none;
 }
 
-.password-toggle-container input:checked ~ .eye-slash {
+.password-toggle-container input:checked~.eye-slash {
     display: block;
 }
 
