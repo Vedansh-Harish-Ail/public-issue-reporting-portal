@@ -4,6 +4,7 @@ from urllib import response
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import re
 from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT ----------------
 import requests
@@ -322,6 +323,17 @@ def user_register():
         email = request.form["email"]
         mobile = request.form["mobile"]
         password = request.form["password"]
+
+        # Server-side Validation
+        # Mobile: +91 followed by 10 digits (6-9)
+        if not re.match(r"^\+91[6-9]\d{9}$", mobile):
+            flash("Invalid Mobile Number. Must start with +91 and contain 10 digits.", "danger")
+            return redirect(url_for("user_register"))
+
+        # Password: 8+ chars, 1 Upper, 1 Lower, 1 Number, 1 Special
+        if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
+             flash("Password too weak. Must be at least 8 chars with 1 Uppercase, 1 Lowercase, 1 Number, and 1 Special Character.", "danger")
+             return redirect(url_for("user_register"))
 
         # store data temporarily
         session["temp_user"] = {
