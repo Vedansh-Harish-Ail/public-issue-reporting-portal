@@ -5,22 +5,22 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from translations import TRANSLATIONS # Import translations
-
+#---------------- SMS OTP IMPORT ----------------
 import requests
 import random
 import time
-
+#---------------- EMAIL OTP IMPORT ------------------
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION ----------------
 
 
 
-#---------------- EMAIL OTP UTILITIES ------------------
-import smtplib
-import random
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+#---------------- EMAIL OTP CONFIGURATION ----------------
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -475,6 +475,24 @@ def admin_dashboard():
 
     conn.close()
     return render_template("admin/dashboard.html", issues=issues)
+
+@app.route("/admin/category/<category>")
+@login_required
+def admin_category_issues(category):
+    # Authorization check handled by decorator
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    issues = conn.execute("""
+        SELECT i.*, u.name as reporter_name 
+        FROM issues i
+        LEFT JOIN users u ON i.user_id = u.id
+        WHERE i.panchayath_id = ? AND i.category = ?
+        ORDER BY i.created_at DESC
+    """, (pid, category)).fetchall()
+
+    conn.close()
+    return render_template("admin/department_issues.html", issues=issues, category=category)
 
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 

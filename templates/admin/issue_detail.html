@@ -6,12 +6,10 @@
 
 {% block content %}
 
-<div class="admin-dashboard-container"
-  style="display: grid; grid-template-columns: 250px 1fr; gap: 30px; padding: 40px; min-height: 80vh; max-width: 1400px; margin: auto;">
+<div class="admin-dashboard-container">
 
   <!-- Sidebar (Consistent) -->
-  <aside class="admin-sidebar"
-    style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content;">
+  <aside class="admin-sidebar">
     <div style="text-align: center; margin-bottom: 30px;">
       <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
       <small style="color: #777;">Issue Management</small>
@@ -19,16 +17,13 @@
 
     <nav class="admin-nav">
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 10px;">
-          <a href="{{ url_for('admin_dashboard') }}"
-            style="display: block; padding: 12px; color: #555; text-decoration: none; font-weight: 500; transition: 0.2s;"
-            onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#555'">
+        <li>
+          <a href="{{ url_for('admin_dashboard') }}" style="transition: 0.2s;">
             &larr; Back to Dashboard
           </a>
         </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-          <a href="{{ url_for('admin_logout') }}"
-            style="display: block; padding: 12px; color: #c53030; text-decoration: none; font-weight: 500;">
+          <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
             🚪 Logout
           </a>
         </li>
@@ -58,7 +53,7 @@
       </div>
 
       <!-- Details Grid -->
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+      <div class="issue-detail-grid">
 
         <!-- Left: Description -->
         <div>
@@ -122,10 +117,6 @@
                 style="width: 100%; border-radius: 8px; border: 1px solid #eee; cursor: pointer;"
                 onclick="openImageModal('{{ url_for('static', filename=issue.photo_path) }}')"
                 title="Click to view full size">
-              <div
-                style="position: absolute; top: 12px; right: 12px; background: rgba(31, 63, 109, 0.75); color: white; padding: 8px 16px; border-radius: 24px; font-size: 13px; font-weight: 600; backdrop-filter: blur(8px); box-shadow: 0 2px 10px rgba(0,0,0,0.25);">
-                🔍 View Full Size
-              </div>
             </div>
           </div>
           {% endif %}

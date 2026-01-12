@@ -145,3 +145,31 @@
         transform: scale(1.2);
     }
 }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 480px) {
+    .admin-login-wrapper {
+        padding: 20px;
+        min-height: calc(100vh - 100px);
+        /* Adjust for mobile address bar/nav */
+    }
+
+    .admin-login-card {
+        padding: 25px 20px;
+    }
+
+    .admin-login-card h2 {
+        font-size: 22px;
+    }
+
+    .login-subtitle {
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+
+    .form-group input {
+        font-size: 16px;
+        /* Prevent zoom on mobile */
+        padding: 12px;
+    }
+}

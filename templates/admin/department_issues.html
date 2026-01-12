@@ -1,0 +1,119 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ category }} Issues - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard-container">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <h3 style="margin-top: 0; color: var(--primary-color);">Admin Panel</h3>
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Welcome, Admin</p>
+
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('admin_notices') }}">Notices</a></li>
+                <li><a href="{{ url_for('admin_logout') }}" style="color: #dc3545;">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <a href="{{ url_for('admin_dashboard') }}"
+                    style="color: #666; text-decoration: none; font-size: 20px;">&larr;</a>
+                <h2 style="margin: 0; color: #333;">{{ category }} Complaints</h2>
+            </div>
+
+            <span
+                style="font-size: 14px; padding: 5px 15px; background: white; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #555;">
+                Total: {{ issues|length }}
+            </span>
+        </div>
+
+        <!-- Issues List (Reusing Table Style) -->
+        <div class="recent-issues"
+            style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                ID</th>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                Photo</th>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                Reporter</th>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                Location</th>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                Status</th>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                Date</th>
+                            <th
+                                style="text-align: left; padding: 15px; background: #f9fafb; color: #666; font-size: 13px; text-transform: uppercase;">
+                                Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in issues %}
+                        <tr>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee; color: #444;">#{{ i.id }}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                                {% if i.photo_path %}
+                                <div style="position: relative; display: inline-block;">
+                                    <img src="{{ url_for('static', filename=i.photo_path) }}"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; cursor: pointer;"
+                                        onclick="window.open('{{ url_for('static', filename=i.photo_path) }}', '_blank')"
+                                        title="Click to view full size">
+                                </div>
+                                {% else %}
+                                <div
+                                    style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                    🖼️
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                                <span style="font-weight: 500;">{{ i.reporter_name or 'Unknown' }}</span>
+                            </td>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee; color: #444;">{{ i.location }}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                                <span style="font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 500;
+                                    {% if i.status == 'Completed' %} background: #def7ec; color: #047857;
+                                    {% elif i.status == 'In Progress' %} background: #e1effe; color: #1e429f;
+                                    {% else %} background: #fff8dd; color: #92400e; {% endif %}">
+                                    {{ i.status }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee; color: #666;">{{ i.created_at[:10]
+                                }}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                                <a href="{{ url_for('admin_issue_detail', issue_id=i.id) }}"
+                                    style="text-decoration: none; color: var(--secondary-color); font-weight: 600;">View
+                                    &rarr;</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="padding: 30px; text-align: center; color: #777;">No issues found in
+                                this category.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+{% endblock %}
