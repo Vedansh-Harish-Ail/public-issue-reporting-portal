@@ -74,7 +74,7 @@
     <div class="department-grid">
       {% for category, dept_issues in issues|sort(attribute='category')|groupby('category') %}
       <!-- Wrap in anchor to make it clickable if needed in future, or just div -->
-      <a href="#" style="text-decoration: none;">
+      <a href="{{ url_for('admin_category_issues', category=category) }}" style="text-decoration: none;">
         <div class="department-stat-card">
           <h3>{{ dept_issues|list|length }}</h3>
           <p class="dept-name">{{ category }}</p>
