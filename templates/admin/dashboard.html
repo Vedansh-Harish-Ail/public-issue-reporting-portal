@@ -49,23 +49,23 @@
     <!-- Stats Row -->
     <div class="dashboard-stats">
       <!-- Total -->
-      <div class="stat-card" style="border-left: 5px solid var(--primary-color);">
-        <h3 style="margin: 0; font-size: 32px; color: var(--primary-color);">{{ issues|length }}</h3>
-        <p style="margin: 5px 0 0; color: #777; font-size: 14px;">Total Issues</p>
+      <div class="stat-card primary">
+        <h3>{{ issues|length }}</h3>
+        <p>Total Issues</p>
       </div>
 
       <!-- Pending -->
-      <div class="stat-card" style="border-left: 5px solid var(--secondary-color);">
+      <div class="stat-card secondary">
         {% set pending = issues|selectattr('status', 'equalto', 'Pending')|list|length %}
-        <h3 style="margin: 0; font-size: 32px; color: var(--secondary-color);">{{ pending }}</h3>
-        <p style="margin: 5px 0 0; color: #777; font-size: 14px;">Pending Actions</p>
+        <h3>{{ pending }}</h3>
+        <p>Pending Actions</p>
       </div>
 
       <!-- Resolved -->
-      <div class="stat-card" style="border-left: 5px solid var(--accent-color);">
+      <div class="stat-card accent">
         {% set resolved = issues|selectattr('status', 'equalto', 'Completed')|list|length %}
-        <h3 style="margin: 0; font-size: 32px; color: var(--accent-color);">{{ resolved }}</h3>
-        <p style="margin: 5px 0 0; color: #777; font-size: 14px;">Resolved</p>
+        <h3>{{ resolved }}</h3>
+        <p>Resolved</p>
       </div>
     </div>
 
