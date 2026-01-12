@@ -476,24 +476,6 @@ def admin_dashboard():
     conn.close()
     return render_template("admin/dashboard.html", issues=issues)
 
-@app.route("/admin/category/<category>")
-@login_required
-def admin_category_issues(category):
-    # Authorization check handled by decorator
-    pid = session["panchayath_id"]
-    conn = connect_db()
-
-    issues = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
-        FROM issues i
-        LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.panchayath_id = ? AND i.category = ?
-        ORDER BY i.created_at DESC
-    """, (pid, category)).fetchall()
-
-    conn.close()
-    return render_template("admin/department_issues.html", issues=issues, category=category)
-
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 
 @app.route("/admin/notices", methods=["GET", "POST"])
