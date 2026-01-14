@@ -22,6 +22,11 @@
             &larr; Back to Dashboard
           </a>
         </li>
+        <li>
+          <a href="{{ url_for('admin_completed_issues') }}" style="transition: 0.2s;">
+            ✅ Resolved Issues
+          </a>
+        </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
             🚪 Logout
@@ -90,23 +95,27 @@
           <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 25px;">
             <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">Update Status</h4>
 
+            {% if issue.status != 'Completed' %}
             <form method="post" action="{{ url_for('update_issue', issue_id=issue.id) }}">
               <div class="form-group">
                 <label style="font-size: 12px; font-weight: 600; color: #666;">Current Status</label>
                 <select name="status"
                   style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
                   <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
-                  <option {% if issue.status=='In Progress' %}selected{% endif %}>In Progress</option>
-                  <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
                   <option {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
+                  <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
                 </select>
               </div>
-
               <button type="submit" class="primary-btn"
                 style="width: 100%; margin-top: 15px; justify-content: center;">Update Status</button>
             </form>
+            {% else %}
+            <div
+              style="padding: 15px; background: #def7ec; color: #047857; border-radius: 8px; font-size: 14px; text-align: center;">
+              ✅ This issue has been marked as <strong>Completed</strong> and cannot be updated further.
+            </div>
+            {% endif %}
           </div>
-
           {% if issue.photo_path %}
           <div style="margin-top: 30px;">
             <h5
@@ -121,13 +130,9 @@
           </div>
           {% endif %}
         </div>
-
       </div>
-
     </div>
-
   </main>
-
 </div>
 
 {% endblock %}

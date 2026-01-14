@@ -118,6 +118,7 @@ def init_db():
 
     CREATE TABLE IF NOT EXISTS issues (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tracking_id TEXT UNIQUE,
         panchayath_id INTEGER,
         category TEXT,
         description TEXT,
@@ -160,6 +161,13 @@ def init_db():
         conn.execute("ALTER TABLE issues ADD COLUMN user_id INTEGER")
         conn.commit()
 
+    # Add tracking_id to issues table if it doesn't exist
+    try:
+        conn.execute("SELECT tracking_id FROM issues LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE issues ADD COLUMN tracking_id TEXT")
+        conn.commit()
+
     # Add banner_path to notices table if it doesn't exist
     try:
         conn.execute("SELECT banner_path FROM notices LIMIT 1")
@@ -190,6 +198,12 @@ def seed_data():
 
     conn.commit()
     conn.close()
+
+# ---------------- HELPERS ----------------
+def generate_tracking_id():
+    import uuid
+    # Generate a short unique ID (e.g., TRK-1A2B3C)
+    return "TRK-" + str(uuid.uuid4())[:8].upper()
 
 # ---------------- CITIZEN ROUTES --------------
 
@@ -256,15 +270,17 @@ def report_issue():
             image.save(os.path.join(upload_folder, filename))
             image_filename = f"uploads/{filename}"
 
+        tracking_id = generate_tracking_id()
+
         conn.execute("""
-            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (panchayath_id, category, description, location, image_filename, user_id))
+            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id))
 
         conn.commit()
         conn.close()
-        flash("Issue reported successfully", "success")
-        return redirect(url_for("track_issue"))
+        flash(f"Issue reported successfully! Your Tracking ID is {tracking_id}", "success")
+        return redirect(url_for("track_issue", new_tracking_id=tracking_id))
 
     panchayaths = conn.execute("SELECT * FROM panchayath").fetchall()
     conn.close()
@@ -274,16 +290,41 @@ def report_issue():
 @user_login_required
 def track_issue():
     user_id = session["user_id"]
+    search_id = request.args.get("search_id")
+    # Helper to highlight specific tracking ID if redirected from report
+    new_tracking_id = request.args.get("new_tracking_id") 
+    
     conn = connect_db()
-    issues = conn.execute("""
-        SELECT i.*, p.name AS panchayath_name
-        FROM issues i
-        JOIN panchayath p ON p.id = i.panchayath_id
-        WHERE i.user_id = ?
-        ORDER BY i.created_at DESC
-    """, (user_id,)).fetchall()
+    
+    if search_id:
+        issues = conn.execute("""
+            SELECT i.*, p.name AS panchayath_name
+            FROM issues i
+            JOIN panchayath p ON p.id = i.panchayath_id
+            WHERE i.tracking_id = ? AND i.user_id = ?
+        """, (search_id.strip(), user_id)).fetchall()
+        
+        if not issues:
+             flash("No issue found with that Tracking ID.", "warning")
+             # Fallback to showing all
+             issues = conn.execute("""
+                SELECT i.*, p.name AS panchayath_name
+                FROM issues i
+                JOIN panchayath p ON p.id = i.panchayath_id
+                WHERE i.user_id = ?
+                ORDER BY i.created_at DESC
+            """, (user_id,)).fetchall()
+    else:
+        issues = conn.execute("""
+            SELECT i.*, p.name AS panchayath_name
+            FROM issues i
+            JOIN panchayath p ON p.id = i.panchayath_id
+            WHERE i.user_id = ?
+            ORDER BY i.created_at DESC
+        """, (user_id,)).fetchall()
+        
     conn.close()
-    return render_template("citizen/track_issue.html", issues=issues, title="My Reported Issues")
+    return render_template("citizen/track_issue.html", issues=issues, title="My Reported Issues", new_tracking_id=new_tracking_id, search_id=search_id)
 
 @app.route("/public-track")
 def public_track():
@@ -481,12 +522,29 @@ def admin_dashboard():
         SELECT i.*, u.name as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.panchayath_id = ?
+        WHERE i.panchayath_id = ? AND i.status != 'Completed'
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
 
     conn.close()
     return render_template("admin/dashboard.html", issues=issues)
+
+@app.route("/admin/completed_issues")
+@login_required
+def admin_completed_issues():
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    issues = conn.execute("""
+        SELECT i.*, u.name as reporter_name 
+        FROM issues i
+        LEFT JOIN users u ON i.user_id = u.id
+        WHERE i.panchayath_id = ? AND i.status = 'Completed'
+        ORDER BY i.created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/completed_issues.html", issues=issues)
 
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 
