@@ -9,9 +9,99 @@
 <div class="container my-5">
   <h2 class="section-title">{{ title or get_text('track_issue_status') }}</h2>
 
+  <!-- IN-PAGE TRACKING SEARCH -->
+  <div style="margin-bottom: 30px; text-align: center;">
+    <form action="{{ url_for('track_issue') }}" method="get"
+      style="display: inline-flex; background: white; padding: 5px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; width: 100%; max-width: 500px;">
+      <input type="text" name="search_id" placeholder="Enter Tracking ID (e.g. TRK-A1B2C3)" required
+        style="flex: 1; border: none; outline: none; padding: 12px 20px; font-size: 15px; background: transparent;">
+      <button type="submit"
+        style="background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;">
+        Track
+      </button>
+    </form>
+  </div>
+
+  <!-- VISUAL TRACKER (Only if searching or just reported) -->
+  {% if (search_id or new_tracking_id) and issues %}
+  {% set tracked_issue = issues[0] %}
+  <div class="status-tracker-wrapper">
+    <div class="tracker-header">
+      <span class="tracker-id-badge">ID: {{ tracked_issue.tracking_id }}</span>
+      <h3 style="margin: 15px 0 5px; color: var(--primary-color);">{{ tracked_issue.category }} Issue</h3>
+      <p style="margin: 0; color: #666;">Reported on {{ tracked_issue.created_at[:10] }}</p>
+    </div>
+
+    <!-- Logic for Steps -->
+    {% set status = tracked_issue.status %}
+    {% set progress = '0%' %}
+    {% set step1_class = 'active' %}
+    {% set step2_class = '' %}
+    {% set step3_class = '' %}
+    {% set step1_check = '' %}
+    {% set step2_check = '' %}
+    {% set step3_check = '' %}
+
+    {% if status == 'Pending' %}
+    {% set progress = '33%' %}
+    {% set step1_class = 'active' %}
+    {% elif status == 'Under Review' %}
+    {% set progress = '66%' %}
+    {% set step1_class = 'completed' %}
+    {% set step2_class = 'active' %}
+    {% set step1_check = '✓' %}
+    {% elif status == 'Completed' %}
+    {% set progress = '100%' %}
+    {% set step1_class = 'completed' %}
+    {% set step2_class = 'completed' %}
+    {% set step3_class = 'active' %}
+    {% set step1_check = '✓' %}
+    {% set step2_check = '✓' %}
+    {% set step3_check = '✓' %}
+    {% elif status == 'Rejected' %}
+    {% set progress = '100%' %}
+    {% set step1_class = 'completed' %}
+    {% set step2_class = 'rejected' %}
+    {% set step3_class = 'rejected' %} <!-- Or handle differently -->
+    {% endif %}
+
+    <div class="progress-track">
+      <div class="progress-fill {% if status == 'Rejected' %}rejected{% endif %}" style="width: {{ progress }};"></div>
+
+      <div class="step-item {{ step1_class }}">
+        <div class="step-circle">{{ step1_check or '1' }}</div>
+        <div class="step-label">Reported</div>
+        <span class="step-date">Issue Received</span>
+      </div>
+
+      <div class="step-item {{ step2_class }}">
+        <div class="step-circle">{{ step2_check or '2' }}</div>
+        <div class="step-label">{% if status == 'Rejected' %}Rejected{% else %}Under Review{% endif %}</div>
+        <span class="step-date">
+          {% if status == 'Rejected' %}Valid reason{% else %}We are checking{% endif %}
+        </span>
+      </div>
+
+      <div class="step-item {{ step3_class }}">
+        <div class="step-circle">{{ step3_check or '3' }}</div>
+        <div class="step-label">Resolved</div>
+        <span class="step-date">Issue Fixed</span>
+      </div>
+    </div>
+
+    {% if status == 'Rejected' %}
+    <div
+      style="text-align: center; margin-top: 30px; padding: 15px; background: #fff5f5; border-radius: 8px; color: #c53030;">
+      <strong>Note:</strong> This issue was rejected. Please contact the panchayat office for more details.
+    </div>
+    {% endif %}
+
+  </div>
+  {% endif %}
+
   <!-- Info Section -->
   <div class="about-card mb-5"
-    style="padding: 20px; align-items: center; gap: 20px; flex-direction: row; border-top: 5px solid var(--primary-color);">
+    style="padding: 20px; align-items: center; gap: 20px; flex-direction: row; border-top: 5px solid var(--primary-color); margin-bottom: 50px;">
 
     <div style="flex: 1;">
       <h5 style="margin: 0; color: var(--primary-color);">
@@ -33,10 +123,16 @@
       <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <h4 style="margin-top: 0; color: var(--primary-color); font-size: 18px;">{{ i.category }}</h4>
 
-        <span class="issue-status {{ i.status|lower|replace(' ', '-') }}"
-          style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
-          {{ i.status }}
-        </span>
+        <div style="text-align: right;">
+          <span class="issue-status {{ i.status|lower|replace(' ', '-') }}"
+            style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+            {{ i.status }}
+          </span>
+          {% if i.tracking_id and (not is_public or session.get('user_id') == i.user_id) %}
+          <div style="font-size: 11px; color: #666; margin-top: 5px; font-family: monospace;">ID: {{ i.tracking_id }}
+          </div>
+          {% endif %}
+        </div>
       </div>
 
       {% if is_public and i.user_name %}

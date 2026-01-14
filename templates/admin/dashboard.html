@@ -105,11 +105,11 @@
                   <span style="display: flex; align-items: center;">
                     <span class="status-dot" style="
                       {% if i.status == 'Completed' %} background: #047857;
-                      {% elif i.status == 'In Progress' %} background: #1e429f;
+                      {% elif i.status == 'Under Review' %} background: #1e429f;
                       {% else %} background: #d97706; {% endif %}"></span>
                     <span style="
                       {% if i.status == 'Completed' %} color: #047857;
-                      {% elif i.status == 'In Progress' %} color: #1e429f;
+                      {% elif i.status == 'Under Review' %} color: #1e429f;
                       {% else %} color: #d97706; {% endif %}">
                       {{ i.status }}
                     </span>

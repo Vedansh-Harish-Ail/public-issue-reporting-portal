@@ -51,7 +51,7 @@
 
         <span class="status-badge" style="padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 14px;
           {% if issue.status == 'Completed' %} background: #def7ec; color: #047857;
-          {% elif issue.status == 'In Progress' %} background: #e1effe; color: #1e429f;
+          {% elif issue.status == 'Under Review' %} background: #e1effe; color: #1e429f;
           {% else %} background: #fff8dd; color: #92400e; {% endif %}">
           {{ issue.status }}
         </span>
@@ -103,6 +103,7 @@
                   style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
                   <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
                   <option {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
+                  <option {% if issue.status=='Under Review' %}selected{% endif %}>Under Review</option>
                   <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
                 </select>
               </div>

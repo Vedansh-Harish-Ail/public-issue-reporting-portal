@@ -169,20 +169,64 @@ main {
     align-items: center;
 }
 
-.search-box {
-    padding: 8px 12px;
-    border-radius: 20px;
+/* ================= SEARCH BAR (Animated) ================= */
+.nav-search-container {
+    width: 40px;
+    /* Reduced from 60px */
+    height: 40px;
+    /* Reduced from 60px */
+    background-color: var(--secondary-color);
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.08);
+    /* Lighter shadow */
+    transition: width 0.3s ease;
     border: none;
-    font-size: 13px;
-    width: 160px;
-    background: rgba(255, 255, 255, 0.9);
-    transition: width 0.3s;
+    padding: 0;
 }
 
-.search-box:focus {
-    width: 200px;
+.nav-search-container:hover,
+.nav-search-container:focus-within {
+    width: 220px;
+    /* Reduced expanded width */
+}
+
+.nav-search-icon {
+    min-width: 40px;
+    /* Match container height */
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    fill: white;
+    cursor: pointer;
+}
+
+.nav-search-input {
+    background: transparent;
+    border: none;
     outline: none;
-    background: #fff;
+    font-size: 14px;
+    /* Reduced font size */
+    color: white;
+    width: 100%;
+    padding-right: 15px;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.nav-search-container:hover .nav-search-input,
+.nav-search-container:focus-within .nav-search-input {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.nav-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .login-btn {
