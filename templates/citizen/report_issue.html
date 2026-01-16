@@ -7,20 +7,21 @@
 
 <!-- HERO SECTION -->
 <div class="hero-section"
-  style="background-image: linear-gradient(rgba(31, 63, 109, 0.85), rgba(31, 63, 109, 0.85)); height: 120px; padding: 40px 0; margin-bottom: 0; border-radius: 0;">
-  {{ back_button(get_text) }}
+  style="background-image: linear-gradient(rgba(31, 63, 109, 0.85), rgba(31, 63, 109, 0.85)); padding: 20px 0; margin-bottom: 0; border-radius: 0;">
+
   <div class="container">
-    <h1 style="font-size: 2.2rem; margin: 0; text-align: center;">{{ get_text('lodge_grievance') }}</h1>
+    <h1 style="font-size: 2.2rem; margin: 0; text-align: center; color: white;">{{ get_text('Report Issue') }}</h1>
   </div>
 </div>
 
 <div class="section-padding bg-light" style="padding: 60px 0;">
   <div class="container">
+    {{ back_button(get_text) }}
     <div class="report-form-card glass-card"
       style="max-width: 800px; margin: auto; background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
 
       <div style="margin-bottom: 40px; text-align: center;">
-        <p style="color: #666; font-size: 1.1rem;">{{ get_text('report_form_desc') }}</p>
+        <p style="color: #666; font-size: 1.1rem;">{{ get_text('Report_Issue_Desc') }}</p>
       </div>
 
       <form method="post" enctype="multipart/form-data">

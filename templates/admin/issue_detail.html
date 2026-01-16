@@ -51,6 +51,7 @@
 
         <span class="status-badge" style="padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 14px;
           {% if issue.status == 'Completed' %} background: #def7ec; color: #047857;
+          {% elif issue.status == 'Rejected' %} background: #fde8e8; color: #c81e1e;
           {% elif issue.status == 'Under Review' %} background: #e1effe; color: #1e429f;
           {% else %} background: #fff8dd; color: #92400e; {% endif %}">
           {{ issue.status }}

@@ -526,8 +526,16 @@ def admin_dashboard():
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
 
+    # Calculate stats for dashboard cards
+    stats = {
+        "total": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ?", (pid,)).fetchone()[0],
+        "resolved": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Completed'", (pid,)).fetchone()[0],
+        "pending": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Pending'", (pid,)).fetchone()[0],
+        "rejected": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Rejected'", (pid,)).fetchone()[0]
+    }
+
     conn.close()
-    return render_template("admin/dashboard.html", issues=issues)
+    return render_template("admin/dashboard.html", issues=issues, stats=stats)
 
 @app.route("/admin/completed_issues")
 @login_required

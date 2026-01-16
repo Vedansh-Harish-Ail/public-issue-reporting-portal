@@ -7,8 +7,9 @@
 {% block content %}
 
 <div class="container my-5">
-  <div style="display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
-    <h2 class="section-title" style="text-align: left; margin-bottom: 20px;">{{ title or get_text('track_issue_status')
+  <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 20px;">
+    <h2 class="section-title" style="text-align: center; width: 100%; margin-bottom: 10px;">{{ title or
+      get_text('track_issue_status')
       }}</h2>
     {{ back_button(get_text) }}
   </div>
