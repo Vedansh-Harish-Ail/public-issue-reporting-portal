@@ -5,10 +5,12 @@
 <!-- HERO SECTION -->
 <div class="hero-section"
     style="background-image: linear-gradient(rgba(15, 36, 68, 0.85), rgba(15, 36, 68, 0.85)), url('{{ url_for('static', filename='image/about_banner.jpg') }}'); margin-bottom: 0; border-radius: 0;">
+    {{ back_button(get_text) }}
     <div class="container text-center">
         <div class="hero-content mx-auto">
-            <h1 style="font-size: 3.5rem;">{{ get_text('about_mission_vision') }}</h1>
-            <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 30px;">{{ get_text('about_hero_desc') }}</p>
+            <h1 style="font-size: 3.5rem; color: white;">{{ get_text('about_mission_vision') }}</h1>
+            <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 30px; color: rgba(255,255,255,0.9);">{{
+                get_text('about_hero_desc') }}</p>
         </div>
     </div>
 </div>

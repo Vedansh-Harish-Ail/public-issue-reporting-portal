@@ -17,7 +17,7 @@ body {
     margin: 0;
     font-family: var(--font-main);
     background: var(--bg-color);
-    color: #ffffff;
+    color: var(--text-color);
     line-height: 1.6;
     font-size: 16px;
     /* Increased base size */
@@ -36,6 +36,7 @@ h6 {
     /* Consistent Premium Headings */
     font-weight: 700;
     margin-top: 0;
+    color: var(--primary-color);
 }
 
 .container {
@@ -1043,5 +1044,83 @@ body.no-scroll {
     /* Also ensure container doesn't have excess padding */
     .hero-slider-content {
         padding: 0 10px;
+    }
+}
+
+/* ================= FANCY BACK BUTTON ================= */
+.back-btn-container {
+    margin: 10px 0 20px 20px;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.back-btn-fancy {
+    background-color: #ffffff;
+    width: 180px;
+    border-radius: 1rem;
+    height: 52px;
+    position: relative;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: 1px solid var(--primary-color);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    font-family: var(--font-main);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn-fancy .icon-box {
+    background-color: var(--primary-color);
+    border-radius: 0.75rem;
+    height: 44px;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 4px;
+    top: 3px;
+    z-index: 10;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-btn-fancy:hover .icon-box {
+    width: 172px;
+}
+
+.back-btn-fancy p {
+    margin: 0;
+    transform: translateX(18px);
+    transition: opacity 0.3s ease;
+}
+
+.back-btn-fancy:hover p {
+    opacity: 0;
+}
+
+.back-btn-fancy svg {
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .back-btn-fancy {
+        width: 150px;
+        height: 48px;
+        font-size: 0.9rem;
+    }
+
+    .back-btn-fancy .icon-box {
+        height: 40px;
+        width: 40px;
+    }
+
+    .back-btn-fancy:hover .icon-box {
+        width: 142px;
     }
 }
