@@ -17,7 +17,7 @@ body {
     margin: 0;
     font-family: var(--font-main);
     background: var(--bg-color);
-    color: #ffffff;
+    color: var(--text-color);
     line-height: 1.6;
     font-size: 16px;
     /* Increased base size */
@@ -36,6 +36,7 @@ h6 {
     /* Consistent Premium Headings */
     font-weight: 700;
     margin-top: 0;
+    color: var(--primary-color);
 }
 
 .container {
