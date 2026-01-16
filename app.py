@@ -125,6 +125,7 @@ def init_db():
         location TEXT,
         photo_path TEXT,
         status TEXT DEFAULT 'Pending',
+        rejection_reason TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -522,7 +523,7 @@ def admin_dashboard():
         SELECT i.*, u.name as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.panchayath_id = ? AND i.status != 'Completed'
+        WHERE i.panchayath_id = ? AND i.status != 'Completed' AND i.status != 'Rejected'
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
 
@@ -553,6 +554,23 @@ def admin_completed_issues():
 
     conn.close()
     return render_template("admin/completed_issues.html", issues=issues)
+
+@app.route("/admin/rejected_issues")
+@login_required
+def admin_rejected_issues():
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    issues = conn.execute("""
+        SELECT i.*, u.name as reporter_name 
+        FROM issues i
+        LEFT JOIN users u ON i.user_id = u.id
+        WHERE i.panchayath_id = ? AND i.status = 'Rejected'
+        ORDER BY i.created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/rejected_issues.html", issues=issues)
 
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 
@@ -654,10 +672,12 @@ def update_issue(issue_id):
     # Authorization check handled by decorator
 
     status = request.form["status"]
+    rejection_reason = request.form.get("rejection_reason") if status == "Rejected" else None
+    
     conn = connect_db()
     conn.execute(
-        "UPDATE issues SET status=? WHERE id=?",
-        (status, issue_id)
+        "UPDATE issues SET status=?, rejection_reason=? WHERE id=?",
+        (status, rejection_reason, issue_id)
     )
     conn.commit()
     conn.close()

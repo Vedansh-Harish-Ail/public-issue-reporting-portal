@@ -27,6 +27,11 @@
             ✅ Resolved Issues
           </a>
         </li>
+        <li>
+          <a href="{{ url_for('admin_rejected_issues') }}" style="transition: 0.2s;">
+            ❌ Rejected Issues
+          </a>
+        </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
             🚪 Logout
@@ -103,10 +108,17 @@
                 <select name="status"
                   style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
                   <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
-                  <option {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
+                  <option value="Rejected" {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
                   <option {% if issue.status=='Under Review' %}selected{% endif %}>Under Review</option>
                   <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
                 </select>
+
+                <div id="rejection-reason-container" style="display: none; margin-top: 15px;">
+                  <label style="font-size: 12px; font-weight: 600; color: #dc3545;">Reason for Rejection *</label>
+                  <textarea name="rejection_reason" id="rejection_reason" rows="3"
+                    placeholder="Please explain why this issue is being rejected..."
+                    style="width: 100%; border: 1px solid #dc3545; border-radius: 8px; padding: 10px; font-family: inherit; margin-top: 5px;"></textarea>
+                </div>
               </div>
               <button type="submit" class="primary-btn"
                 style="width: 100%; margin-top: 15px; justify-content: center;">Update Status</button>
@@ -137,4 +149,24 @@
   </main>
 </div>
 
+
+<script>
+  const statusSelect = document.querySelector('select[name="status"]');
+  const rejectionContainer = document.getElementById('rejection-reason-container');
+  const rejectionTextarea = document.getElementById('rejection_reason');
+
+  function toggleRejectionReason() {
+    if (statusSelect.value === 'Rejected') {
+      rejectionContainer.style.display = 'block';
+      rejectionTextarea.required = true;
+    } else {
+      rejectionContainer.style.display = 'none';
+      rejectionTextarea.required = false;
+    }
+  }
+
+  statusSelect.addEventListener('change', toggleRejectionReason);
+  // Run on load in case it's already rejected
+  toggleRejectionReason();
+</script>
 {% endblock %}

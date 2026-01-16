@@ -136,7 +136,23 @@
           {% if i.tracking_id and (not is_public or session.get('user_id') == i.user_id) %}
           <div style="font-size: 11px; color: #666; margin-top: 5px; font-family: monospace;">ID: {{ i.tracking_id }}
           </div>
+          {% elif i.status == 'Rejected' %}
+          <div
+            style="background: #fde8e8; padding: 10px 15px; border-radius: 50px; display: inline-flex; align-items: center; gap: 10px;">
+            <span style="display: block; width: 10px; height: 10px; background: #c81e1e; border-radius: 50%;"></span>
+            <span style="color: #c81e1e; font-weight: 600;">Rejected</span>
+          </div>
+
+          {% if i.rejection_reason %}
+          <div
+            style="margin-top: 20px; background: #fff5f5; border-left: 4px solid #f05252; padding: 15px; border-radius: 4px;">
+            <strong style="display: block; color: #c81e1e; margin-bottom: 5px; font-size: 14px;">Reason for
+              Rejection:</strong>
+            <p style="margin: 0; color: #444;">{{ i.rejection_reason }}</p>
+          </div>
           {% endif %}
+
+          {% else %}
         </div>
       </div>
 
