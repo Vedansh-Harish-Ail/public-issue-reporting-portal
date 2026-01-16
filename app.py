@@ -421,7 +421,7 @@ def verify_otp():
                     user["email"],
                     user["mobile"],
                     user["password"]
-                ))
+                )) 
                 conn.commit()
             except sqlite3.IntegrityError:
                 flash("Email or Mobile already exists.", "danger")
@@ -669,3 +669,4 @@ if __name__ == "__main__":
     init_db()
     seed_data()
     app.run(debug=True)
+
