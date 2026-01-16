@@ -16,6 +16,7 @@ TRANSLATIONS = {
         "search_placeholder": "Search...",
         "hi": "Hi",
         "menu": "Menu",
+        "go_back": "Go Back",
         
         # Home Page
         "hero_title": "Empowering Rural India",
@@ -145,6 +146,7 @@ TRANSLATIONS = {
         "search_placeholder": "ಹುಡುಕಿ...",
         "hi": "ನಮಸ್ಕಾರ",
         "menu": "ಮೆನು",
+        "go_back": "ಹಿಂದಕ್ಕೆ ಹೋಗಿ",
 
         # Home Page
         "hero_title": "ಗ್ರಾಮೀಣ ಭಾರತದ ಸಬಲೀಕರಣ",

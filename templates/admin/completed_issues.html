@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="admin-dashboard-container">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
+            <small style="color: #777;">Panchayat Official</small>
+        </div>
+
+        <nav class="admin-nav">
+            <ul style="list-style: none; padding: 0;">
+                <li>
+                    <a href="{{ url_for('admin_dashboard') }}">
+                        📊 Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_completed_issues') }}" class="active">
+                        ✅ Resolved Issues
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_notices') }}">
+                        📢 Manage Notices
+                    </a>
+                </li>
+                <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                    <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
+                        🚪 Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+
+        <h2 style="margin: 0; color: #333; margin-bottom: 20px;">Resolved Issues</h2>
+
+        <!-- Issues List -->
+        <div class="department-grid" style="display: block;">
+            <!-- Using block display instead of grid to list them all simply, or we can keep the grouping design -->
+            {% if issues %}
+            {% for category, dept_issues in issues|sort(attribute='category')|groupby('category') %}
+            <div class="department-card" style="margin-bottom: 20px;">
+                <div class="department-header">
+                    <h3>{{ category }}</h3>
+                    <span
+                        style="font-size: 13px; font-weight: 600; color: #666; background: #eee; padding: 4px 10px; border-radius: 20px;">
+                        {{ dept_issues|list|length }} Issues
+                    </span>
+                </div>
+
+                <div class="issue-list-scroll">
+                    {% for i in dept_issues %}
+                    <a href="{{ url_for('admin_issue_detail', issue_id=i.id) }}" style="text-decoration: none;">
+                        <div class="dept-issue-item">
+                            <div class="dept-issue-icon">
+                                {% if i.photo_path %}
+                                <img src="{{ url_for('static', filename=i.photo_path) }}"
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                                {% else %}
+                                📄
+                                {% endif %}
+                            </div>
+                            <div class="dept-issue-content">
+                                <span class="dept-issue-title">#{{ i.id }} - {{ i.location }}</span>
+                                <div class="dept-issue-meta">
+                                    <span>{{ i.created_at[:10] }}</span>
+                                    <span style="display: flex; align-items: center;">
+                                        <span class="status-dot" style="background: #047857;"></span>
+                                        <span style="color: #047857;">Completed</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align: center; padding: 50px; background: white; border-radius: 12px; color: #777;">
+                <h3>No resolved issues found.</h3>
+                <p>Completed complaints will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

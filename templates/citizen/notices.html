@@ -6,43 +6,46 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
+{{ back_button(get_text) }}
+<div style="width: 100%; padding: 0 20px; box-sizing: border-box; margin-top: 40px; margin-bottom: 40px;">
   <h2 class="section-title">{{ get_text('public_notices_announcements') }}</h2>
+  <div style="margin-bottom: 30px;">
+  </div>
 
-  <div class="admin-login-card mx-auto" style="max-width: 900px; text-align: left; padding: 0;">
+  <div class="admin-login-card mx-auto" style="width: 100%; text-align: left; padding: 0;">
 
-    <ul style="list-style: none; padding: 0; margin: 0;">
+    <ul class="notices-grid">
       {% for n in notices %}
-      <li
-        style="border-bottom: 1px solid #eee; padding: 0; overflow: hidden; margin-bottom: 30px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+      <li class="notice-card" onclick="openNoticeModal(this)" data-title="{{ n.title }}"
+        data-date="{{ n.created_at[:10] }}" data-panchayat="{{ n.panchayath_name }}"
+        data-description="{{ n.description }}"
+        data-image="{{ url_for('static', filename=n.banner_path) if n.banner_path else '' }}">
+
         {% if n.banner_path %}
-        <div
-          style="height: 200px; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('/static/{{ n.banner_path }}'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; color: white;">
+        <div class="notice-banner"
+          style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('/static/{{ n.banner_path }}');">
           <strong style="font-size: 24px;">{{ n.title }}</strong>
-          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at[:10] }} | {{ get_text('issued_by') }}: {{
-            n.panchayath_name
-            }}</small>
-        </div>
-        <div style="padding: 25px;">
-          <p style="color: #444; line-height: 1.6; font-size: 16px;">{{ n.description }}</p>
+          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at[:10] }}</small>
         </div>
         {% else %}
-        <div style="padding: 30px;">
-          <div
-            style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;">
+        <div style="padding: 30px; flex-grow: 1; display: flex; flex-direction: column;">
+          <div style="margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;">
             <strong style="font-size: 20px; color: var(--primary-color);">{{ n.title }}</strong>
-            <small style="color: #666;">{{ n.created_at[:10] }}</small>
+            <small style="color: #666; display: block; margin-top: 5px;">{{ n.created_at[:10] }}</small>
           </div>
-          <p style="color: #444; line-height: 1.6; font-size: 16px;">{{ n.description }}</p>
-          <div style="margin-top: 20px; border-top: 1px solid #f9f9f9; padding-top: 10px;">
-            <small class="text-muted" style="font-weight: 500;">{{ get_text('issued_by') }}: {{ n.panchayath_name
-              }}</small>
+          <p
+            style="color: #444; line-height: 1.6; font-size: 16px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ n.description }}
+          </p>
+          <div style="margin-top: 20px; text-align: right;">
+            <span style="color: var(--secondary-color); font-weight: 600; font-size: 14px;">View Details &rarr;</span>
           </div>
         </div>
         {% endif %}
       </li>
       {% else %}
-      <li style="padding: 30px; text-align: center; color: #777;">
+      <li
+        style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #777; background: #f9f9f9; border-radius: 12px;">
         {{ get_text('no_notices') }}
       </li>
       {% endfor %}
@@ -50,4 +53,57 @@
 
   </div>
 </div>
+
+<!-- Notice Modal -->
+<div id="noticeModal" class="modal-overlay" onclick="closeNoticeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeNoticeModal()">
+      &times;
+    </button>
+    <div class="modal-body">
+      <img id="modalImage" class="modal-image" src="" alt="Notice Banner" style="display: none;">
+      <div class="modal-text">
+        <h3 id="modalTitle" class="modal-title"></h3>
+        <div class="modal-meta">
+          <span id="modalDate"></span>
+          <span>|</span>
+          <span id="modalPanchayat"></span>
+        </div>
+        <div id="modalDesc" class="modal-desc"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openNoticeModal(card) {
+    const title = card.getAttribute('data-title');
+    const date = card.getAttribute('data-date');
+    const panchayat = card.getAttribute('data-panchayat');
+    const desc = card.getAttribute('data-description');
+    const image = card.getAttribute('data-image');
+
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDate').textContent = date;
+    document.getElementById('modalPanchayat').textContent = "Issued by: " + panchayat;
+    document.getElementById('modalDesc').textContent = desc;
+
+    const imgElem = document.getElementById('modalImage');
+    if (image) {
+      imgElem.src = image;
+      imgElem.style.display = 'block';
+    } else {
+      imgElem.style.display = 'none';
+    }
+
+    document.getElementById('noticeModal').classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+
+  function closeNoticeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('noticeModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+</script>
 {% endblock %}

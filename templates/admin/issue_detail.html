@@ -6,12 +6,10 @@
 
 {% block content %}
 
-<div class="admin-dashboard-container"
-  style="display: grid; grid-template-columns: 250px 1fr; gap: 30px; padding: 40px; min-height: 80vh; max-width: 1400px; margin: auto;">
+<div class="admin-dashboard-container">
 
   <!-- Sidebar (Consistent) -->
-  <aside class="admin-sidebar"
-    style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content;">
+  <aside class="admin-sidebar">
     <div style="text-align: center; margin-bottom: 30px;">
       <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
       <small style="color: #777;">Issue Management</small>
@@ -19,16 +17,18 @@
 
     <nav class="admin-nav">
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 10px;">
-          <a href="{{ url_for('admin_dashboard') }}"
-            style="display: block; padding: 12px; color: #555; text-decoration: none; font-weight: 500; transition: 0.2s;"
-            onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#555'">
+        <li>
+          <a href="{{ url_for('admin_dashboard') }}" style="transition: 0.2s;">
             &larr; Back to Dashboard
           </a>
         </li>
+        <li>
+          <a href="{{ url_for('admin_completed_issues') }}" style="transition: 0.2s;">
+            ✅ Resolved Issues
+          </a>
+        </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-          <a href="{{ url_for('admin_logout') }}"
-            style="display: block; padding: 12px; color: #c53030; text-decoration: none; font-weight: 500;">
+          <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
             🚪 Logout
           </a>
         </li>
@@ -51,14 +51,14 @@
 
         <span class="status-badge" style="padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 14px;
           {% if issue.status == 'Completed' %} background: #def7ec; color: #047857;
-          {% elif issue.status == 'In Progress' %} background: #e1effe; color: #1e429f;
+          {% elif issue.status == 'Under Review' %} background: #e1effe; color: #1e429f;
           {% else %} background: #fff8dd; color: #92400e; {% endif %}">
           {{ issue.status }}
         </span>
       </div>
 
       <!-- Details Grid -->
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+      <div class="issue-detail-grid">
 
         <!-- Left: Description -->
         <div>
@@ -95,23 +95,28 @@
           <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 25px;">
             <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">Update Status</h4>
 
+            {% if issue.status != 'Completed' %}
             <form method="post" action="{{ url_for('update_issue', issue_id=issue.id) }}">
               <div class="form-group">
                 <label style="font-size: 12px; font-weight: 600; color: #666;">Current Status</label>
                 <select name="status"
                   style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
                   <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
-                  <option {% if issue.status=='In Progress' %}selected{% endif %}>In Progress</option>
-                  <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
                   <option {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
+                  <option {% if issue.status=='Under Review' %}selected{% endif %}>Under Review</option>
+                  <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
                 </select>
               </div>
-
               <button type="submit" class="primary-btn"
                 style="width: 100%; margin-top: 15px; justify-content: center;">Update Status</button>
             </form>
+            {% else %}
+            <div
+              style="padding: 15px; background: #def7ec; color: #047857; border-radius: 8px; font-size: 14px; text-align: center;">
+              ✅ This issue has been marked as <strong>Completed</strong> and cannot be updated further.
+            </div>
+            {% endif %}
           </div>
-
           {% if issue.photo_path %}
           <div style="margin-top: 30px;">
             <h5
@@ -122,21 +127,13 @@
                 style="width: 100%; border-radius: 8px; border: 1px solid #eee; cursor: pointer;"
                 onclick="openImageModal('{{ url_for('static', filename=issue.photo_path) }}')"
                 title="Click to view full size">
-              <div
-                style="position: absolute; top: 12px; right: 12px; background: rgba(31, 63, 109, 0.75); color: white; padding: 8px 16px; border-radius: 24px; font-size: 13px; font-weight: 600; backdrop-filter: blur(8px); box-shadow: 0 2px 10px rgba(0,0,0,0.25);">
-                🔍 View Full Size
-              </div>
             </div>
           </div>
           {% endif %}
         </div>
-
       </div>
-
     </div>
-
   </main>
-
 </div>
 
 {% endblock %}

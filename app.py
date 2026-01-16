@@ -4,23 +4,24 @@ from urllib import response
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import re
 from translations import TRANSLATIONS # Import translations
-
+#---------------- SMS OTP IMPORT ----------------
 import requests
 import random
 import time
-
+#---------------- EMAIL OTP IMPORT ------------------
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION ----------------
 
 
 
-#---------------- EMAIL OTP UTILITIES ------------------
-import smtplib
-import random
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+#---------------- EMAIL OTP CONFIGURATION ----------------
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -117,6 +118,7 @@ def init_db():
 
     CREATE TABLE IF NOT EXISTS issues (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tracking_id TEXT UNIQUE,
         panchayath_id INTEGER,
         category TEXT,
         description TEXT,
@@ -159,6 +161,13 @@ def init_db():
         conn.execute("ALTER TABLE issues ADD COLUMN user_id INTEGER")
         conn.commit()
 
+    # Add tracking_id to issues table if it doesn't exist
+    try:
+        conn.execute("SELECT tracking_id FROM issues LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE issues ADD COLUMN tracking_id TEXT")
+        conn.commit()
+
     # Add banner_path to notices table if it doesn't exist
     try:
         conn.execute("SELECT banner_path FROM notices LIMIT 1")
@@ -189,6 +198,12 @@ def seed_data():
 
     conn.commit()
     conn.close()
+
+# ---------------- HELPERS ----------------
+def generate_tracking_id():
+    import uuid
+    # Generate a short unique ID (e.g., TRK-1A2B3C)
+    return "TRK-" + str(uuid.uuid4())[:8].upper()
 
 # ---------------- CITIZEN ROUTES --------------
 
@@ -255,15 +270,17 @@ def report_issue():
             image.save(os.path.join(upload_folder, filename))
             image_filename = f"uploads/{filename}"
 
+        tracking_id = generate_tracking_id()
+
         conn.execute("""
-            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (panchayath_id, category, description, location, image_filename, user_id))
+            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id))
 
         conn.commit()
         conn.close()
-        flash("Issue reported successfully", "success")
-        return redirect(url_for("track_issue"))
+        flash(f"Issue reported successfully! Your Tracking ID is {tracking_id}", "success")
+        return redirect(url_for("track_issue", new_tracking_id=tracking_id))
 
     panchayaths = conn.execute("SELECT * FROM panchayath").fetchall()
     conn.close()
@@ -273,16 +290,41 @@ def report_issue():
 @user_login_required
 def track_issue():
     user_id = session["user_id"]
+    search_id = request.args.get("search_id")
+    # Helper to highlight specific tracking ID if redirected from report
+    new_tracking_id = request.args.get("new_tracking_id") 
+    
     conn = connect_db()
-    issues = conn.execute("""
-        SELECT i.*, p.name AS panchayath_name
-        FROM issues i
-        JOIN panchayath p ON p.id = i.panchayath_id
-        WHERE i.user_id = ?
-        ORDER BY i.created_at DESC
-    """, (user_id,)).fetchall()
+    
+    if search_id:
+        issues = conn.execute("""
+            SELECT i.*, p.name AS panchayath_name
+            FROM issues i
+            JOIN panchayath p ON p.id = i.panchayath_id
+            WHERE i.tracking_id = ? AND i.user_id = ?
+        """, (search_id.strip(), user_id)).fetchall()
+        
+        if not issues:
+             flash("No issue found with that Tracking ID.", "warning")
+             # Fallback to showing all
+             issues = conn.execute("""
+                SELECT i.*, p.name AS panchayath_name
+                FROM issues i
+                JOIN panchayath p ON p.id = i.panchayath_id
+                WHERE i.user_id = ?
+                ORDER BY i.created_at DESC
+            """, (user_id,)).fetchall()
+    else:
+        issues = conn.execute("""
+            SELECT i.*, p.name AS panchayath_name
+            FROM issues i
+            JOIN panchayath p ON p.id = i.panchayath_id
+            WHERE i.user_id = ?
+            ORDER BY i.created_at DESC
+        """, (user_id,)).fetchall()
+        
     conn.close()
-    return render_template("citizen/track_issue.html", issues=issues, title="My Reported Issues")
+    return render_template("citizen/track_issue.html", issues=issues, title="My Reported Issues", new_tracking_id=new_tracking_id, search_id=search_id)
 
 @app.route("/public-track")
 def public_track():
@@ -322,6 +364,17 @@ def user_register():
         email = request.form["email"]
         mobile = request.form["mobile"]
         password = request.form["password"]
+
+        # Server-side Validation
+        # Mobile: +91 followed by 10 digits (6-9)
+        if not re.match(r"^\+91[6-9]\d{9}$", mobile):
+            flash("Invalid Mobile Number. Must start with +91 and contain 10 digits.", "danger")
+            return redirect(url_for("user_register"))
+
+        # Password: 8+ chars, 1 Upper, 1 Lower, 1 Number, 1 Special
+        if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
+             flash("Password too weak. Must be at least 8 chars with 1 Uppercase, 1 Lowercase, 1 Number, and 1 Special Character.", "danger")
+             return redirect(url_for("user_register"))
 
         # store data temporarily
         session["temp_user"] = {
@@ -368,7 +421,7 @@ def verify_otp():
                     user["email"],
                     user["mobile"],
                     user["password"]
-                ))
+                )) 
                 conn.commit()
             except sqlite3.IntegrityError:
                 flash("Email or Mobile already exists.", "danger")
@@ -469,12 +522,29 @@ def admin_dashboard():
         SELECT i.*, u.name as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.panchayath_id = ?
+        WHERE i.panchayath_id = ? AND i.status != 'Completed'
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
 
     conn.close()
     return render_template("admin/dashboard.html", issues=issues)
+
+@app.route("/admin/completed_issues")
+@login_required
+def admin_completed_issues():
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    issues = conn.execute("""
+        SELECT i.*, u.name as reporter_name 
+        FROM issues i
+        LEFT JOIN users u ON i.user_id = u.id
+        WHERE i.panchayath_id = ? AND i.status = 'Completed'
+        ORDER BY i.created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/completed_issues.html", issues=issues)
 
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 
@@ -599,3 +669,4 @@ if __name__ == "__main__":
     init_db()
     seed_data()
     app.run(debug=True)
+

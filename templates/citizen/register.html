@@ -25,9 +25,8 @@
 
             <div class="form-group">
                 <label for="mobile">{{ get_text('mobile_number') }}</label>
-                <input type="tel" name="mobile" id="mobile" class="form-control"
-                    placeholder="{{ get_text('mobile_placeholder') }}" pattern="[6-9]{1}[0-9]{9}"
-                    title="Enter a valid 10-digit mobile number" required>
+                <input type="tel" name="mobile" id="mobile" class="form-control" placeholder="+919876543210"
+                    pattern="^\+91[6-9]\d{9}$" title="Must start with +91 and contain 10 digits" required>
             </div>
 
             <div class="form-group">
@@ -46,9 +45,15 @@
 
             <div class="form-group">
                 <label for="password">{{ get_text('password') }}</label>
+                <small style="display: block; color: #666; font-size: 11px; margin-bottom: 5px;">
+                    (Min 8 chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char)
+                </small>
                 <div class="password-input-wrapper">
                     <input type="password" name="password" id="password-field" class="form-control"
-                        placeholder="{{ get_text('choose_password') }}" minlength="6" required>
+                        placeholder="{{ get_text('choose_password') }}"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                        title="Must be at least 8 characters with 1 Uppercase, 1 Lowercase, 1 Number, and 1 Special Character"
+                        required>
 
                     <label class="password-toggle-container">
                         <input type="checkbox" id="toggle-password">
@@ -67,7 +72,7 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                {{ get_text('register_now ') }}
+                {{ get_text('register now ') }}
             </button>
 
             <!-- OTP Info Message -->
@@ -75,7 +80,6 @@
                 An OTP will be sent to your email and sms for verification.
             </p>
         </form>
-
         <div class="auth-footer">
             <p>
                 {{ get_text('already_have_account') }}

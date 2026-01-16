@@ -67,6 +67,41 @@
     border-left: 5px solid transparent;
 }
 
+.stat-card h3 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.stat-card p {
+    margin: 5px 0 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.stat-card.primary {
+    border-left-color: var(--primary-color);
+}
+
+.stat-card.primary h3 {
+    color: var(--primary-color);
+}
+
+.stat-card.secondary {
+    border-left-color: var(--secondary-color);
+}
+
+.stat-card.secondary h3 {
+    color: var(--secondary-color);
+}
+
+.stat-card.accent {
+    border-left-color: var(--accent-color);
+}
+
+.stat-card.accent h3 {
+    color: var(--accent-color);
+}
+
 /* ================= TABLES & LISTS ================= */
 .recent-issues,
 .notice-list-container,
@@ -105,4 +140,169 @@ td {
 
 .notice-item:last-child {
     border-bottom: none;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+    .admin-dashboard-container {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .admin-sidebar {
+        margin-bottom: 20px;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    /* Table Scroll */
+    .recent-issues,
+    .notice-list-container {
+        overflow-x: hidden;
+        /* Prevent container overflow */
+    }
+
+    .recent-issues>div {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-dashboard-container {
+        padding: 15px;
+    }
+
+    .stat-card h3 {
+        font-size: 24px;
+    }
+
+    .admin-sidebar h3 {
+        font-size: 18px;
+    }
+
+    /* Stack form elements in Notices */
+    .notice-create form {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* ================= INNER PAGES GRIDS ================= */
+.issue-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+.notices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 900px) {
+
+    .issue-detail-grid,
+    .notices-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================= DEPARTMENT GROUPS ================= */
+.department-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.department-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    /* Fixed height for uniformity */
+}
+
+.department-header {
+    padding: 20px;
+    background: #f8faff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.department-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 18px;
+    font-family: var(--font-main);
+    font-weight: 700;
+}
+
+.issue-list-scroll {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0;
+}
+
+.dept-issue-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+    display: flex;
+    gap: 15px;
+}
+
+.dept-issue-item:hover {
+    background: #f9fafb;
+}
+
+.dept-issue-item:last-child {
+    border-bottom: none;
+}
+
+.dept-issue-icon {
+    width: 40px;
+    height: 40px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.dept-issue-content {
+    flex: 1;
+}
+
+.dept-issue-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.dept-issue-meta {
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
 }
