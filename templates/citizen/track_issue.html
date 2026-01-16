@@ -7,7 +7,11 @@
 {% block content %}
 
 <div class="container my-5">
-  <h2 class="section-title">{{ title or get_text('track_issue_status') }}</h2>
+  <div style="display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+    <h2 class="section-title" style="text-align: left; margin-bottom: 20px;">{{ title or get_text('track_issue_status')
+      }}</h2>
+    {{ back_button(get_text) }}
+  </div>
 
   <!-- IN-PAGE TRACKING SEARCH -->
   <div style="margin-bottom: 30px; text-align: center;">
