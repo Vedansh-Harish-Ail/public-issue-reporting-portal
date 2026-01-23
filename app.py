@@ -71,12 +71,13 @@ def connect_db():
 
 # ---------------- I18N UTILS ----------------
 
+def _get_text(key):
+    lang = session.get("lang", "en")
+    return TRANSLATIONS.get(lang, TRANSLATIONS["en"]).get(key, key)
+
 @app.context_processor
 def inject_get_text():
-    def get_text(key):
-        lang = session.get("lang", "en")
-        return TRANSLATIONS.get(lang, TRANSLATIONS["en"]).get(key, key)
-    return dict(get_text=get_text)
+    return dict(get_text=_get_text)
 
 @app.route("/set_language/<lang_code>")
 def set_language(lang_code):
@@ -90,7 +91,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "admin_id" not in session:
-            flash("Please login to access this page.", "warning")
+            flash(_get_text("flash_login_required"), "warning")
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
     return decorated_function
@@ -99,7 +100,7 @@ def user_login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
-            flash("Please login to access this page.", "info")
+            flash(_get_text("flash_login_required"), "info")
             return redirect(url_for("user_login"))
         return f(*args, **kwargs)
     return decorated_function
@@ -239,7 +240,7 @@ def home():
 def report_issue():
     # Admins can't report issues (already blocked but good to keep logic clear)
     if "admin_id" in session:
-        flash("Admins cannot report issues. Please use the dashboard.", "warning")
+        flash(_get_text("flash_admin_no_report"), "warning")
         return redirect(url_for("admin_dashboard"))
 
     conn = connect_db()
@@ -280,7 +281,7 @@ def report_issue():
 
         conn.commit()
         conn.close()
-        flash(f"Issue reported successfully! Your Tracking ID is {tracking_id}", "success")
+        flash(_get_text("flash_report_success").format(tracking_id), "success")
         return redirect(url_for("track_issue", new_tracking_id=tracking_id))
 
     panchayaths = conn.execute("SELECT * FROM panchayath").fetchall()
@@ -306,9 +307,9 @@ def track_issue():
         """, (search_id.strip(), user_id)).fetchall()
         
         if not issues:
-             flash("No issue found with that Tracking ID.", "warning")
-             # Fallback to showing all
-             issues = conn.execute("""
+            flash(_get_text("flash_no_issue_found"), "warning")
+            # Fallback to showing all
+            issues = conn.execute("""
                 SELECT i.*, p.name AS panchayath_name
                 FROM issues i
                 JOIN panchayath p ON p.id = i.panchayath_id
@@ -369,13 +370,13 @@ def user_register():
         # Server-side Validation
         # Mobile: +91 followed by 10 digits (6-9)
         if not re.match(r"^\+91[6-9]\d{9}$", mobile):
-            flash("Invalid Mobile Number. Must start with +91 and contain 10 digits.", "danger")
+            flash(_get_text("flash_invalid_mobile"), "danger")
             return redirect(url_for("user_register"))
 
         # Password: 8+ chars, 1 Upper, 1 Lower, 1 Number, 1 Special
         if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
-             flash("Password too weak. Must be at least 8 chars with 1 Uppercase, 1 Lowercase, 1 Number, and 1 Special Character.", "danger")
-             return redirect(url_for("user_register"))
+            flash(_get_text("flash_password_weak"), "danger")
+            return redirect(url_for("user_register"))
 
         # store data temporarily
         session["temp_user"] = {
@@ -391,11 +392,11 @@ def user_register():
         
         # Send OTP via Email
         if send_email_otp(email, otp):
-             flash(f"OTP sent to {email}", "info")
-             return redirect(url_for("verify_otp"))
+            flash(_get_text("flash_otp_sent").format(email), "info")
+            return redirect(url_for("verify_otp"))
         else:
-             flash("Failed to send OTP. Please check your email or try again later.", "danger")
-             return redirect(url_for("user_register"))
+            flash(_get_text("flash_otp_failed"), "danger")
+            return redirect(url_for("user_register"))
 
     return render_template("citizen/register.html")
 
@@ -406,7 +407,7 @@ def verify_otp():
 
         # OTP expiry: 2 minutes
         if time.time() - session.get("otp_time", 0) > 120:
-            flash("OTP expired. Please resend OTP.", "danger")
+            flash(_get_text("flash_otp_expired"), "danger")
             return redirect(url_for("verify_otp"))
 
         if entered_otp == session.get("otp"):
@@ -425,7 +426,7 @@ def verify_otp():
                 )) 
                 conn.commit()
             except sqlite3.IntegrityError:
-                flash("Email or Mobile already exists.", "danger")
+                flash(_get_text("flash_user_exists"), "danger")
                 return redirect(url_for("user_register"))
             finally:
                 conn.close()
@@ -435,17 +436,17 @@ def verify_otp():
             session.pop("otp_time", None)
             session.pop("temp_user", None)
 
-            flash("Registration successful. Please login.", "success")
+            flash(_get_text("flash_reg_success"), "success")
             return redirect(url_for("user_login"))
 
-        flash("Invalid OTP", "danger")
+        flash(_get_text("flash_invalid_otp"), "danger")
 
     return render_template("citizen/verify_otp.html")
 
 @app.route("/resend-otp")
 def resend_otp():
     if "temp_user" not in session:
-        flash("Session expired. Please register again.", "warning")
+        flash(_get_text("flash_session_expired"), "warning")
         return redirect(url_for("user_register"))
     
     otp = generate_otp()
@@ -455,9 +456,9 @@ def resend_otp():
     email = session["temp_user"]["email"]
     
     if send_email_otp(email, otp):
-        flash(f"New OTP sent to {email}", "info")
+        flash(_get_text("flash_otp_sent").format(email), "info")
     else:
-        flash("Failed to send OTP. Try again.", "danger")
+        flash(_get_text("flash_otp_failed"), "danger")
         
     return redirect(url_for("verify_otp"))
 
@@ -474,10 +475,10 @@ def user_login():
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
-            flash(f"Welcome back, {user['name']}!", "success")
+            flash(_get_text("flash_welcome_user").format(user['name']), "success")
             return redirect(url_for("home"))
         
-        flash("Invalid email or password.", "danger")
+        flash(_get_text("flash_invalid_login"), "danger")
         
     return render_template("citizen/login.html")
 
@@ -485,7 +486,7 @@ def user_login():
 def user_logout():
     session.pop("user_id", None)
     session.pop("user_name", None)
-    flash("You have been logged out.", "success")
+    flash(_get_text("flash_logged_out"), "success")
     return redirect(url_for("home"))
 
 # ---------------- ADMIN ROUTES ----------------
@@ -505,10 +506,10 @@ def admin_login():
         if admin and check_password_hash(admin["password_hash"], password):
             session["admin_id"] = admin["id"]
             session["panchayath_id"] = admin["panchayath_id"]
-            flash(f"Welcome back, Admin {admin['username']}!", "success")
+            flash(_get_text("flash_admin_welcome").format(admin['username']), "success")
             return redirect(url_for("admin_dashboard"))
 
-        flash("Invalid credentials", "danger")
+        flash(_get_text("flash_invalid_login"), "danger")
 
     return render_template("admin/login.html")
 
@@ -602,7 +603,7 @@ def admin_notices():
             VALUES (?, ?, ?, ?)
         """, (pid, title, description, banner_filename))
         conn.commit()
-        flash("Notice published successfully", "success")
+        flash(_get_text("flash_notice_published"), "success")
 
     notices = conn.execute("""
         SELECT * FROM notices
@@ -625,9 +626,9 @@ def delete_notice(notice_id):
     if notice:
         conn.execute("DELETE FROM notices WHERE id = ?", (notice_id,))
         conn.commit()
-        flash("Notice deleted successfully", "success")
+        flash(_get_text("flash_notice_deleted"), "success")
     else:
-        flash("Notice not found or unauthorized", "danger")
+        flash(_get_text("flash_notice_unauthorized"), "danger")
         
     conn.close()
     return redirect(url_for("admin_notices"))
@@ -641,7 +642,7 @@ def user_profile():
     conn.close()
     
     if not user:
-        flash("User not found", "danger")
+        flash(_get_text("flash_user_not_found"), "danger")
         return redirect(url_for("home"))
         
     return render_template("citizen/profile.html", user=user)
@@ -661,7 +662,7 @@ def admin_issue_detail(issue_id):
     conn.close()
 
     if not issue:
-        flash("Issue not found", "danger")
+        flash(_get_text("flash_issue_not_found"), "danger")
         return redirect(url_for("admin_dashboard"))
 
     return render_template("admin/issue_detail.html", issue=issue)
@@ -682,13 +683,13 @@ def update_issue(issue_id):
     conn.commit()
     conn.close()
 
-    flash("Status updated", "success")
+    flash(_get_text("flash_status_updated"), "success")
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/logout")
 def admin_logout():
     session.clear()
-    flash("Admin logged out successfully.", "success")
+    flash(_get_text("flash_admin_logout"), "success")
     return redirect(url_for("admin_login"))
 
 # ---------------- MAIN ----------------

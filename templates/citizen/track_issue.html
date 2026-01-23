@@ -1,3 +1,4 @@
+{% from "macros.html" import back_button %}
 {% extends "base.html" %}
 
 {% block css %}
@@ -22,7 +23,7 @@
         style="flex: 1; border: none; outline: none; padding: 12px 20px; font-size: 15px; background: transparent;">
       <button type="submit"
         style="background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;">
-        Track
+        {{ get_text('track') }}
       </button>
     </form>
   </div>
@@ -32,9 +33,10 @@
   {% set tracked_issue = issues[0] %}
   <div class="status-tracker-wrapper">
     <div class="tracker-header">
-      <span class="tracker-id-badge">ID: {{ tracked_issue.tracking_id }}</span>
-      <h3 style="margin: 15px 0 5px; color: var(--primary-color);">{{ tracked_issue.category }} Issue</h3>
-      <p style="margin: 0; color: #666;">Reported on {{ tracked_issue.created_at[:10] }}</p>
+      <span class="tracker-id-badge">{{ get_text('issue_id_label') }}: {{ tracked_issue.tracking_id }}</span>
+      <h3 style="margin: 15px 0 5px; color: var(--primary-color);">{{ tracked_issue.category }} {{
+        get_text('issue_suffix') }}</h3>
+      <p style="margin: 0; color: #666;">{{ get_text('reported_on') }} {{ tracked_issue.created_at[:10] }}</p>
     </div>
 
     <!-- Logic for Steps -->
@@ -75,29 +77,31 @@
 
       <div class="step-item {{ step1_class }}">
         <div class="step-circle">{{ step1_check or '1' }}</div>
-        <div class="step-label">Reported</div>
-        <span class="step-date">Issue Received</span>
+        <div class="step-label">{{ get_text('reported') }}</div>
+        <span class="step-date">{{ get_text('status_received') }}</span>
       </div>
 
       <div class="step-item {{ step2_class }}">
         <div class="step-circle">{{ step2_check or '2' }}</div>
-        <div class="step-label">{% if status == 'Rejected' %}Rejected{% else %}Under Review{% endif %}</div>
+        <div class="step-label">{% if status == 'Rejected' %}{{ get_text('status_rejected') }}{% else %}{{
+          get_text('under_review') }}{% endif %}</div>
         <span class="step-date">
-          {% if status == 'Rejected' %}Valid reason{% else %}We are checking{% endif %}
+          {% if status == 'Rejected' %}{{ get_text('status_valid_reason') }}{% else %}{{ get_text('status_checking')
+          }}{% endif %}
         </span>
       </div>
 
       <div class="step-item {{ step3_class }}">
         <div class="step-circle">{{ step3_check or '3' }}</div>
-        <div class="step-label">Resolved</div>
-        <span class="step-date">Issue Fixed</span>
+        <div class="step-label">{{ get_text('resolved') }}</div>
+        <span class="step-date">{{ get_text('status_fixed') }}</span>
       </div>
     </div>
 
     {% if status == 'Rejected' %}
     <div
       style="text-align: center; margin-top: 30px; padding: 15px; background: #fff5f5; border-radius: 8px; color: #c53030;">
-      <strong>Note:</strong> This issue was rejected. Please contact the panchayat office for more details.
+      {{ get_text('rejection_note')|safe }}
     </div>
     {% endif %}
 
@@ -126,12 +130,12 @@
     <div class="service-card" style="text-align: left; position: relative;">
 
       <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <h4 style="margin-top: 0; color: var(--primary-color); font-size: 18px;">{{ i.category }}</h4>
+        <h4 style="margin-top: 0; color: var(--primary-color); font-size: 18px;">{{ get_text(i.category) }}</h4>
 
         <div style="text-align: right;">
           <span class="issue-status {{ i.status|lower|replace(' ', '-') }}"
             style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
-            {{ i.status }}
+            {{ get_text(i.status) }}
           </span>
           {% if i.tracking_id and (not is_public or session.get('user_id') == i.user_id) %}
           <div style="font-size: 11px; color: #666; margin-top: 5px; font-family: monospace;">ID: {{ i.tracking_id }}
@@ -146,13 +150,13 @@
           {% if i.rejection_reason %}
           <div
             style="margin-top: 20px; background: #fff5f5; border-left: 4px solid #f05252; padding: 15px; border-radius: 4px;">
-            <strong style="display: block; color: #c81e1e; margin-bottom: 5px; font-size: 14px;">Reason for
-              Rejection:</strong>
+            <strong style="display: block; color: #c81e1e; margin-bottom: 5px; font-size: 14px;">{{
+              get_text('rejection_reason_label') }}</strong>
             <p style="margin: 0; color: #444;">{{ i.rejection_reason }}</p>
           </div>
           {% endif %}
 
-          {% else %}
+          {% endif %}
         </div>
       </div>
 
@@ -174,7 +178,7 @@
           style="width: 100%; height: 100%; object-fit: cover;">
         <div
           style="position: absolute; top: 10px; right: 10px; background: rgba(31, 63, 109, 0.75); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-          🔍 View
+          🔍 {{ get_text('view') }}
         </div>
       </div>
       {% endif %}

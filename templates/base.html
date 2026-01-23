@@ -94,7 +94,7 @@
                         <a href="{{ url_for('public_track') }}">{{ get_text('public_issues') }}</a>
                     </li>
                     <li>
-                        <a href="{{ url_for('notices') }}">{{ get_text('Announcements') }}</a>
+                        <a href="{{ url_for('notices') }}">{{ get_text('announcements') }}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -109,7 +109,8 @@
                                 </path>
                             </svg>
                         </div>
-                        <input type="text" name="search_id" class="nav-search-input" placeholder="Track ID..." required>
+                        <input type="text" name="search_id" class="nav-search-input"
+                            placeholder="{{ get_text('track_id_placeholder') }}" required>
                     </form>
 
                     {% if session.get('admin_id') %}
@@ -126,7 +127,7 @@
                     </div>
                     {% else %}
                     <a href="{{ url_for('admin_login') }}" class="login-btn official-btn">{{
-                        get_text('Panchayat login') }}</a>
+                        get_text('panchayat_login_btn') }}</a>
                     <a href="{{ url_for('user_login') }}" class="login-btn">{{ get_text('login') }}</a>
                     <a href="{{ url_for('user_register') }}" class="login-btn register-outline-btn">{{
                         get_text('register') }}</a>
@@ -221,7 +222,7 @@
                 <div style="margin-top: 15px;">
                     <a href="{{ url_for('admin_login') }}"
                         style="color: var(--secondary-color); font-size: 14px; text-decoration: none; font-weight: 600;">➔
-                        {{ get_text('official_admin_login') }}</a>
+                        {{ get_text('official_admin_login_link') }}</a>
                 </div>
             </div>
 
@@ -321,22 +322,22 @@
             let colorClass = '';
 
             if (type === 'success') {
-                title = 'Success';
+                title = '{{ get_text("success") }}';
                 colorClass = 'popup-success';
                 // Checkmark
                 iconPath = '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"></path>';
             } else if (type === 'danger' || type === 'error') {
-                title = 'Error';
+                title = '{{ get_text("error") }}';
                 colorClass = 'popup-error';
                 // X Icon
                 iconPath = '<path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>';
             } else if (type === 'warning') {
-                title = 'Warning';
+                title = '{{ get_text("warning") }}';
                 colorClass = 'popup-warning';
                 // Exclamation
                 iconPath = '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"></path>';
             } else {
-                title = 'Notice';
+                title = '{{ get_text("notice") }}';
                 colorClass = 'popup-info';
                 // Info
                 iconPath = '<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>';
