@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import re
+from datetime import datetime
 from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT ----------------
 import requests
@@ -28,21 +29,32 @@ def generate_otp():
 
 def send_email_otp(user_email, otp):
     # Use provided credentials as defaults if env vars are missing
-    sender_email = os.environ.get("MAIL_USERNAME", "panchayatseva1@gmail.com")
-    # REPLACE THE STRING BELOW WITH YOUR 16-CHARACTER GOOGLE APP PASSWORD
-    app_password = os.environ.get("MAIL_PASSWORD", "tkao zyic hwog dxnd")
+    env_user = os.environ.get("MAIL_USERNAME")
+    env_pass = os.environ.get("MAIL_PASSWORD")
+    sender_email = env_user or "panchayatseva1@gmail.com"
+    app_password = env_pass or "tkao zyic hwog dxnd"
     
     if not sender_email or not app_password:
         print("Error: Email credentials not found in environment variables.")
         return False
 
+    print(f"[{datetime.now()}] Attempting to send OTP to {user_email}...")
+    print(f"Using Sender: {sender_email}")
+    # print(f"Using Password: {'***' if app_password else 'None'}") # Security: don't log password
+
     try:
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = user_email
-        msg['Subject'] = "Your Verification OTP"
+        msg['Subject'] = _get_text("otp_email_subject")
 
-        body = f"Your OTP is: {otp}\n\nThis OTP is valid for 2 minutes.\nDo not share this with anyone."
+        body_template = _get_text("otp_email_body")
+        # Ensure template has placeholder, otherwise verify fallback
+        if "{}" in body_template:
+            body = body_template.format(otp)
+        else:
+            body = f"{body_template}: {otp}" 
+
         msg.attach(MIMEText(body, 'plain'))
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -50,10 +62,10 @@ def send_email_otp(user_email, otp):
         server.login(sender_email, app_password)
         server.sendmail(sender_email, user_email, msg.as_string())
         server.quit()
+        print(f"[{datetime.now()}] Email sent successfully to {user_email}")
         return True
     except Exception as e:
-        print(f"Error sending email: {e}")
-        # Even if email fails, print to console so user can still test
+        print(f"[{datetime.now()}] Error sending email: {e}")
         print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
         return True
 
@@ -65,8 +77,10 @@ DB_NAME = "database/panchayath.db"
 # ---------------- DATABASE CONNECTION ----------------
 
 def connect_db():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10) # Added timeout
     conn.row_factory = sqlite3.Row
+    # Enable WAL mode for better concurrency and stability
+    conn.execute("PRAGMA journal_mode=WAL;")
     return conn
 
 # ---------------- I18N UTILS ----------------
@@ -624,6 +638,15 @@ def delete_notice(notice_id):
     notice = conn.execute("SELECT * FROM notices WHERE id = ? AND panchayath_id = ?", (notice_id, pid)).fetchone()
     
     if notice:
+        # Delete the physical file if it exists
+        if notice['banner_path']:
+            file_path = os.path.join("static", notice['banner_path'])
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
         conn.execute("DELETE FROM notices WHERE id = ?", (notice_id,))
         conn.commit()
         flash(_get_text("flash_notice_deleted"), "success")
@@ -647,25 +670,51 @@ def user_profile():
         
     return render_template("citizen/profile.html", user=user)
 
-@app.route("/admin/issue/<int:issue_id>")
+@app.route("/admin/issue/view/<int:issue_id>")
 @login_required
 def admin_issue_detail(issue_id):
-    # Authorization check handled by decorator
-
+    pid = session["panchayath_id"]
     conn = connect_db()
     issue = conn.execute("""
-        SELECT i.*, u.name as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile
+        SELECT i.*, u.name as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile, p.name as panchayath_name
         FROM issues i
-        LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.id = ?
-    """, (issue_id,)).fetchone()
+        JOIN users u ON i.user_id = u.id
+        JOIN panchayath p ON i.panchayath_id = p.id
+        WHERE i.id = ? AND i.panchayath_id = ?
+    """, (issue_id, pid)).fetchone()
     conn.close()
-
     if not issue:
         flash(_get_text("flash_issue_not_found"), "danger")
         return redirect(url_for("admin_dashboard"))
-
     return render_template("admin/issue_detail.html", issue=issue)
+
+@app.route("/admin/issue/delete/<int:issue_id>")
+@login_required
+def delete_issue(issue_id):
+    pid = session["panchayath_id"]
+    conn = connect_db()
+    
+    # Ensure the issue belongs to this panchayath
+    issue = conn.execute("SELECT * FROM issues WHERE id = ? AND panchayath_id = ?", (issue_id, pid)).fetchone()
+    
+    if issue:
+        # Delete the physical file if it exists
+        if issue['photo_path']:
+            file_path = os.path.join("static", issue['photo_path'])
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
+        conn.execute("DELETE FROM issues WHERE id = ?", (issue_id,))
+        conn.commit()
+        flash(_get_text("flash_issue_deleted"), "success")
+    else:
+        flash(_get_text("flash_issue_unauthorized"), "danger")
+        
+    conn.close()
+    return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/update/<int:issue_id>", methods=["POST"])
 @login_required

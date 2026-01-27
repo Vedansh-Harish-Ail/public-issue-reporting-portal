@@ -20,7 +20,7 @@
     {% block css %}{% endblock %}
 </head>
 
-<body class="lang-{{ session.get('lang', 'en') }}">
+<body class="lang-{{ session.get('lang', 'en') }}" id="top">
     <!--
          TOP GOVERNMENT STRIP 
 
@@ -38,8 +38,8 @@
             <div class="logo-left">
                 <img src="{{ url_for('static', filename='image/logo_left.png') }}" alt="Meri Panchayat Logo">
                 <div class="logo-text">
-                    <strong>मेरी पंचायत</strong><br>
-                    <small>Meri Panchayat<br>Empowering Rural India</small>
+                    <strong>{{ get_text('brand_name_hindi') }}</strong><br>
+                    <small>{{ get_text('brand_name_en') }}<br>{{ get_text('brand_tagline') }}</small>
                 </div>
             </div>
             <div class="logo-right">
@@ -76,7 +76,7 @@
                     </li>
                     {% else %}
                     <li>
-                        <a href="{{ url_for('home') }}">{{ get_text('home') }}</a>
+                        <a href="{{ url_for('home', _anchor='top') }}">{{ get_text('home') }}</a>
                     </li>
                     <li>
                         <!-- Scrolls to About section on home page -->
@@ -180,7 +180,7 @@
     </script>
     </nav>
     <!-- PAGE CONTENT -->
-    <main class="{% block main_class %}{% endblock %}">
+    <main class="page-transition {% block main_class %}{% endblock %}">
         <div class="container">
             <!-- Flash Messages -->
 
@@ -207,8 +207,8 @@
                 <h5>{{ get_text('important_links') }}</h5>
                 <ul>
                     <li><a href="https://panchayat.gov.in" target="_blank">{{ get_text('ministry_name') }}</a></li>
-                    <li><a href="https://egramswaraj.gov.in" target="_blank">eGramSwaraj</a></li>
-                    <li><a href="https://serviceonline.gov.in" target="_blank">ServicePlus</a></li>
+                    <li><a href="https://egramswaraj.gov.in" target="_blank">{{ get_text('egram_swaraj') }}</a></li>
+                    <li><a href="https://serviceonline.gov.in" target="_blank">{{ get_text('service_plus') }}</a></li>
                 </ul>
             </div>
 
@@ -380,7 +380,7 @@
 
     <!-- Image Modal -->
     <div id="imageModal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; cursor: pointer; align-items: center; justify-content: center;">
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10001; cursor: pointer; align-items: center; justify-content: center;">
         <img id="modalImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px;">
     </div>
 
@@ -410,6 +410,8 @@
             }
         });
     </script>
+    <!-- Custom Modals Block -->
+    {% block modals %}{% endblock %}
 </body>
 
 </html>
