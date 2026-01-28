@@ -5,12 +5,12 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import re
+import time
 from datetime import datetime
 from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT ----------------
-import requests
-import random
-import time
+
+
 #---------------- EMAIL OTP IMPORT ------------------
 import smtplib
 import random
@@ -19,8 +19,6 @@ from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION ----------------
-
-
 
 #---------------- EMAIL OTP CONFIGURATION ----------------
 
