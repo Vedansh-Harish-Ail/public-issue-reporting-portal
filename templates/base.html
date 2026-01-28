@@ -126,11 +126,12 @@
                             get_text('logout') }}</a>
                     </div>
                     {% else %}
-                    <a href="{{ url_for('admin_login') }}" class="login-btn official-btn">{{
-                        get_text('panchayat_login_btn') }}</a>
+
                     <a href="{{ url_for('user_login') }}" class="login-btn">{{ get_text('login') }}</a>
                     <a href="{{ url_for('user_register') }}" class="login-btn register-outline-btn">{{
                         get_text('register') }}</a>
+                    <a href="{{ url_for('admin_login') }}" class="login-btn official-btn">{{
+                        get_text('panchayat_login_btn') }}</a>
                     {% endif %}
                 </div>
             </div>

@@ -1,7 +1,7 @@
 TRANSLATIONS = {
     "en": {
         "home": "Home",
-        "about_scheme": "About Scheme",
+        "about_scheme": "About",
         "report_issue": "Report Issue",
         "my_issues": "My Issues",
         "public_issues": "Public Issues",
@@ -96,7 +96,7 @@ TRANSLATIONS = {
         "cat_water": "Water Supply",
         "cat_road": "Road Maintenance",
         "cat_light": "Street Lights",
-        "cat_drainage": "Drainage/Sewerage",
+        "cat_drainage": "Drainage",
         "cat_others": "Others",
 
         # Track Issue Page
@@ -175,7 +175,8 @@ TRANSLATIONS = {
         "Garbage Collection": "Garbage Collection",
         "Street Lights": "Street Lights",
         "Road Maintenance": "Road Maintenance",
-        "Drainage/Sewerage": "Drainage/Sewerage",
+        "Drainage/Sewerage": "Drainage",
+        "Drainage": "Drainage",
         "Water Supply": "Water Supply",
         "Others": "Others",
         "view": "View",
@@ -250,7 +251,7 @@ TRANSLATIONS = {
     },
     "kn": {
         "home": "ಮುಖಪುಟ",
-        "about_scheme": "ಯೋಜನೆ ಬಗ್ಗೆ",
+        "about_scheme": "ಯೋಜನೆ",
         "report_issue": "ದೂರು ನೀಡಿ",
         "my_issues": "ನನ್ನ ದೂರುಗಳು",
         "public_issues": "ಸಾರ್ವಜನಿಕ ದೂರುಗಳು",
@@ -427,6 +428,7 @@ TRANSLATIONS = {
         "Street Lights": "ಬೀದಿ ದೀಪಗಳು",
         "Road Maintenance": "ರಸ್ತೆ ನಿರ್ವಹಣೆ",
         "Drainage/Sewerage": "ಚರಂಡಿ ವ್ಯವಸ್ಥೆ",
+        "Drainage": "ಚರಂಡಿ ವ್ಯವಸ್ಥೆ",
         "Water Supply": "ನೀರು ಸರಬರಾಜು",
         "Others": "ಇತರರು",
         "view": "ನೋಡಿ",
