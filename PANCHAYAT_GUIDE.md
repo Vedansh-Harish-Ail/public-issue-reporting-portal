@@ -1,42 +1,50 @@
-# 📖 Quick Start Guide for Panchayat Staff
-
-This guide explains how to set up and run the **Meri Panchayat Portal** on your office computer without needing any technical software like VS Code.
-
+# 📖 Meri Panchayat Portal - Staff Guide
+This guide explains how to set up and run the **Meri Panchayat Portal** on your office computer. Follow these simple steps to keep the portal running smoothly.
+---
 ## 🛠️ Initial One-Time Setup
-Before running the portal for the first time, you must install the necessary components:
+*Run these steps only if this is a brand-new computer.*
 
-1.  **Install Python**: Ensure Python 3.x is installed on the computer. (Download from [python.org](https://www.python.org/downloads/)).
-2.  **Install Project Packages**:
-    - Locate the file `install_packages.bat` in this folder.
-    - **Double-click** it.
-    - Wait for the black window to finish and then press any key to close it.
+1.  **Install Python**: Download and install Python 3.x from [python.org](https://www.python.org/downloads/).
+2.  **Install Packages**: 
+    - Find `install_packages.bat` in this folder.
+    - **Double-click** it and wait for the window to close.
+---
+## 🚀 Daily Launch Instructions
+*Follow these steps every morning or whenever you need the portal.*
 
+1.  **Start the Portal**: Double-click `LAUNCH_PORTAL.bat`.
+2.  **Wait for the Browser**: Your web browser will open automatically.
+3.  **Keep it Running**: A black terminal window will stay open—**do not close it**. This is the "engine" that runs the portal.
 ---
 
-## 🚀 How to Launch the Portal
-Every morning (or whenever you need to use the system), simply:
 
-1.  Locate the file `LAUNCH_PORTAL.bat`.
-2.  **Double-click** it.
-3.  **What happens next?**
-    - Your web browser will automatically open to the portal.
-    - A black terminal window will stay open in the background—**do not close this window**, as it is the "engine" running the portal.
+## 📱 Accessing from Mobile Phones
+Other staff members can access the portal from their phones or other computers on the **same Wi-Fi**.
 
----
-
-## 📱 Accessing from Other Computers (LAN)
-Since this portal is set up for office use, other staff on the **same Wi-Fi or Local Network** can also access it:
-
-1.  When you run `LAUNCH_PORTAL.bat`, look at the black terminal window. 
-2.  It will display a line: **"Your Local Network Address is: http://192.168.x.x:5000"**.
-3.  On any other computer or phone connected to the office Wi-Fi, type that exact address into the browser.
-4.  The portal will open just like it does on the main computer!
+1.  Read the **Local Network Address** from the black terminal window (e.g., `http://192.168.1.5:5000`).
+2.  Type that exact address into any phone's web browser.
 
 > [!TIP]
-> **No Files Needed on Phone:** Your phone (or other computers) does **not** need any of these project files. Only the main "Server" computer needs the files. Your phone just uses its web browser to look at the portal running on the main computer.
-
-
+> **No Setup Needed on Phones:** Your phone does **not** need these files. It only needs to be on the same Wi-Fi.
 ---
+## 🛠️ Troubleshooting Mobile Access
+If the link won't open on your phone, check these 3 common fixes on the **Main Computer**:
 
-## 🛑 How to Stop
-To turn off the portal, simply close the black terminal window that says "Starting Meri Panchayat Portal".
+### 1. Same Wi-Fi
+Ensure the phone and computer are on the **exact same Wi-Fi network**.
+
+### 2. Network Profile (Private vs Public)
+1. Go to **Settings > Network & Internet > Wi-Fi**.
+2. Click your Wi-Fi name and ensure **Network Profile Type** is set to **Private**.
+
+### 3. Windows Firewall (Python Access)
+1. Search Windows for **"Allow an app through Windows Firewall"**.
+2. Click **Change settings** (top right).
+3. Find **"Python"** and ensure both **Private** and **Public** boxes are checked.
+4. Click **OK**.
+---
+## 🛑 How to Stop or Restart
+- **To Stop**: Simply close the black terminal window.
+- **To Restart**: Close the black terminal window, then double-click `LAUNCH_PORTAL.bat` again.
+---
+*Developed for Meri Panchayat Portal Management.*

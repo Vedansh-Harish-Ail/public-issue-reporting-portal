@@ -10,7 +10,6 @@ pip install flask werkzeug gunicorn
 ```powershell
 .\install_packages.bat
 ```
-
 ### 🍎 macOS / 🐧 Linux
 ```bash
 pip3 install flask werkzeug gunicorn

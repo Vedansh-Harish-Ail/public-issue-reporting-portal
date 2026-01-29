@@ -1,7 +1,7 @@
 TRANSLATIONS = {
     "en": {
         "home": "Home",
-        "about_scheme": "About",
+        "about_scheme": "About Us",
         "report_issue": "Report Issue",
         "my_issues": "My Issues",
         "public_issues": "Public Issues",
