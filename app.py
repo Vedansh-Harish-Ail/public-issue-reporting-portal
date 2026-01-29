@@ -744,5 +744,6 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     seed_data()
-    app.run(debug=True)
+    # Host '0.0.0.0' allows external access on the local network
+    app.run(debug=True, host='0.0.0.0')
 
