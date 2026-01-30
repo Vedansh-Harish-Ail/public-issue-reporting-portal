@@ -102,6 +102,14 @@
     color: var(--accent-color);
 }
 
+.stat-card.danger {
+    border-left-color: #ef4444;
+}
+
+.stat-card.danger h3 {
+    color: #ef4444;
+}
+
 /* ================= TABLES & LISTS ================= */
 .recent-issues,
 .notice-list-container,

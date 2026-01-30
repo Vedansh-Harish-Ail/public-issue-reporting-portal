@@ -1,4 +1,4 @@
-<!-- templates/citizen/notices.html -->
+{% from "macros.html" import back_button %}
 {% extends "base.html" %}
 
 {% block css %}
@@ -6,9 +6,12 @@
 {% endblock %}
 
 {% block content %}
-{{ back_button(get_text) }}
 <div style="width: 100%; padding: 0 20px; box-sizing: border-box; margin-top: 40px; margin-bottom: 40px;">
-  <h2 class="section-title">{{ get_text('public_notices_announcements') }}</h2>
+  <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 30px;">
+    <h2 class="section-title" style="margin-bottom: 15px; text-align: center; width: 100%;">{{
+      get_text('public_notices_announcements') }}</h2>
+    {{ back_button(get_text) }}
+  </div>
   <div style="margin-bottom: 30px;">
   </div>
 
@@ -53,7 +56,9 @@
 
   </div>
 </div>
+{% endblock %}
 
+{% block modals %}
 <!-- Notice Modal -->
 <div id="noticeModal" class="modal-overlay" onclick="closeNoticeModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
@@ -61,7 +66,7 @@
       &times;
     </button>
     <div class="modal-body">
-      <img id="modalImage" class="modal-image" src="" alt="Notice Banner" style="display: none;">
+      <img id="noticeModalImage" class="modal-image" src="" alt="Notice Banner" style="display: none;">
       <div class="modal-text">
         <h3 id="modalTitle" class="modal-title"></h3>
         <div class="modal-meta">
@@ -88,7 +93,7 @@
     document.getElementById('modalPanchayat').textContent = "Issued by: " + panchayat;
     document.getElementById('modalDesc').textContent = desc;
 
-    const imgElem = document.getElementById('modalImage');
+    const imgElem = document.getElementById('noticeModalImage');
     if (image) {
       imgElem.src = image;
       imgElem.style.display = 'block';
@@ -98,12 +103,14 @@
 
     document.getElementById('noticeModal').classList.add('active');
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    document.documentElement.style.overflow = 'hidden'; // Handle html scroll for some browsers
   }
 
   function closeNoticeModal(event) {
     if (event && event.target !== event.currentTarget) return;
     document.getElementById('noticeModal').classList.remove('active');
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   }
 </script>
 {% endblock %}

@@ -5,11 +5,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import re
+import time
+from datetime import datetime
 from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT ----------------
-import requests
-import random
-import time
+
 #---------------- EMAIL OTP IMPORT ------------------
 import smtplib
 import random
@@ -19,8 +19,6 @@ from email.mime.multipart import MIMEMultipart
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION ----------------
 
-
-
 #---------------- EMAIL OTP CONFIGURATION ----------------
 
 def generate_otp():
@@ -28,21 +26,32 @@ def generate_otp():
 
 def send_email_otp(user_email, otp):
     # Use provided credentials as defaults if env vars are missing
-    sender_email = os.environ.get("MAIL_USERNAME", "panchayatseva1@gmail.com")
-    # REPLACE THE STRING BELOW WITH YOUR 16-CHARACTER GOOGLE APP PASSWORD
-    app_password = os.environ.get("MAIL_PASSWORD", "tkao zyic hwog dxnd")
+    env_user = os.environ.get("MAIL_USERNAME")
+    env_pass = os.environ.get("MAIL_PASSWORD")
+    sender_email = env_user or "panchayatseva1@gmail.com"
+    app_password = env_pass or "tkao zyic hwog dxnd"
     
     if not sender_email or not app_password:
         print("Error: Email credentials not found in environment variables.")
         return False
 
+    print(f"[{datetime.now()}] Attempting to send OTP to {user_email}...")
+    print(f"Using Sender: {sender_email}")
+    # print(f"Using Password: {'***' if app_password else 'None'}") # Security: don't log password
+
     try:
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = user_email
-        msg['Subject'] = "Your Verification OTP"
+        msg['Subject'] = _get_text("otp_email_subject")
 
-        body = f"Your OTP is: {otp}\n\nThis OTP is valid for 2 minutes.\nDo not share this with anyone."
+        body_template = _get_text("otp_email_body")
+        # Ensure template has placeholder, otherwise verify fallback
+        if "{}" in body_template:
+            body = body_template.format(otp)
+        else:
+            body = f"{body_template}: {otp}" 
+
         msg.attach(MIMEText(body, 'plain'))
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -50,33 +59,42 @@ def send_email_otp(user_email, otp):
         server.login(sender_email, app_password)
         server.sendmail(sender_email, user_email, msg.as_string())
         server.quit()
+        print(f"[{datetime.now()}] Email sent successfully to {user_email}")
         return True
     except Exception as e:
-        print(f"Error sending email: {e}")
-        # Even if email fails, print to console so user can still test
+        print(f"[{datetime.now()}] Error sending email: {e}")
         print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
         return True
 
 # ---------------- CONFIGURATION ----------------
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
 
-DB_NAME = "database/panchayath.db"
+# Ensure the database directory exists
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_DIR = os.path.join(BASE_DIR, "database")
+DB_NAME = os.path.join(DB_DIR, "panchayath.db")
+
+if not os.path.exists(DB_DIR):
+    os.makedirs(DB_DIR)
 
 # ---------------- DATABASE CONNECTION ----------------
 
 def connect_db():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10) # Added timeout
     conn.row_factory = sqlite3.Row
+    # Enable WAL mode for better concurrency and stability
+    conn.execute("PRAGMA journal_mode=WAL;")
     return conn
 
 # ---------------- I18N UTILS ----------------
 
+def _get_text(key):
+    lang = session.get("lang", "en")
+    return TRANSLATIONS.get(lang, TRANSLATIONS["en"]).get(key, key)
+
 @app.context_processor
 def inject_get_text():
-    def get_text(key):
-        lang = session.get("lang", "en")
-        return TRANSLATIONS.get(lang, TRANSLATIONS["en"]).get(key, key)
-    return dict(get_text=get_text)
+    return dict(get_text=_get_text)
 
 @app.route("/set_language/<lang_code>")
 def set_language(lang_code):
@@ -90,7 +108,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "admin_id" not in session:
-            flash("Please login to access this page.", "warning")
+            flash(_get_text("flash_login_required"), "warning")
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
     return decorated_function
@@ -99,7 +117,7 @@ def user_login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
-            flash("Please login to access this page.", "info")
+            flash(_get_text("flash_login_required"), "info")
             return redirect(url_for("user_login"))
         return f(*args, **kwargs)
     return decorated_function
@@ -125,6 +143,7 @@ def init_db():
         location TEXT,
         photo_path TEXT,
         status TEXT DEFAULT 'Pending',
+        rejection_reason TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -238,7 +257,7 @@ def home():
 def report_issue():
     # Admins can't report issues (already blocked but good to keep logic clear)
     if "admin_id" in session:
-        flash("Admins cannot report issues. Please use the dashboard.", "warning")
+        flash(_get_text("flash_admin_no_report"), "warning")
         return redirect(url_for("admin_dashboard"))
 
     conn = connect_db()
@@ -279,7 +298,7 @@ def report_issue():
 
         conn.commit()
         conn.close()
-        flash(f"Issue reported successfully! Your Tracking ID is {tracking_id}", "success")
+        flash(_get_text("flash_report_success").format(tracking_id), "success")
         return redirect(url_for("track_issue", new_tracking_id=tracking_id))
 
     panchayaths = conn.execute("SELECT * FROM panchayath").fetchall()
@@ -305,9 +324,9 @@ def track_issue():
         """, (search_id.strip(), user_id)).fetchall()
         
         if not issues:
-             flash("No issue found with that Tracking ID.", "warning")
-             # Fallback to showing all
-             issues = conn.execute("""
+            flash(_get_text("flash_no_issue_found"), "warning")
+            # Fallback to showing all
+            issues = conn.execute("""
                 SELECT i.*, p.name AS panchayath_name
                 FROM issues i
                 JOIN panchayath p ON p.id = i.panchayath_id
@@ -368,13 +387,13 @@ def user_register():
         # Server-side Validation
         # Mobile: +91 followed by 10 digits (6-9)
         if not re.match(r"^\+91[6-9]\d{9}$", mobile):
-            flash("Invalid Mobile Number. Must start with +91 and contain 10 digits.", "danger")
+            flash(_get_text("flash_invalid_mobile"), "danger")
             return redirect(url_for("user_register"))
 
         # Password: 8+ chars, 1 Upper, 1 Lower, 1 Number, 1 Special
         if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
-             flash("Password too weak. Must be at least 8 chars with 1 Uppercase, 1 Lowercase, 1 Number, and 1 Special Character.", "danger")
-             return redirect(url_for("user_register"))
+            flash(_get_text("flash_password_weak"), "danger")
+            return redirect(url_for("user_register"))
 
         # store data temporarily
         session["temp_user"] = {
@@ -390,11 +409,11 @@ def user_register():
         
         # Send OTP via Email
         if send_email_otp(email, otp):
-             flash(f"OTP sent to {email}", "info")
-             return redirect(url_for("verify_otp"))
+            flash(_get_text("flash_otp_sent").format(email), "info")
+            return redirect(url_for("verify_otp"))
         else:
-             flash("Failed to send OTP. Please check your email or try again later.", "danger")
-             return redirect(url_for("user_register"))
+            flash(_get_text("flash_otp_failed"), "danger")
+            return redirect(url_for("user_register"))
 
     return render_template("citizen/register.html")
 
@@ -405,7 +424,7 @@ def verify_otp():
 
         # OTP expiry: 2 minutes
         if time.time() - session.get("otp_time", 0) > 120:
-            flash("OTP expired. Please resend OTP.", "danger")
+            flash(_get_text("flash_otp_expired"), "danger")
             return redirect(url_for("verify_otp"))
 
         if entered_otp == session.get("otp"):
@@ -424,7 +443,7 @@ def verify_otp():
                 )) 
                 conn.commit()
             except sqlite3.IntegrityError:
-                flash("Email or Mobile already exists.", "danger")
+                flash(_get_text("flash_user_exists"), "danger")
                 return redirect(url_for("user_register"))
             finally:
                 conn.close()
@@ -434,17 +453,17 @@ def verify_otp():
             session.pop("otp_time", None)
             session.pop("temp_user", None)
 
-            flash("Registration successful. Please login.", "success")
+            flash(_get_text("flash_reg_success"), "success")
             return redirect(url_for("user_login"))
 
-        flash("Invalid OTP", "danger")
+        flash(_get_text("flash_invalid_otp"), "danger")
 
     return render_template("citizen/verify_otp.html")
 
 @app.route("/resend-otp")
 def resend_otp():
     if "temp_user" not in session:
-        flash("Session expired. Please register again.", "warning")
+        flash(_get_text("flash_session_expired"), "warning")
         return redirect(url_for("user_register"))
     
     otp = generate_otp()
@@ -454,9 +473,9 @@ def resend_otp():
     email = session["temp_user"]["email"]
     
     if send_email_otp(email, otp):
-        flash(f"New OTP sent to {email}", "info")
+        flash(_get_text("flash_otp_sent").format(email), "info")
     else:
-        flash("Failed to send OTP. Try again.", "danger")
+        flash(_get_text("flash_otp_failed"), "danger")
         
     return redirect(url_for("verify_otp"))
 
@@ -473,10 +492,10 @@ def user_login():
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
-            flash(f"Welcome back, {user['name']}!", "success")
+            flash(_get_text("flash_welcome_user").format(user['name']), "success")
             return redirect(url_for("home"))
         
-        flash("Invalid email or password.", "danger")
+        flash(_get_text("flash_invalid_login"), "danger")
         
     return render_template("citizen/login.html")
 
@@ -484,7 +503,7 @@ def user_login():
 def user_logout():
     session.pop("user_id", None)
     session.pop("user_name", None)
-    flash("You have been logged out.", "success")
+    flash(_get_text("flash_logged_out"), "success")
     return redirect(url_for("home"))
 
 # ---------------- ADMIN ROUTES ----------------
@@ -504,10 +523,10 @@ def admin_login():
         if admin and check_password_hash(admin["password_hash"], password):
             session["admin_id"] = admin["id"]
             session["panchayath_id"] = admin["panchayath_id"]
-            flash(f"Welcome back, Admin {admin['username']}!", "success")
+            flash(_get_text("flash_admin_welcome").format(admin['username']), "success")
             return redirect(url_for("admin_dashboard"))
 
-        flash("Invalid credentials", "danger")
+        flash(_get_text("flash_invalid_login"), "danger")
 
     return render_template("admin/login.html")
 
@@ -522,12 +541,20 @@ def admin_dashboard():
         SELECT i.*, u.name as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.panchayath_id = ? AND i.status != 'Completed'
+        WHERE i.panchayath_id = ? AND i.status != 'Completed' AND i.status != 'Rejected'
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
 
+    # Calculate stats for dashboard cards
+    stats = {
+        "total": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ?", (pid,)).fetchone()[0],
+        "resolved": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Completed'", (pid,)).fetchone()[0],
+        "pending": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Pending'", (pid,)).fetchone()[0],
+        "rejected": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Rejected'", (pid,)).fetchone()[0]
+    }
+
     conn.close()
-    return render_template("admin/dashboard.html", issues=issues)
+    return render_template("admin/dashboard.html", issues=issues, stats=stats)
 
 @app.route("/admin/completed_issues")
 @login_required
@@ -545,6 +572,23 @@ def admin_completed_issues():
 
     conn.close()
     return render_template("admin/completed_issues.html", issues=issues)
+
+@app.route("/admin/rejected_issues")
+@login_required
+def admin_rejected_issues():
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    issues = conn.execute("""
+        SELECT i.*, u.name as reporter_name 
+        FROM issues i
+        LEFT JOIN users u ON i.user_id = u.id
+        WHERE i.panchayath_id = ? AND i.status = 'Rejected'
+        ORDER BY i.created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/rejected_issues.html", issues=issues)
 
 # ---------------- ADMIN NOTICES (FIXED PART) ----------------
 
@@ -576,7 +620,7 @@ def admin_notices():
             VALUES (?, ?, ?, ?)
         """, (pid, title, description, banner_filename))
         conn.commit()
-        flash("Notice published successfully", "success")
+        flash(_get_text("flash_notice_published"), "success")
 
     notices = conn.execute("""
         SELECT * FROM notices
@@ -597,11 +641,20 @@ def delete_notice(notice_id):
     notice = conn.execute("SELECT * FROM notices WHERE id = ? AND panchayath_id = ?", (notice_id, pid)).fetchone()
     
     if notice:
+        # Delete the physical file if it exists
+        if notice['banner_path']:
+            file_path = os.path.join("static", notice['banner_path'])
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
         conn.execute("DELETE FROM notices WHERE id = ?", (notice_id,))
         conn.commit()
-        flash("Notice deleted successfully", "success")
+        flash(_get_text("flash_notice_deleted"), "success")
     else:
-        flash("Notice not found or unauthorized", "danger")
+        flash(_get_text("flash_notice_unauthorized"), "danger")
         
     conn.close()
     return redirect(url_for("admin_notices"))
@@ -615,30 +668,56 @@ def user_profile():
     conn.close()
     
     if not user:
-        flash("User not found", "danger")
+        flash(_get_text("flash_user_not_found"), "danger")
         return redirect(url_for("home"))
         
     return render_template("citizen/profile.html", user=user)
 
-@app.route("/admin/issue/<int:issue_id>")
+@app.route("/admin/issue/view/<int:issue_id>")
 @login_required
 def admin_issue_detail(issue_id):
-    # Authorization check handled by decorator
-
+    pid = session["panchayath_id"]
     conn = connect_db()
     issue = conn.execute("""
-        SELECT i.*, u.name as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile
+        SELECT i.*, u.name as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile, p.name as panchayath_name
         FROM issues i
-        LEFT JOIN users u ON i.user_id = u.id
-        WHERE i.id = ?
-    """, (issue_id,)).fetchone()
+        JOIN users u ON i.user_id = u.id
+        JOIN panchayath p ON i.panchayath_id = p.id
+        WHERE i.id = ? AND i.panchayath_id = ?
+    """, (issue_id, pid)).fetchone()
     conn.close()
-
     if not issue:
-        flash("Issue not found", "danger")
+        flash(_get_text("flash_issue_not_found"), "danger")
         return redirect(url_for("admin_dashboard"))
-
     return render_template("admin/issue_detail.html", issue=issue)
+
+@app.route("/admin/issue/delete/<int:issue_id>")
+@login_required
+def delete_issue(issue_id):
+    pid = session["panchayath_id"]
+    conn = connect_db()
+    
+    # Ensure the issue belongs to this panchayath
+    issue = conn.execute("SELECT * FROM issues WHERE id = ? AND panchayath_id = ?", (issue_id, pid)).fetchone()
+    
+    if issue:
+        # Delete the physical file if it exists
+        if issue['photo_path']:
+            file_path = os.path.join("static", issue['photo_path'])
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
+        conn.execute("DELETE FROM issues WHERE id = ?", (issue_id,))
+        conn.commit()
+        flash(_get_text("flash_issue_deleted"), "success")
+    else:
+        flash(_get_text("flash_issue_unauthorized"), "danger")
+        
+    conn.close()
+    return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/update/<int:issue_id>", methods=["POST"])
 @login_required
@@ -646,21 +725,23 @@ def update_issue(issue_id):
     # Authorization check handled by decorator
 
     status = request.form["status"]
+    rejection_reason = request.form.get("rejection_reason") if status == "Rejected" else None
+    
     conn = connect_db()
     conn.execute(
-        "UPDATE issues SET status=? WHERE id=?",
-        (status, issue_id)
+        "UPDATE issues SET status=?, rejection_reason=? WHERE id=?",
+        (status, rejection_reason, issue_id)
     )
     conn.commit()
     conn.close()
 
-    flash("Status updated", "success")
+    flash(_get_text("flash_status_updated"), "success")
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/logout")
 def admin_logout():
     session.clear()
-    flash("Admin logged out successfully.", "success")
+    flash(_get_text("flash_admin_logout"), "success")
     return redirect(url_for("admin_login"))
 
 # ---------------- MAIN ----------------
@@ -668,5 +749,6 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     seed_data()
-    app.run(debug=True)
+    # Host '0.0.0.0' allows external access on the local network
+    app.run(debug=True, host='0.0.0.0')
 

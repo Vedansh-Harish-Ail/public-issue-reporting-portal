@@ -11,25 +11,31 @@
   <!-- Sidebar (Consistent) -->
   <aside class="admin-sidebar">
     <div style="text-align: center; margin-bottom: 30px;">
-      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
-      <small style="color: #777;">Issue Management</small>
+      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">{{ get_text('admin_panel') }}
+      </h3>
+      <small style="color: #777;">{{ get_text('issue_mgmt') }}</small>
     </div>
 
     <nav class="admin-nav">
       <ul style="list-style: none; padding: 0;">
         <li>
           <a href="{{ url_for('admin_dashboard') }}" style="transition: 0.2s;">
-            &larr; Back to Dashboard
+            &larr; {{ get_text('back_to_dashboard') }}
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin_completed_issues') }}" style="transition: 0.2s;">
-            ✅ Resolved Issues
+            ✅ {{ get_text('resolved_issues') }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin_rejected_issues') }}" style="transition: 0.2s;">
+            ❌ {{ get_text('rejected_issues') }}
           </a>
         </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
-            🚪 Logout
+            🚪 {{ get_text('logout') }}
           </a>
         </li>
       </ul>
@@ -45,15 +51,17 @@
       <div
         style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
         <div>
-          <h2 style="margin: 0; color: var(--primary-color); font-family: var(--font-serif);">Issue #{{ issue.id }}</h2>
-          <span style="color: #666; font-size: 14px;">Reported on {{ issue.created_at[:10] }}</span>
+          <h2 style="margin: 0; color: var(--primary-color); font-family: var(--font-serif);">{{
+            get_text('issue_suffix') }} #{{ issue.id }}</h2>
+          <span style="color: #666; font-size: 14px;">{{ get_text('reported_on') }} {{ issue.created_at[:10] }}</span>
         </div>
 
         <span class="status-badge" style="padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 14px;
           {% if issue.status == 'Completed' %} background: #def7ec; color: #047857;
+          {% elif issue.status == 'Rejected' %} background: #fde8e8; color: #c81e1e;
           {% elif issue.status == 'Under Review' %} background: #e1effe; color: #1e429f;
           {% else %} background: #fff8dd; color: #92400e; {% endif %}">
-          {{ issue.status }}
+          {{ get_text(issue.status) }}
         </span>
       </div>
 
@@ -63,65 +71,80 @@
         <!-- Left: Description -->
         <div>
           <h5 style="margin-top: 0; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
-            Reporter Details</h5>
+            {{ get_text('reporter_details') }}</h5>
           <div
             style="background: #fff; padding: 15px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 25px;">
             <p style="margin: 0; font-size: 16px; font-weight: 700; color: var(--primary-color);">{{ issue.reporter_name
-              or 'Anonymous' }}</p>
+              or get_text('anonymous') }}</p>
             <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 14px; color: #666;">
-              <span>📧 {{ issue.reporter_email or 'N/A' }}</span>
-              <span>📱 {{ issue.reporter_mobile or 'N/A' }}</span>
+              <span>📧 {{ issue.reporter_email or get_text('na') }}</span>
+              <span>📱 {{ issue.reporter_mobile or get_text('na') }}</span>
             </div>
           </div>
 
           <h5 style="margin-top: 0; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
-            Category</h5>
-          <p style="font-size: 18px; font-weight: 600; color: #222; margin-top: 5px;">{{ issue.category }}</p>
+            {{ get_text('category') }}</h5>
+          <p style="font-size: 18px; font-weight: 600; color: #222; margin-top: 5px;">{{ get_text(issue.category) }}</p>
 
           <h5 style="margin-top: 30px; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
-            Description</h5>
+            {{ get_text('description') }}</h5>
           <div
             style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #eef2f6; line-height: 1.7; color: #333;">
             {{ issue.description }}
           </div>
 
           <h5 style="margin-top: 30px; color: #444; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
-            Location</h5>
+            {{ get_text('location_label') }}</h5>
           <p style="font-size: 16px; color: #222; margin-top: 5px;">📍 {{ issue.location }}</p>
         </div>
 
         <!-- Right: Actions & Photo -->
         <div>
           <div style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 25px;">
-            <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">Update Status</h4>
+            <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">{{ get_text('update_status') }}
+            </h4>
 
             {% if issue.status != 'Completed' %}
             <form method="post" action="{{ url_for('update_issue', issue_id=issue.id) }}">
               <div class="form-group">
-                <label style="font-size: 12px; font-weight: 600; color: #666;">Current Status</label>
+                <label style="font-size: 12px; font-weight: 600; color: #666;">{{ get_text('current_status') }}</label>
                 <select name="status"
                   style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
-                  <option {% if issue.status=='Pending' %}selected{% endif %}>Pending</option>
-                  <option {% if issue.status=='Rejected' %}selected{% endif %}>Rejected</option>
-                  <option {% if issue.status=='Under Review' %}selected{% endif %}>Under Review</option>
-                  <option {% if issue.status=='Completed' %}selected{% endif %}>Completed</option>
+                  <option value="Pending" {% if issue.status=='Pending' %}selected{% endif %}>{{ get_text('Pending') }}
+                  </option>
+                  <option value="Rejected" {% if issue.status=='Rejected' %}selected{% endif %}>{{ get_text('Rejected')
+                    }}</option>
+                  <option value="Under Review" {% if issue.status=='Under Review' %}selected{% endif %}>{{
+                    get_text('Under Review') }}</option>
+                  <option value="Completed" {% if issue.status=='Completed' %}selected{% endif %}>{{
+                    get_text('Completed') }}</option>
                 </select>
+
+                <div id="rejection-reason-container" style="display: none; margin-top: 15px;">
+                  <label style="font-size: 12px; font-weight: 600; color: #dc3545;">{{
+                    get_text('rejection_reason_title') }}</label>
+                  <textarea name="rejection_reason" id="rejection_reason" rows="3"
+                    placeholder="{{ get_text('rejection_reason_placeholder') }}"
+                    style="width: 100%; border: 1px solid #dc3545; border-radius: 8px; padding: 10px; font-family: inherit; margin-top: 5px;"></textarea>
+                </div>
               </div>
               <button type="submit" class="primary-btn"
-                style="width: 100%; margin-top: 15px; justify-content: center;">Update Status</button>
+                style="width: 100%; margin-top: 15px; justify-content: center;">{{ get_text('status_update_btn')
+                }}</button>
             </form>
             {% else %}
             <div
               style="padding: 15px; background: #def7ec; color: #047857; border-radius: 8px; font-size: 14px; text-align: center;">
-              ✅ This issue has been marked as <strong>Completed</strong> and cannot be updated further.
+              ✅ {{ get_text('completed_notice') }}
             </div>
             {% endif %}
+
           </div>
           {% if issue.photo_path %}
           <div style="margin-top: 30px;">
             <h5
               style="margin-top: 0; color: #444; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">
-              Attachment</h5>
+              {{ get_text('attachment') }}</h5>
             <div style="position: relative; display: inline-block; width: 100%;">
               <img src="{{ url_for('static', filename=issue.photo_path) }}"
                 style="width: 100%; border-radius: 8px; border: 1px solid #eee; cursor: pointer;"
@@ -136,4 +159,24 @@
   </main>
 </div>
 
+
+<script>
+  const statusSelect = document.querySelector('select[name="status"]');
+  const rejectionContainer = document.getElementById('rejection-reason-container');
+  const rejectionTextarea = document.getElementById('rejection_reason');
+
+  function toggleRejectionReason() {
+    if (statusSelect.value === 'Rejected') {
+      rejectionContainer.style.display = 'block';
+      rejectionTextarea.required = true;
+    } else {
+      rejectionContainer.style.display = 'none';
+      rejectionTextarea.required = false;
+    }
+  }
+
+  statusSelect.addEventListener('change', toggleRejectionReason);
+  // Run on load in case it's already rejected
+  toggleRejectionReason();
+</script>
 {% endblock %}

@@ -13,6 +13,10 @@
     --font-serif: 'Playfair Display', serif;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
     font-family: var(--font-main);
@@ -53,6 +57,23 @@ h6 {
 main {
     padding: 20px 0;
     min-height: 60vh;
+}
+
+/* Page Transition Animation */
+@keyframes fadeInSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-transition {
+    animation: fadeInSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .main-no-padding {
@@ -243,18 +264,75 @@ main {
     white-space: nowrap;
 }
 
-.user-greet-link {
+.user-greet-span {
     color: white;
-    font-size: 12px;
-    /* Default for Kannada */
+    font-size: 13px;
     font-weight: 700;
-    text-decoration: none;
     white-space: nowrap;
+    padding: 0 5px;
 }
 
-.lang-en .user-greet-link {
-    font-size: 14px;
+.lang-en .user-greet-span {
+    font-size: 15px;
     font-weight: 600;
+}
+
+.profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: var(--secondary-color);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: white;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-btn:hover {
+    transform: scale(1.05);
+    /* Reduced scale */
+    box-shadow: 0 4px 15px rgba(246, 141, 46, 0.4);
+    background: #e07d1e;
+}
+
+/* Tooltip for Profile */
+.profile-btn::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 50px;
+    /* Adjusted position */
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: #2d3436;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    /* Faster, simpler transition */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10002;
+    pointer-events: none;
+}
+
+.profile-btn:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.profile-btn svg {
+    width: 22px;
+    height: 22px;
 }
 
 .logout-btn {
@@ -266,6 +344,83 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
     font-size: 11px !important;
     padding: 6px 12px !important;
+}
+
+.admin-logo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: white;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    margin-left: 0px;
+    /* Push to far right */
+    position: relative;
+}
+
+.admin-logo-btn:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transform: scale(1.05);
+    /* Removed rotation, reduced scale */
+    box-shadow: 0 4px 15px rgba(246, 141, 46, 0.3);
+}
+
+/* Custom Tooltip */
+.admin-logo-btn::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: #2d3436;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    /* Simple transition */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10002;
+    pointer-events: none;
+    letter-spacing: 0.3px;
+}
+
+/* Tooltip Arrow */
+.admin-logo-btn::after {
+    content: '';
+    position: absolute;
+    top: 43px;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    border: 7px solid transparent;
+    border-bottom-color: #2d3436;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 10002;
+}
+
+.admin-logo-btn:hover::before,
+.admin-logo-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.admin-logo-btn svg {
+    width: 20px;
+    height: 20px;
 }
 
 .lang-en .official-btn {
@@ -1123,4 +1278,132 @@ body.no-scroll {
     .back-btn-fancy:hover .icon-box {
         width: 142px;
     }
+}
+
+/* ================= MODAL STYLING (GLOBAL) ================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    width: 95%;
+    max-width: 1000px;
+    max-height: 90vh;
+    border-radius: 16px;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    margin: auto;
+    /* Ensure centering */
+}
+
+.modal-content::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: #fff;
+    color: #c53030;
+}
+
+.modal-body {
+    padding: 0;
+}
+
+.modal-image {
+    width: 100%;
+    height: auto;
+    max-height: 60vh;
+    object-fit: contain;
+    background: #f0f0f0;
+    display: block;
+}
+
+.modal-text {
+    padding: 40px;
+}
+
+@media (max-width: 768px) {
+    .modal-text {
+        padding: 25px;
+    }
+}
+
+.modal-title {
+    color: var(--primary-color);
+    font-size: 32px;
+    margin: 0 0 15px;
+    font-family: var(--font-serif);
+}
+
+@media (max-width: 768px) {
+    .modal-title {
+        font-size: 24px;
+    }
+}
+
+.modal-meta {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    gap: 15px;
+}
+
+.modal-desc {
+    color: #333;
+    line-height: 1.8;
+    font-size: 16px;
+    white-space: pre-wrap;
 }

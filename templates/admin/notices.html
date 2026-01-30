@@ -11,15 +11,16 @@
   <!-- Sidebar (Reusable for consistency) -->
   <aside class="admin-sidebar">
     <div style="text-align: center; margin-bottom: 30px;">
-      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
-      <small style="color: #777;">Manage Notices</small>
+      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">{{ get_text('admin_panel') }}
+      </h3>
+      <small style="color: #777;">{{ get_text('manage_notices_nav') }}</small>
     </div>
 
     <nav class="admin-nav">
       <ul style="list-style: none; padding: 0;">
         <li>
           <a href="{{ url_for('admin_dashboard') }}">
-            📊 Dashboard
+            📊 {{ get_text('dashboard') }}
           </a>
         </li>
         <li>
@@ -28,13 +29,18 @@
           </a>
         </li>
         <li>
+          <a href="{{ url_for('admin_rejected_issues') }}">
+            ❌ Rejected Issues
+          </a>
+        </li>
+        <li>
           <a href="{{ url_for('admin_notices') }}" class="active">
-            📢 Manage Notices
+            📢 {{ get_text('manage_notices_nav') }}
           </a>
         </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
-            🚪 Logout
+            🚪 {{ get_text('logout') }}
           </a>
         </li>
       </ul>
@@ -48,28 +54,29 @@
       style="background-image: linear-gradient(rgba(1, 41, 112, 0.7), rgba(1, 41, 112, 0.7)), url('/static/image/admin_notices_banner_bg.png'); 
              height: 180px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 30px; 
              display: flex; flex-direction: column; justify-content: center; padding: 0 40px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-      <h2 style="margin: 0; font-family: var(--font-serif); font-size: 32px;">Official Notifications</h2>
-      <p style="margin: 5px 0 0; opacity: 0.9; font-size: 16px;">Publish and manage public announcements for the
-        Panchayat</p>
+      <h2 style="margin: 0; font-family: var(--font-serif); font-size: 32px; color: white;">{{ get_text('announcements')
+        }}</h2>
+      <p style="margin: 5px 0 0; opacity: 0.9; font-size: 16px;">{{ get_text('latest_notices_desc') }}</p>
     </div>
 
     <div class="notices-grid">
 
       <!-- Create Notice Form -->
       <div class="notice-create">
-        <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">Publish Announcement</h4>
+        <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">{{ get_text('publish_notice') }}
+        </h4>
 
         <form method="post" enctype="multipart/form-data">
           <div class="form-group">
-            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">Notice
-              Title</label>
+            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
+              get_text('notice_title') }}</label>
             <input type="text" name="title" required placeholder="Ex. Gram Sabha Meeting..."
               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
           </div>
 
           <div class="form-group">
-            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">Banner
-              Image (Optional)</label>
+            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
+              get_text('optional_banner') }}</label>
             <input type="file" name="banner" accept="image/*"
               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fdfdfd;">
             <small style="color: #888; display: block; margin-top: 5px;">High-quality landscape images work
@@ -77,13 +84,14 @@
           </div>
 
           <div class="form-group">
-            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">Notice
-              Details</label>
+            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
+              get_text('notice_desc') }}</label>
             <textarea name="description" rows="6" required placeholder="Enter full notice content here..."
               style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-family: inherit; box-sizing: border-box;"></textarea>
           </div>
 
-          <button type="submit" class="primary-btn" style="width: 100%; justify-content: center;">Publish Now</button>
+          <button type="submit" class="primary-btn" style="width: 100%; justify-content: center;">{{
+            get_text('publish_btn') }}</button>
         </form>
       </div>
 
@@ -93,21 +101,19 @@
 
         <div class="notice-list" style="max-height: 600px; overflow-y: auto;">
           {% for n in notices %}
-          <div class="notice-item">
+          <div class="notice-item" style="cursor: pointer;" onclick="openNoticeModal(this)" data-title="{{ n.title }}"
+            data-date="{{ n.created_at[:10] }}" data-description="{{ n.description }}"
+            data-image="{{ url_for('static', filename=n.banner_path) if n.banner_path else '' }}">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <strong style="font-size: 16px; color: var(--primary-color);">{{ n.title }}</strong>
-              <div style="display: flex; align-items: center; gap: 15px;">
+              <div style="display: flex; align-items: center; gap: 15px;" onclick="event.stopPropagation()">
                 <small style="color: #888; font-size: 12px;">{{ n.created_at[:10] }}</small>
-                <a href="{{ url_for('delete_notice', notice_id=n.id) }}"
-                  onclick="return confirm('Are you sure you want to delete this notice?')"
-                  style="color: #dc3545; text-decoration: none; font-size: 12px;">🗑️ Delete</a>
               </div>
             </div>
             <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">{{ n.description }}</p>
           </div>
           {% else %}
-          <p class="text-muted" style="text-align: center; padding: 20px;">No public notices have been published yet.
-          </p>
+          <p class="text-muted" style="text-align: center; padding: 20px;">{{ get_text('no_notices') }}</p>
           {% endfor %}
         </div>
       </div>
@@ -115,4 +121,57 @@
   </main>
 </div>
 
+{% endblock %}
+
+{% block modals %}
+<!-- Notice Modal -->
+<div id="noticeModal" class="modal-overlay" onclick="closeNoticeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeNoticeModal()">
+      &times;
+    </button>
+    <div class="modal-body">
+      <img id="noticeModalImage" class="modal-image" src="" alt="Notice Banner" style="display: none;">
+      <div class="modal-text">
+        <h3 id="modalTitle" class="modal-title"></h3>
+        <div class="modal-meta">
+          <span id="modalDate"></span>
+        </div>
+        <div id="modalDesc" class="modal-desc"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openNoticeModal(card) {
+    const title = card.getAttribute('data-title');
+    const date = card.getAttribute('data-date');
+    const desc = card.getAttribute('data-description');
+    const image = card.getAttribute('data-image');
+
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDate').textContent = date;
+    document.getElementById('modalDesc').textContent = desc;
+
+    const imgElem = document.getElementById('noticeModalImage');
+    if (image) {
+      imgElem.src = image;
+      imgElem.style.display = 'block';
+    } else {
+      imgElem.style.display = 'none';
+    }
+
+    document.getElementById('noticeModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  function closeNoticeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('noticeModal').classList.remove('active');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+  }
+</script>
 {% endblock %}

@@ -12,30 +12,36 @@
   <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div style="text-align: center; margin-bottom: 30px;">
-      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">Admin Panel</h3>
-      <small style="color: #777;">Panchayat Official</small>
+      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">{{ get_text('admin_panel') }}
+      </h3>
+      <small style="color: #777;">{{ get_text('official_panchayat') }}</small>
     </div>
 
     <nav class="admin-nav">
       <ul style="list-style: none; padding: 0;">
         <li>
           <a href="{{ url_for('admin_dashboard') }}" class="active">
-            📊 Dashboard
+            📊 {{ get_text('dashboard') }}
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin_completed_issues') }}">
-            ✅ Resolved Issues
+            ✅ {{ get_text('resolved_issues') }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin_rejected_issues') }}">
+            ❌ {{ get_text('rejected_issues') }}
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin_notices') }}">
-            📢 Manage Notices
+            📢 {{ get_text('manage_notices_nav') }}
           </a>
         </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
-            🚪 Logout
+            🚪 {{ get_text('logout') }}
           </a>
         </li>
       </ul>
@@ -45,7 +51,7 @@
   <!-- Main Content -->
   <main class="dashboard-main">
 
-    <h2 style="margin: 0; color: #333;">Dashboard Overview</h2>
+    <h2 style="margin: 0; color: #333;">{{ get_text('dashboard_overview') }}</h2>
     <span style="font-size: 14px; color: #666;" id="currentDate"></span>
     <script>
       document.getElementById('currentDate').innerText = 'Date: ' + new Date().toLocaleDateString();
@@ -55,22 +61,26 @@
     <div class="dashboard-stats">
       <!-- Total -->
       <div class="stat-card primary">
-        <h3>{{ issues|length }}</h3>
-        <p>Total Issues</p>
+        <h3>{{ stats.total }}</h3>
+        <p>{{ get_text('total_issues') }}</p>
       </div>
 
       <!-- Pending -->
       <div class="stat-card secondary">
-        {% set pending = issues|selectattr('status', 'equalto', 'Pending')|list|length %}
-        <h3>{{ pending }}</h3>
-        <p>Pending Actions</p>
+        <h3>{{ stats.pending }}</h3>
+        <p>{{ get_text('pending_actions') }}</p>
       </div>
 
       <!-- Resolved -->
       <div class="stat-card accent">
-        {% set resolved = issues|selectattr('status', 'equalto', 'Completed')|list|length %}
-        <h3>{{ resolved }}</h3>
-        <p>Resolved</p>
+        <h3>{{ stats.resolved }}</h3>
+        <p>{{ get_text('resolved') }}</p>
+      </div>
+
+      <!-- Rejected -->
+      <div class="stat-card danger">
+        <h3>{{ stats.rejected }}</h3>
+        <p>{{ get_text('Rejected') }}</p>
       </div>
     </div>
 
@@ -79,10 +89,10 @@
       {% for category, dept_issues in issues|sort(attribute='category')|groupby('category') %}
       <div class="department-card">
         <div class="department-header">
-          <h3>{{ category }}</h3>
+          <h3>{{ get_text(category) }}</h3>
           <span
             style="font-size: 13px; font-weight: 600; color: #666; background: #eee; padding: 4px 10px; border-radius: 20px;">
-            {{ dept_issues|list|length }} Issues
+            {{ dept_issues|list|length }} {{ get_text('issues_count_suffix') }}
           </span>
         </div>
 
@@ -105,10 +115,12 @@
                   <span style="display: flex; align-items: center;">
                     <span class="status-dot" style="
                       {% if i.status == 'Completed' %} background: #047857;
+                      {% elif i.status == 'Rejected' %} background: #ef4444;
                       {% elif i.status == 'Under Review' %} background: #1e429f;
                       {% else %} background: #d97706; {% endif %}"></span>
                     <span style="
                       {% if i.status == 'Completed' %} color: #047857;
+                      {% elif i.status == 'Rejected' %} color: #ef4444;
                       {% elif i.status == 'Under Review' %} color: #1e429f;
                       {% else %} color: #d97706; {% endif %}">
                       {{ i.status }}
@@ -124,8 +136,8 @@
       {% else %}
       <div
         style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px; color: #777;">
-        <h3>No issues found.</h3>
-        <p>There are currently no reported issues in the system.</p>
+        <h3>{{ get_text('no_issues_found_admin') }}</h3>
+        <p>{{ get_text('no_issues_desc_admin') }}</p>
       </div>
       {% endfor %}
     </div>
