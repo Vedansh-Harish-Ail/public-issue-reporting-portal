@@ -122,7 +122,7 @@ TRANSLATIONS = {
         "verified_citizen": "Verified Citizen",
         "email_address": "Email Address",
         "mobile_number": "Mobile Number",
-        "member_since": "Member Since",
+        "registered_on": "Registered On",
         "return_to_home": "Return to Home",
 
         # Auth Pages
@@ -374,7 +374,7 @@ TRANSLATIONS = {
         "verified_citizen": "ಪರಿಶೀಲಿಸಿದ ನಾಗರಿಕ",
         "email_address": "ಇಮೇಲ್ ವಿಳಾಸ",
         "mobile_number": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
-        "member_since": "ಸದಸ್ಯರಾದ ದಿನಾಂಕ",
+        "registered_on": "ನೋಂದಾಯಿತ ದಿನಾಂಕ",
         "return_to_home": "ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ",
 
         # Auth Pages
