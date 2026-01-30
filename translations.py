@@ -154,7 +154,7 @@ TRANSLATIONS = {
         "meri_panchayat_en": "Meri Panchayat",
         "empowering_rural_india": "Empowering Rural India",
         "track_id_placeholder": "Track ID...",
-        "panchayat_login_btn": "Panchayat login",
+        "panchayat_login_btn": "Panchayath log-in",
         "official_admin_login_link": "Official / Admin Login",
         "otp_method_label": "OTP Verification Method",
         "sms_soon": "SMS (Coming Soon)",

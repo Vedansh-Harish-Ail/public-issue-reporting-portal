@@ -10,7 +10,6 @@ from datetime import datetime
 from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT ----------------
 
-
 #---------------- EMAIL OTP IMPORT ------------------
 import smtplib
 import random
