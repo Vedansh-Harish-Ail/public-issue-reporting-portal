@@ -211,9 +211,9 @@
                 <h5>{{ get_text('information') }}</h5>
                 <ul>
                     <li><a href="{{ url_for('about') }}">{{ get_text('about_us') }}</a></li>
-                    <li><a href="#">{{ get_text('report_issue') }}</a></li>
-                    <li><a href="#">{{ get_text('public_issues') }}</a></li>
-                    <li><a href="#">{{ get_text('announcements') }}</a></li>
+                    <li><a href="{{ url_for('report_issue') }}">{{ get_text('report_issue') }}</a></li>
+                    <li><a href="{{ url_for('public_track') }}">{{ get_text('public_issues') }}</a></li>
+                    <li><a href="{{ url_for('notices') }}">{{ get_text('announcements') }}</a></li>
                 </ul>
             </div>
 

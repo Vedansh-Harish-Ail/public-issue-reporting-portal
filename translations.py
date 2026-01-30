@@ -214,6 +214,8 @@ TRANSLATIONS = {
         "flash_issue_unauthorized": "Issue not found or unauthorized",
         "delete_issue": "Delete Issue",
         "confirm_delete": "Are you sure you want to delete this issue? This action cannot be undone.",
+        "delete": "Delete",
+        "confirm_delete_notice": "Are you sure you want to delete this notice?",
         
         # Admin Panel Labels
         "admin_panel": "Admin Panel",
@@ -466,6 +468,8 @@ TRANSLATIONS = {
         "flash_issue_unauthorized": "ದೂರು ಕಂಡುಬಂದಿಲ್ಲ ಅಥವಾ ಅನಧಿಕೃತವಾಗಿದೆ",
         "delete_issue": "ದೂರನ್ನು ಅಳಿಸಿ",
         "confirm_delete": "ಈ ದೂರನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ? ಈ ಕ್ರಮವನ್ನು ರದ್ದುಗೊಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+        "delete": "ಅಳಿಸಿ",
+        "confirm_delete_notice": "ಈ ಸೂಚನೆಯನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ?",
         
         # Admin Panel Labels
         "admin_panel": "ನಿರ್ವಾಹಕರ ಫಲಕ",
