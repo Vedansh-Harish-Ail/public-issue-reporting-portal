@@ -31,6 +31,7 @@ TRANSLATIONS = {
         "track_id_search_placeholder": "Enter Tracking ID (e.g. TRK-A1B2C3)",
         "password_hint": "Min 8 chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char",
         "Rejected": "Rejected",
+        "Report_Issue_Desc": "Please provide accurate details to help us address your concern promptly.",
         
         # Home Page
         "hero_title": "Empowering Rural India",

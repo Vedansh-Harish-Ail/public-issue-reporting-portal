@@ -25,9 +25,7 @@
 
   <div class="hero-slider-content">
     <div class="container" style="text-align: center;">
-      <h1
-        style="font-size: 4rem; color: white; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.1; text-shadow: 0 4px 20px rgba(0,0,0,0.7); margin: 0; font-family: var(--font-serif); font-weight: 800;">
-        {{ get_text('hero_title') }}</h1>
+      <h1 class="hero-title-text">{{ get_text('hero_title') }}</h1>
     </div>
   </div>
 </div>
@@ -85,25 +83,25 @@
   <div class="container">
     <div class="stats-grid">
       <div class="stat-item" style="border: none;">
-        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.panchayaths }}+</div>
+        <div class="stat-number">{{ stats.panchayaths }}+</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
           {{ get_text('active_panchayats') }}</p>
       </div>
 
       <div class="stat-item" style="border: none;">
-        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.issues }}+</div>
+        <div class="stat-number">{{ stats.issues }}+</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
           {{ get_text('issues_reported') }}</p>
       </div>
 
       <div class="stat-item" style="border: none;">
-        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.resolution }}%</div>
+        <div class="stat-number">{{ stats.resolution }}%</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
           {{ get_text('resolution_rate') }}</p>
       </div>
 
       <div class="stat-item" style="border: none;">
-        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-serif);">{{ stats.citizens }}</div>
+        <div class="stat-number">{{ stats.citizens }}</div>
         <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; opacity: 0.8; margin-top: 10px;">
           {{ get_text('citizens_connected') }}</p>
       </div>
@@ -114,8 +112,7 @@
 <!-- ABOUT SECTION -->
 <div class="section-padding" id="about-scheme">
   <div class="container">
-    <div class="about-card glass-card"
-      style="display: flex; gap: 50px; align-items: center; border: none; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+    <div class="about-card glass-card about-card-inner">
       <!-- Left Image -->
       <div class="about-image" style="flex: 1; border-radius: 12px; overflow: hidden; height: 400px;">
         <img src="{{ url_for('static', filename='image/image.png') }}" alt="Panchayat Building"

@@ -9,7 +9,7 @@
     {{ back_button(get_text) }}
     <div class="container text-center">
         <div class="hero-content mx-auto">
-            <h1 style="font-size: 3.5rem; color: white;">{{ get_text('about_mission_vision') }}</h1>
+            <h1 class="about-hero-title">{{ get_text('about_mission_vision') }}</h1>
             <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto 30px; color: rgba(255,255,255,0.9);">{{
                 get_text('about_hero_desc') }}</p>
         </div>
@@ -18,9 +18,8 @@
 
 <div class="section-padding bg-light">
     <div class="container">
-        <div class="glass-card"
-            style="background: white; margin-top: -60px; position: relative; z-index: 10; padding: 60px; box-shadow: 0 15px 50px rgba(0,0,0,0.1);">
-            <div class="about-content">
+        <div class="glass-card about-page-card">
+            <div class="about-content" style="padding: 0;">
                 <div
                     style="color: var(--secondary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 15px;">
                     {{ get_text('who_we_are') }}</div>
@@ -37,15 +36,14 @@
                     </p>
                 </div>
 
-                <div class="row" style="display: flex; gap: 30px; margin-top: 50px; flex-wrap: wrap;">
-                    <div class="col hover-float"
-                        style="flex: 1; min-width: 300px; background: #f8fafc; padding: 40px; border-radius: 12px; border-left: 5px solid var(--secondary-color);">
+                <div class="vision-mission-row">
+                    <div class="col hover-float vision-mission-col"
+                        style="border-left: 5px solid var(--secondary-color);">
                         <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 22px;">{{
                             get_text('the_vision') }}</h4>
                         <p style="font-size: 16px; color: #555; line-height: 1.6;">{{ get_text('vision_desc') }}</p>
                     </div>
-                    <div class="col hover-float"
-                        style="flex: 1; min-width: 300px; background: #f8fafc; padding: 40px; border-radius: 12px; border-left: 5px solid var(--accent-color);">
+                    <div class="col hover-float vision-mission-col" style="border-left: 5px solid var(--accent-color);">
                         <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 22px;">{{
                             get_text('the_mission') }}</h4>
                         <p style="font-size: 16px; color: #555; line-height: 1.6;">{{ get_text('mission_full_desc') }}

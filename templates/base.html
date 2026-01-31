@@ -131,6 +131,8 @@
                             </svg>
                         </a>
                     </div>
+                    <a href="{{ url_for('user_logout') }}" class="login-btn"
+                        style="background: #dc3545; margin-left: 10px;">{{ get_text('logout') }}</a>
                     {% else %}
 
                     <a href="{{ url_for('user_login') }}" class="login-btn">{{ get_text('login') }}</a>
