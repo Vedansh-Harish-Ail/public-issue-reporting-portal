@@ -344,6 +344,13 @@ def report_issue():
     if request.method == "POST":
         panchayath_id = request.form["panchayath_id"]
         category = request.form["category"]
+        
+        # If "Others" is selected, use the custom name provided
+        if category == "Others":
+            other_cat = request.form.get("other_category_name", "").strip()
+            if other_cat:
+                category = other_cat
+
         description = request.form["description"]
         location = request.form["location"]
         user_id = session["user_id"]

@@ -151,6 +151,8 @@ TRANSLATIONS = {
         "cat_light": "Street Lights",
         "cat_drainage": "Drainage",
         "cat_others": "Others",
+        "specify_other_issue": "Specify Issue Type *",
+        "other_issue_placeholder": "E.g. Street dogs, Park maintenance, etc...",
 
         # Track Issue Page
         "track_issue_status": "Track Issue Status",
@@ -405,6 +407,8 @@ TRANSLATIONS = {
         "cat_light": "ಬೀದಿ ದೀಪಗಳು",
         "cat_drainage": "ಚರಂಡಿ ವ್ಯವಸ್ಥೆ",
         "cat_others": "ಇತರರು",
+        "specify_other_issue": "ದೂರಿನ ಪ್ರಕಾರವನ್ನು ತಿಳಿಸಿ *",
+        "other_issue_placeholder": "ಉದಾ: ಬೀದಿ ನಾಯಿಗಳ ಕಾಟ, ಪಾರ್ಕ್ ನಿರ್ವಹಣೆ, ಇತ್ಯಾದಿ...",
 
         # Track Issue Page
         "track_issue_status": "ದೂರಿನ ಸ್ಥಿತಿ ಪರಿಶೀಲಿಸಿ",
