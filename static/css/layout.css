@@ -13,6 +13,11 @@
     --font-serif: 'Playfair Display', serif;
 }
 
+/* ================= RESET ================= */
+* {
+    box-sizing: border-box;
+}
+
 html {
     scroll-behavior: smooth;
 }

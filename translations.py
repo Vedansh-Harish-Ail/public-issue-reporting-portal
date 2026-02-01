@@ -31,6 +31,7 @@ TRANSLATIONS = {
         "track_id_search_placeholder": "Enter Tracking ID (e.g. TRK-A1B2C3)",
         "password_hint": "Min 8 chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char",
         "Rejected": "Rejected",
+        "Report_Issue_Desc": "Please provide accurate details to help us address your concern promptly.",
         
         # Home Page
         "hero_title": "Empowering Rural India",
@@ -214,6 +215,8 @@ TRANSLATIONS = {
         "flash_issue_unauthorized": "Issue not found or unauthorized",
         "delete_issue": "Delete Issue",
         "confirm_delete": "Are you sure you want to delete this issue? This action cannot be undone.",
+        "delete": "Delete",
+        "confirm_delete_notice": "Are you sure you want to delete this notice?",
         
         # Admin Panel Labels
         "admin_panel": "Admin Panel",
@@ -466,6 +469,8 @@ TRANSLATIONS = {
         "flash_issue_unauthorized": "ದೂರು ಕಂಡುಬಂದಿಲ್ಲ ಅಥವಾ ಅನಧಿಕೃತವಾಗಿದೆ",
         "delete_issue": "ದೂರನ್ನು ಅಳಿಸಿ",
         "confirm_delete": "ಈ ದೂರನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ? ಈ ಕ್ರಮವನ್ನು ರದ್ದುಗೊಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+        "delete": "ಅಳಿಸಿ",
+        "confirm_delete_notice": "ಈ ಸೂಚನೆಯನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ?",
         
         # Admin Panel Labels
         "admin_panel": "ನಿರ್ವಾಹಕರ ಫಲಕ",

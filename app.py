@@ -8,18 +8,18 @@ import re
 import time
 from datetime import datetime
 from translations import TRANSLATIONS # Import translations
-#---------------- SMS OTP IMPORT ----------------
+#---------------- SMS OTP IMPORT --------------------------
 
-#---------------- EMAIL OTP IMPORT ------------------
+#---------------- EMAIL OTP IMPORT ------------------------
 import smtplib
 import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
-#---------------- SMS OTP CONFIGURATION ----------------
+#---------------- SMS OTP CONFIGURATION -------------------
 
-#---------------- EMAIL OTP CONFIGURATION ----------------
+#---------------- EMAIL OTP CONFIGURATION -----------------
 
 def generate_otp():
     return str(random.randint(100000, 999999))

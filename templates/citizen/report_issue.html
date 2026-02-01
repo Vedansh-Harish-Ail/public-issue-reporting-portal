@@ -18,21 +18,19 @@
 <div class="section-padding bg-light" style="padding: 60px 0;">
   <div class="container">
     {{ back_button(get_text) }}
-    <div class="report-form-card glass-card"
-      style="max-width: 800px; margin: auto; background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
+    <div class="report-form-card glass-card">
 
       <div style="margin-bottom: 40px; text-align: center;">
         <p style="color: #666; font-size: 1.1rem;">{{ get_text('Report_Issue_Desc') }}</p>
       </div>
 
       <form method="post" enctype="multipart/form-data">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-grid-row">
           <!-- Panchayath Selection -->
           <div class="form-group" style="margin-bottom: 25px;">
             <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
               get_text('select_panchayath') }}</label>
-            <select name="panchayath_id" class="form-control" required
-              style="width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-family: inherit;">
+            <select name="panchayath_id" class="form-control" required>
               <option value="">{{ get_text('select_option') }}</option>
               {% for p in panchayaths %}
               <option value="{{ p.id }}">{{ p.name }}</option>
@@ -44,8 +42,7 @@
           <div class="form-group" style="margin-bottom: 25px;">
             <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
               get_text('issue_category') }}</label>
-            <select name="category" class="form-control" required
-              style="width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-family: inherit;">
+            <select name="category" class="form-control" required>
               <option value="">{{ get_text('select_option') }}</option>
               <option value="Garbage Collection">{{ get_text('cat_garbage') }}</option>
               <option value="Water Supply">{{ get_text('cat_water') }}</option>
@@ -62,8 +59,7 @@
           <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
             get_text('location_neighborhood') }}</label>
           <input type="text" name="location" class="form-control" required
-            placeholder="{{ get_text('location_placeholder') }}"
-            style="width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; box-sizing: border-box;">
+            placeholder="{{ get_text('location_placeholder') }}">
         </div>
 
         <!-- Description -->
@@ -71,8 +67,7 @@
           <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
             get_text('detailed_description') }}</label>
           <textarea name="description" rows="5" class="form-control" required
-            placeholder="{{ get_text('description_placeholder') }}"
-            style="width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; box-sizing: border-box; font-family: inherit;"></textarea>
+            placeholder="{{ get_text('description_placeholder') }}"></textarea>
         </div>
 
         <!-- Image Upload -->
