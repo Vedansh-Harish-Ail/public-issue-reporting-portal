@@ -74,9 +74,14 @@
                                 <span>{{ i.created_at[:10] }}</span>
                                 <span style="display: flex; align-items: center;">
                                     <span class="status-dot" style="background: #ef4444;"></span>
-                                    <span style="color: #ef4444;">Rejected</span>
+                                    <span style="color: #ef4444;">{{ get_text('Rejected') }}</span>
                                 </span>
                             </div>
+                            {% if i.rejection_reason %}
+                            <div style="font-size: 13px; color: #c53030; margin-top: 5px; font-style: italic;">
+                                <strong>{{ get_text('rejection_reason_label') }}</strong> {{ i.rejection_reason }}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </a>

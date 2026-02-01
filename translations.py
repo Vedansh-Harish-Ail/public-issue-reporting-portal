@@ -23,6 +23,58 @@ TRANSLATIONS = {
         "brand_tagline": "Empowering Rural India",
         "otp_email_subject": "Meri Panchayat: Account Verification OTP",
         "otp_email_body": "Dear Citizen,\n\nYour One-Time Password (OTP) for account verification is: {}\n\nThis code is valid for 2 minutes. For your security, please do not share this code with anyone.\n\nRegards,\nMeri Panchayat Team",
+        "email_status_subject": "Update on your Issue #{}",
+        "email_status_body": "Dear {},\n\nThe status of your reported issue '{}' (ID: {}) has been updated to: {}.\n\nThank you,\nPanchayath Administration",
+        "email_report_subject": "Issue Reported Successfully: {}",
+        "email_report_body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }}
+    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #f9f9f9; }}
+    .header {{ background-color: #1f3f6d; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }}
+    .content {{ padding: 20px; background-color: white; border: 1px solid #eee; }}
+    .detail-row {{ margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }}
+    .label {{ font-weight: bold; color: #555; }}
+    .footer {{ text-align: center; font-size: 12px; color: #777; margin-top: 20px; }}
+    .button {{ display: inline-block; padding: 10px 20px; background-color: #1f3f6d; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2 style="margin:0;">Meri Panchayat</h2>
+        <p style="margin:5px 0 0 0;">Issue Reporting Portal</p>
+    </div>
+    <div class="content">
+        <h3>Issue Submitted Successfully</h3>
+        <p>Dear {user_name},</p>
+        <p>Thank you for reporting your concern. We have received your issue and it has been assigned the following tracking ID:</p>
+        
+        <div style="text-align:center; padding: 15px; background: #eeffe0; border: 1px solid #b7eb8f; border-radius: 5px; margin: 20px 0;">
+            <strong style="font-size: 18px; color: #2e7d32;">{tracking_id}</strong>
+        </div>
+
+        <div class="detail-row"><span class="label">Date:</span> {date}</div>
+        <div class="detail-row"><span class="label">Category:</span> {category}</div>
+        <div class="detail-row"><span class="label">Location:</span> {location}</div>
+        <div class="detail-row"><span class="label">Description:</span><br>{description}</div>
+
+        <p>You can track the status of your reported issue using the button below:</p>
+        <div style="text-align: center;">
+             <!-- Note: You might want to hardcode the domain if not using url_for in template string -->
+             <a href="#" class="button">Track Status</a>
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2026 Meri Panchayat Portal. All rights reserved.<br>
+        Empowering Rural India | Ministry of Panchayati Raj</p>
+    </div>
+</div>
+</body>
+</html>
+""",
         "reported": "Reported",
         "under_review": "Under Review",
         "status_rejected": "Rejected",

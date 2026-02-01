@@ -86,13 +86,13 @@
 
     <!-- Departmental Issues Grid -->
     <div class="department-grid">
-      {% for category, dept_issues in issues|sort(attribute='category')|groupby('category') %}
+      {% for category, dept_issues in issues_by_category.items() %}
       <div class="department-card">
         <div class="department-header">
           <h3>{{ get_text(category) }}</h3>
           <span
             style="font-size: 13px; font-weight: 600; color: #666; background: #eee; padding: 4px 10px; border-radius: 20px;">
-            {{ dept_issues|list|length }} {{ get_text('issues_count_suffix') }}
+            {{ dept_issues|length }} {{ get_text('issues_count_suffix') }}
           </span>
         </div>
 
