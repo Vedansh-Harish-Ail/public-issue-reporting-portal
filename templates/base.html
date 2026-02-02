@@ -205,7 +205,8 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- GOVERNMENT FOOTER -->
+    <!-- GOVERNMENT FOOTER (Hidden for Admins) -->
+    {% if not session.get('admin_id') %}
     <footer class="gov-footer">
         <div class="container footer-container">
 
@@ -249,6 +250,7 @@
             </div>
         </div>
     </footer>
+    {% endif %}
 
     <!-- Floating Language Selector -->
     <div class="language-selector-widget">
@@ -318,13 +320,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Get messages from Flask
-            const messages = {{ get_flashed_messages(with_categories = true) | tojson | safe
+            const messages = {{ get_flashed_messages(with_categories = True) | tojson | safe
         }};
 
         if (messages && messages.length > 0) {
-            // Show first message immediately for now
+            const seen = new Set();
             messages.forEach(([category, message]) => {
-                createPopup(message, category);
+                // Deduplicate based on message content
+                if (!seen.has(message)) {
+                    createPopup(message, category);
+                    seen.add(message);
+                }
             });
         }
         });

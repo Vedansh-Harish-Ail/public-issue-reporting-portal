@@ -11,10 +11,24 @@ from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT --------------------------
 
 #---------------- EMAIL OTP IMPORT ------------------------
+#---------------- EMAIL OTP IMPORT ------------------------
 import smtplib
 import random
+import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+# Define Base Directory for Absolute Paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+CATEGORIES = [
+    "Garbage Collection",
+    "Water Supply",
+    "Road Maintenance",
+    "Street Lights",
+    "Drainage",
+    "Others"
+]
 
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION -------------------
@@ -24,7 +38,8 @@ app = Flask(__name__)
 def generate_otp():
     return str(random.randint(100000, 999999))
 
-def send_email_otp(user_email, otp):
+def send_email(to_email, subject, body, content_type="plain"):
+    """Generic function to send emails. Supports 'plain' and 'html'."""
     # Use provided credentials as defaults if env vars are missing
     env_user = os.environ.get("MAIL_USERNAME")
     env_pass = os.environ.get("MAIL_PASSWORD")
@@ -35,36 +50,93 @@ def send_email_otp(user_email, otp):
         print("Error: Email credentials not found in environment variables.")
         return False
 
-    print(f"[{datetime.now()}] Attempting to send OTP to {user_email}...")
-    print(f"Using Sender: {sender_email}")
-    # print(f"Using Password: {'***' if app_password else 'None'}") # Security: don't log password
-
+    print(f"[{datetime.now()}] Attempting to send email to {to_email}...")
+    
+    debug_file = os.path.join(BASE_DIR, "debug_email.txt")
+    
     try:
         msg = MIMEMultipart()
         msg['From'] = sender_email
-        msg['To'] = user_email
-        msg['Subject'] = _get_text("otp_email_subject")
+        msg['To'] = to_email
+        msg['Subject'] = subject
 
-        body_template = _get_text("otp_email_body")
-        # Ensure template has placeholder, otherwise verify fallback
-        if "{}" in body_template:
-            body = body_template.format(otp)
-        else:
-            body = f"{body_template}: {otp}" 
+        msg.attach(MIMEText(body, content_type))
 
-        msg.attach(MIMEText(body, 'plain'))
+        # Debugging Email
+        with open(debug_file, "a") as f:
+            f.write(f"[{datetime.now()}] Sending {content_type} email to {to_email} with subject: {subject}\n")
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(sender_email, app_password)
-        server.sendmail(sender_email, user_email, msg.as_string())
+        server.sendmail(sender_email, to_email, msg.as_string())
         server.quit()
-        print(f"[{datetime.now()}] Email sent successfully to {user_email}")
+        
+        with open(debug_file, "a") as f:
+            f.write(f"[{datetime.now()}] SUCCESS: Email sent to {to_email}\n")
+            
+        print(f"[{datetime.now()}] Email sent successfully to {to_email}")
         return True
     except Exception as e:
+        with open(debug_file, "a") as f:
+            f.write(f"[{datetime.now()}] ERROR: {e}\n")
         print(f"[{datetime.now()}] Error sending email: {e}")
-        print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
+        return False
+
+def send_email_otp(user_email, otp):
+    """Sends OTP email using the generic send_email function."""
+    subject = _get_text("otp_email_subject")
+    body_template = _get_text("otp_email_body")
+    
+    # Ensure template has placeholder, otherwise verify fallback
+    if "{}" in body_template:
+        body = body_template.format(otp)
+    else:
+        body = f"{body_template}: {otp}"
+        
+    if send_email(user_email, subject, body):
         return True
+    else:
+        print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
+        return True  # Return True to allow fallback manual entry if email fails
+
+def send_status_update_email(user_email, user_name, tracking_id, issue_category, new_status, rejection_reason=None):
+    """Sends an email notification when an issue status changes."""
+    subject = _get_text("email_status_subject").format(tracking_id)
+    
+    body_template = _get_text("email_status_body")
+    
+    # Construct the status message
+    status_msg = new_status
+    if new_status == "Rejected" and rejection_reason:
+        status_msg += f" (Reason: {rejection_reason})"
+        
+    try:
+        body = body_template.format(user_name, issue_category, tracking_id, status_msg)
+        # Run email sending in a separate thread
+        threading.Thread(target=send_email, args=(user_email, subject, body)).start()
+        return True
+    except Exception as e:
+        print(f"Error initiating email thread: {e}")
+        return False
+
+def send_issue_confirmation_email(user_email, user_name, tracking_id, category, description, location):
+    """Sends an appealing HTML email confirmation on issue reporting."""
+    subject = _get_text("email_report_subject").format(tracking_id)
+    
+    # Simple HTML Template with inline CSS for broad compatibility
+    body_html = _get_text("email_report_body_html").format(
+        user_name=user_name,
+        tracking_id=tracking_id,
+        category=category,
+        location=location,
+        description=description,
+        date=datetime.now().strftime("%d %b %Y, %I:%M %p")
+    )
+    
+    # Run email sending in a separate thread
+    threading.Thread(target=send_email, args=(user_email, subject, body_html), kwargs={"content_type": "html"}).start()
+    return True
 
 # ---------------- CONFIGURATION ----------------
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
@@ -272,6 +344,13 @@ def report_issue():
     if request.method == "POST":
         panchayath_id = request.form["panchayath_id"]
         category = request.form["category"]
+        
+        # If "Others" is selected, use the custom name provided
+        if category == "Others":
+            other_cat = request.form.get("other_category_name", "").strip()
+            if other_cat:
+                category = other_cat
+
         description = request.form["description"]
         location = request.form["location"]
         user_id = session["user_id"]
@@ -280,13 +359,15 @@ def report_issue():
         image_filename = None
         
         if image and image.filename != "":
-            upload_folder = os.path.join("static", "uploads")
+            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
             os.makedirs(upload_folder, exist_ok=True)
             import time
             from werkzeug.utils import secure_filename
             ext = os.path.splitext(image.filename)[1]
             filename = f"issue_{int(time.time())}{ext}"
             image.save(os.path.join(upload_folder, filename))
+            
+            # Store relative path for URL generation
             image_filename = f"uploads/{filename}"
 
         tracking_id = generate_tracking_id()
@@ -297,6 +378,20 @@ def report_issue():
         """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id))
 
         conn.commit()
+        
+        # Fetch user email for notification
+        user = conn.execute("SELECT email, name FROM users WHERE id = ?", (user_id,)).fetchone()
+        
+        if user:
+            send_issue_confirmation_email(
+                user_email=user["email"],
+                user_name=user["name"],
+                tracking_id=tracking_id,
+                category=category,
+                description=description,
+                location=location
+            )
+            
         conn.close()
         flash(_get_text("flash_report_success").format(tracking_id), "success")
         return redirect(url_for("track_issue", new_tracking_id=tracking_id))
@@ -534,16 +629,32 @@ def admin_login():
 @login_required
 def admin_dashboard():
     # if "admin_id" not in session: check handled by decorator
-    pid = session["panchayath_id"]
+    pid = session.get("panchayath_id")
+    print(f"DEBUG ADMIN DASHBOARD: Session PID = {pid}")
     conn = connect_db()
 
-    issues = conn.execute("""
+    issues_rows = conn.execute("""
         SELECT i.*, u.name as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status != 'Completed' AND i.status != 'Rejected'
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
+    
+    print(f"DEBUG ADMIN DASHBOARD: Found {len(issues_rows)} active rows in DB for PID {pid}")
+    
+    issues = [dict(row) for row in issues_rows]
+
+    # Pre-group issues by category for robust template rendering
+    grouped_issues = {cat: [] for cat in CATEGORIES}
+    for issue in issues:
+        cat = issue.get('category')
+        print(f"DEBUG ADMIN DASHBOARD: Processing issue {issue['id']} with category '{cat}'")
+        if cat in grouped_issues:
+            grouped_issues[cat].append(issue)
+        else:
+            print(f"DEBUG ADMIN DASHBOARD: Category '{cat}' not found in CATEGORIES list!")
+            grouped_issues.setdefault("Others", []).append(issue)
 
     # Calculate stats for dashboard cards
     stats = {
@@ -554,7 +665,7 @@ def admin_dashboard():
     }
 
     conn.close()
-    return render_template("admin/dashboard.html", issues=issues, stats=stats)
+    return render_template("admin/dashboard.html", issues_by_category=grouped_issues, stats=stats)
 
 @app.route("/admin/completed_issues")
 @login_required
@@ -607,7 +718,7 @@ def admin_notices():
         banner_filename = None
         
         if banner and banner.filename != "":
-            upload_folder = os.path.join("static", "uploads")
+            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
             os.makedirs(upload_folder, exist_ok=True)
             import time
             ext = os.path.splitext(banner.filename)[1]
@@ -643,7 +754,7 @@ def delete_notice(notice_id):
     if notice:
         # Delete the physical file if it exists
         if notice['banner_path']:
-            file_path = os.path.join("static", notice['banner_path'])
+            file_path = os.path.join(BASE_DIR, "static", notice['banner_path'])
             if os.path.exists(file_path):
                 try:
                     os.remove(file_path)
@@ -703,7 +814,7 @@ def delete_issue(issue_id):
     if issue:
         # Delete the physical file if it exists
         if issue['photo_path']:
-            file_path = os.path.join("static", issue['photo_path'])
+            file_path = os.path.join(BASE_DIR, "static", issue['photo_path'])
             if os.path.exists(file_path):
                 try:
                     os.remove(file_path)
@@ -728,12 +839,33 @@ def update_issue(issue_id):
     rejection_reason = request.form.get("rejection_reason") if status == "Rejected" else None
     
     conn = connect_db()
+    
+    # Fetch issue and user details BEFORE updating
+    issue = conn.execute("""
+        SELECT i.*, u.email, u.name as user_name, p.name as panchayath_name
+        FROM issues i
+        LEFT JOIN users u ON i.user_id = u.id
+        JOIN panchayath p ON i.panchayath_id = p.id
+        WHERE i.id = ?
+    """, (issue_id,)).fetchone()
+    
     conn.execute(
         "UPDATE issues SET status=?, rejection_reason=? WHERE id=?",
         (status, rejection_reason, issue_id)
     )
     conn.commit()
     conn.close()
+
+    if issue and issue["email"]:
+        # Send email notification
+        send_status_update_email(
+            user_email=issue["email"],
+            user_name=issue["user_name"],
+            tracking_id=issue["tracking_id"],
+            issue_category=issue["category"],
+            new_status=status,
+            rejection_reason=rejection_reason
+        )
 
     flash(_get_text("flash_status_updated"), "success")
     return redirect(url_for("admin_dashboard"))

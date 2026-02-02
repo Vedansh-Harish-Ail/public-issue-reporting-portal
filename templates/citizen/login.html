@@ -67,5 +67,21 @@
             passwordField.type = this.checked ? 'text' : 'password';
         });
     }
+
+    // Prevent Double Submission
+    const form = document.querySelector('.auth-form');
+    if (form) {
+        form.addEventListener('submit', function () {
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                // Short delay to allow form data to be gathered
+                setTimeout(() => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.7';
+                    btn.innerText = '{{ get_text("processing") }}...';
+                }, 10);
+            }
+        });
+    }
 </script>
 {% endblock %}

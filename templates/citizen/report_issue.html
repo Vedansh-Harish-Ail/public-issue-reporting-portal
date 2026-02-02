@@ -42,7 +42,7 @@
           <div class="form-group" style="margin-bottom: 25px;">
             <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
               get_text('issue_category') }}</label>
-            <select name="category" class="form-control" required>
+            <select name="category" id="categorySelect" class="form-control" required>
               <option value="">{{ get_text('select_option') }}</option>
               <option value="Garbage Collection">{{ get_text('cat_garbage') }}</option>
               <option value="Water Supply">{{ get_text('cat_water') }}</option>
@@ -52,6 +52,15 @@
               <option value="Others">{{ get_text('cat_others') }}</option>
             </select>
           </div>
+        </div>
+
+        <!-- Hidden Field for Other Category -->
+        <div id="otherCategoryField" class="form-group" style="margin-bottom: 25px; display: none;">
+          <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">
+            {{ get_text('specify_other_issue') }}
+          </label>
+          <input type="text" name="other_category_name" id="otherCategoryInput" class="form-control"
+            placeholder="{{ get_text('other_issue_placeholder') }}">
         </div>
 
         <!-- Location -->
@@ -88,4 +97,44 @@
   </div>
 </div>
 
+
+<script>
+  const categorySelect = document.getElementById('categorySelect');
+  const otherField = document.getElementById('otherCategoryField');
+  const otherInput = document.getElementById('otherCategoryInput');
+
+  if (categorySelect) {
+    categorySelect.addEventListener('change', function () {
+      if (this.value === 'Others') {
+        otherField.style.display = 'block';
+        otherInput.setAttribute('required', 'required');
+      } else {
+        otherField.style.display = 'none';
+        otherInput.removeAttribute('required');
+        otherInput.value = ''; // Clear if they switch back
+      }
+    });
+
+    // Handle case where it might be pre-selected on reload
+    if (categorySelect.value === 'Others') {
+      otherField.style.display = 'block';
+      otherInput.setAttribute('required', 'required');
+    }
+  }
+
+  // Double Submit Prevention
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function () {
+      const btn = this.querySelector('button[type="submit"]');
+      if (btn) {
+        setTimeout(() => {
+          btn.disabled = true;
+          btn.style.opacity = '0.7';
+          btn.innerHTML = '{{ get_text("processing") }}...';
+        }, 10);
+      }
+    });
+  }
+</script>
 {% endblock %}
