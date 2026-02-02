@@ -117,6 +117,7 @@
                     <a href="{{ url_for('admin_dashboard') }}" class="login-btn">{{ get_text('dashboard') }}</a>
                     <a href="{{ url_for('admin_logout') }}" class="login-btn" style="background: #dc3545;">{{
                         get_text('logout') }}</a>
+
                     {% elif session.get('user_id') %}
                     <div class="user-profile-group">
                         <span class="user-greet-span">
@@ -131,8 +132,7 @@
                             </svg>
                         </a>
                     </div>
-                    <a href="{{ url_for('user_logout') }}" class="login-btn"
-                        style="background: #dc3545; margin-left: 10px;">{{ get_text('logout') }}</a>
+
                     {% else %}
 
                     <a href="{{ url_for('user_login') }}" class="login-btn">{{ get_text('login') }}</a>
