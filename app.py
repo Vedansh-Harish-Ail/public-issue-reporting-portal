@@ -11,7 +11,6 @@ from translations import TRANSLATIONS # Import translations
 #---------------- SMS OTP IMPORT --------------------------
 
 #---------------- EMAIL OTP IMPORT ------------------------
-#---------------- EMAIL OTP IMPORT ------------------------
 import smtplib
 import random
 import threading
@@ -32,6 +31,7 @@ CATEGORIES = [
 
 app = Flask(__name__)
 #---------------- SMS OTP CONFIGURATION -------------------
+
 
 #---------------- EMAIL OTP CONFIGURATION -----------------
 
