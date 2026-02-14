@@ -1,7 +1,5 @@
 # 📦 Installation Commands
 
-To set up the environment for **Meri Panchayat**, run the following commands based on your operating system:
-
 ### 🪟 Windows (Powershell / CMD)
 ```powershell
 pip install flask werkzeug gunicorn
