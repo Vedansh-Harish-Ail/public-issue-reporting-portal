@@ -2,6 +2,90 @@
 {% extends "base.html" %}
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/citizen.css') }}">
+<!-- Leaflet Maps -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  #map-container {
+    height: 350px;
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #e2e8f0;
+    display: none;
+    /* Hidden by default */
+  }
+
+  .map-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .pick-map-btn {
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+
+  .pick-map-btn:hover {
+    background: #2d3748;
+    transform: translateY(-1px);
+  }
+
+  /* Map Search Styles */
+  .map-search-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 5px;
+    display: none;
+    /* Shown with map */
+  }
+
+  .map-search-wrapper {
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    /* Clear zoom controls */
+    z-index: 1000;
+    display: flex;
+    gap: 5px;
+    background: white;
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: calc(100% - 60px);
+    max-width: 400px;
+  }
+
+  .map-search-input {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .map-search-btn {
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -67,29 +151,79 @@
         <div class="form-group" style="margin-bottom: 25px;">
           <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
             get_text('location_neighborhood') }}</label>
-          <input type="text" name="location" class="form-control" required
+          <input type="text" name="location" id="locationInput" class="form-control" required
             placeholder="{{ get_text('location_placeholder') }}">
+
+          <button type="button" id="toggleMapBtn" class="pick-map-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            {{ get_text('pick_from_map') }}
+          </button>
+
+          <div id="mapOuterContainer" style="position: relative; display: none;">
+            <div id="mapSearchContainer" class="map-search-container" style="display: block;">
+              <div class="map-search-wrapper">
+                <input type="text" id="mapSearchInput" class="map-search-input"
+                  placeholder="{{ get_text('search_map_placeholder') }}">
+                <button type="button" id="mapSearchBtn" class="map-search-btn">{{ get_text('search_btn') }}</button>
+              </div>
+            </div>
+            <div id="map-container" style="display: block;"></div>
+          </div>
+
+          <div id="mapActions" class="map-actions">
+            <button type="button" id="confirmLocationBtn" class="login-btn"
+              style="padding: 8px 15px; font-size: 13px; border-radius: 8px;">{{ get_text('confirm_location')
+              }}</button>
+            <button type="button" id="closeMapBtn" class="login-btn"
+              style="padding: 8px 15px; font-size: 13px; border-radius: 8px; background: #718096;">{{
+              get_text('close_map')
+              }}</button>
+          </div>
         </div>
 
         <!-- Description -->
         <div class="form-group" style="margin-bottom: 25px;">
           <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 8px; display: block;">{{
             get_text('detailed_description') }}</label>
-          <textarea name="description" rows="5" class="form-control" required
+          <textarea name="description" id="descriptionTextarea" rows="5" class="form-control" required maxlength="500"
             placeholder="{{ get_text('description_placeholder') }}"></textarea>
+
+          <div
+            style="display: flex; justify-content: flex-start; gap: 20px; font-size: 0.8rem; color: #718096; margin-top: 5px;">
+            <span>Words: <span id="wordCount">0</span> / 10 min</span>
+            <span>Characters: <span id="charCount">0</span> / 500</span>
+          </div>
+
+          <small id="descriptionHint" class="text-muted"
+            style="color: #718096; font-size: 0.85rem; display: block; margin-top: 5px;">
+            {{ get_text('flash_description_words') }} {{ get_text('or') }} {{ get_text('flash_description_len') }}
+          </small>
+          <small id="junkWarning" style="color: #e53e3e; font-size: 0.8rem; display: none; margin-top: 2px;">
+            * {{ get_text('flash_description_junk') }}
+          </small>
         </div>
 
         <!-- Image Upload -->
         <div class="form-group"
           style="margin-bottom: 35px; border: 2px dashed #e2e8f0; padding: 30px; border-radius: 15px; text-align: center; background: #f8fafc;">
-          <label style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 15px; display: block;">{{
+          <label id="photoLabel"
+            style="font-weight: 700; color: #4a5568; font-size: 14px; margin-bottom: 15px; display: block;">{{
             get_text('attach_photo') }}</label>
-          <input type="file" name="image" accept="image/*" class="file-input"
+          <input type="file" name="image" id="photoInput" accept="image/*" class="file-input"
             style="display: block; margin: 0 auto; color: #718096;">
+          <small id="wordPhotoHint" style="color: #e53e3e; font-size: 0.8rem; display: none; margin-top: 10px;">
+            * {{ get_text('flash_photo_required_words') }}
+          </small>
+          <small id="charPhotoHint" style="color: #e53e3e; font-size: 0.8rem; display: none; margin-top: 2px;">
+            * {{ get_text('flash_photo_required_refined') }}
+          </small>
         </div>
 
         <!-- Submit -->
-        <button type="submit" class="login-btn hover-float"
+        <button type="submit" id="submitBtn" class="login-btn hover-float"
           style="width: 100%; padding: 15px; border-radius: 30px; font-size: 16px; box-shadow: 0 5px 15px rgba(246, 141, 46, 0.2);">{{
           get_text('submit_complaint') }}</button>
       </form>
@@ -98,7 +232,214 @@
 </div>
 
 
+<!-- Leaflet Maps JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+  // --- Map Logic ---
+  let map;
+  let marker;
+  const toggleMapBtn = document.getElementById('toggleMapBtn');
+  const mapOuterContainer = document.getElementById('mapOuterContainer');
+  const mapContainer = document.getElementById('map-container');
+  const mapActions = document.getElementById('mapActions');
+  const locationInput = document.getElementById('locationInput');
+  const confirmLocationBtn = document.getElementById('confirmLocationBtn');
+  const closeMapBtn = document.getElementById('closeMapBtn');
+
+  const mapSearchInput = document.getElementById('mapSearchInput');
+  const mapSearchBtn = document.getElementById('mapSearchBtn');
+
+  function initMap() {
+    if (map) return; // Already initialized
+
+    // Default view: Region from Udupi to Kasaragod
+    const udupi = [13.3409, 74.7421];
+    const kasaragod = [12.5103, 74.9852];
+    map = L.map('map-container').fitBounds([udupi, kasaragod]);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Try to get user's current location (but don't wait for it to show the map)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        map.setView([lat, lng], 15);
+        placeMarker(lat, lng);
+      });
+    }
+
+    map.on('click', function (e) {
+      placeMarker(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Search functionality
+    if (mapSearchBtn) {
+      mapSearchBtn.addEventListener('click', performMapSearch);
+      mapSearchInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          performMapSearch();
+        }
+      });
+    }
+  }
+
+  function performMapSearch() {
+    const query = mapSearchInput.value.trim();
+    if (!query) return;
+
+    mapSearchBtn.innerText = '...';
+    mapSearchBtn.disabled = true;
+
+    // Use viewbox to bias results towards the local region (approx Udupi to Kasaragod)
+    const viewbox = '74.5,14,75.5,12';
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=${viewbox}&bounded=0&limit=1`)
+      .then(response => response.json())
+      .then(results => {
+        if (results && results.length > 0) {
+          const res = results[0];
+          const lat = parseFloat(res.lat);
+          const lon = parseFloat(res.lon);
+          map.setView([lat, lon], 16);
+          placeMarker(lat, lon);
+        } else {
+          alert("Place not found. Try a different name.");
+        }
+      })
+      .catch(err => console.error("Search error:", err))
+      .finally(() => {
+        mapSearchBtn.innerText = '{{ get_text("search_btn") }}';
+        mapSearchBtn.disabled = false;
+      });
+  }
+
+  function placeMarker(lat, lng) {
+    if (marker) {
+      marker.setLatLng([lat, lng]);
+    } else {
+      marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    }
+
+    // Optional: Fetch address via Nominatim (reverse geocoding)
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.display_name) {
+          marker.bindPopup(data.display_name).openPopup();
+          marker.tempAddress = data.display_name;
+        }
+      })
+      .catch(err => console.error("Geocoding error:", err));
+  }
+
+  if (toggleMapBtn) {
+    toggleMapBtn.addEventListener('click', function () {
+      mapOuterContainer.style.display = 'block';
+      mapActions.style.display = 'flex';
+      toggleMapBtn.style.display = 'none';
+      if (!map) {
+        initMap();
+      } else {
+        setTimeout(() => map.invalidateSize(), 100);
+      }
+    });
+  }
+
+  if (confirmLocationBtn) {
+    confirmLocationBtn.addEventListener('click', function () {
+      if (marker && marker.tempAddress) {
+        locationInput.value = marker.tempAddress;
+      } else if (marker) {
+        const latlng = marker.getLatLng();
+        locationInput.value = `Coords: ${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
+      }
+      closeMap();
+    });
+  }
+
+  if (closeMapBtn) {
+    closeMapBtn.addEventListener('click', closeMap);
+  }
+
+  function closeMap() {
+    mapOuterContainer.style.display = 'none';
+    mapActions.style.display = 'none';
+    toggleMapBtn.style.display = 'flex';
+  }
+
+  // --- End Map Logic ---
+
+  const descriptionTextarea = document.getElementById('descriptionTextarea');
+  const wordCountDisplay = document.getElementById('wordCount');
+  const charCountDisplay = document.getElementById('charCount');
+  const photoInput = document.getElementById('photoInput');
+  const submitBtn = document.getElementById('submitBtn');
+
+  const wordPhotoHint = document.getElementById('wordPhotoHint');
+  const charPhotoHint = document.getElementById('charPhotoHint');
+  const junkWarning = document.getElementById('junkWarning');
+  const descriptionHint = document.getElementById('descriptionHint');
+
+  function updateValidation() {
+    const text = descriptionTextarea.value.trim();
+
+    // Counts
+    const charCount = text.length;
+    const words = text ? text.split(/\s+/).filter(w => w.length > 0) : [];
+    const wordCount = words.length;
+
+    charCountDisplay.innerText = charCount;
+    wordCountDisplay.innerText = wordCount;
+
+    // Junk Check (5+ repeating characters)
+    const hasJunk = /(.)\1{4,}/.test(text);
+    junkWarning.style.display = hasJunk ? 'block' : 'none';
+
+    // Highlight minimum requirements in red if text exists but criteria not met
+    if (text.length > 0 && (wordCount < 10 || charCount < 30)) {
+      descriptionHint.style.color = '#e53e3e';
+    } else {
+      descriptionHint.style.color = '#718096';
+    }
+
+    // Toggle photo requirement (Threshold: 15 words or 30 characters)
+    let photoNeeded = false;
+
+    if (charCount > 0) {
+      if (wordCount < 15) {
+        wordPhotoHint.style.display = 'block';
+        photoNeeded = true;
+      } else {
+        wordPhotoHint.style.display = 'none';
+      }
+
+      if (charCount < 30) {
+        charPhotoHint.style.display = 'block';
+        photoNeeded = true;
+      } else {
+        charPhotoHint.style.display = 'none';
+      }
+    } else {
+      wordPhotoHint.style.display = 'none';
+      charPhotoHint.style.display = 'none';
+    }
+
+    if (photoNeeded) {
+      photoInput.setAttribute('required', 'required');
+    } else {
+      photoInput.removeAttribute('required');
+    }
+  }
+
+  if (descriptionTextarea) {
+    descriptionTextarea.addEventListener('input', updateValidation);
+    updateValidation(); // Run once on load
+  }
+
   const categorySelect = document.getElementById('categorySelect');
   const otherField = document.getElementById('otherCategoryField');
   const otherInput = document.getElementById('otherCategoryInput');
