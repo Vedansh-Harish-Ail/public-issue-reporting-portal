@@ -11,30 +11,32 @@ def test_email():
     
     sender_email = env_user or "panchayatseva1@gmail.com"
     app_password = env_pass or "tkao zyic hwog dxnd"
-    recipient = "ailvedansh@gmail.com"
+    recipient1 = "kshamyaamin19@gmail.com"
+    recipient2 = "ailvedansh@gmail.com"
     otp_code = "123456"
     
     # Use the template from the new file
     html_template = EMAIL_TEMPLATES["en"].format(otp_code)
 
-    print(f"Attempting to send HTML OTP to: {recipient}")
+    recipients = [recipient1, recipient2]
+    print(f"Attempting to send HTML OTP to: {', '.join(recipients)}")
     
     try:
         msg = MIMEMultipart('alternative')
         msg['From'] = sender_email
-        msg['To'] = recipient
-        msg['Subject'] = "STYLING TEST: Account Verification OTP"
+        msg['To'] = ", ".join(recipients)
+        msg['Subject'] = "Meri Panchayat: Account Verification OTP"
         msg.attach(MIMEText(html_template, 'html', 'utf-8'))
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(sender_email, app_password)
-        server.sendmail(sender_email, recipient, msg.as_string())
+        server.sendmail(sender_email, recipients, msg.as_string())
         server.quit()
         print("--- DEBUG: FIRST 300 CHARS OF EMAIL STRING ---")
         print(msg.as_string()[:300])
         print("--- END DEBUG ---")
-        print(f"SUCCESS! Check your inbox at {recipient}")
+        print(f"SUCCESS! Check your inbox at {', '.join(recipients)}")
         
     except Exception as e:
         print(f"FAILED: {e}")
