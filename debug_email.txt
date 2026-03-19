@@ -1,5 +1,6 @@
 [2026-02-01 17:29:42.908810] Sending plain email to akshayanknair@gmail.com with subject: Update on your Issue #TRK-B0F84F6B
 [2026-02-01 17:30:09.434524] SUCCESS: Email sent to akshayanknair@gmail.com
+
 [2026-02-01 18:51:29.700256] Sending plain email to sadanandaa3571@GMAIL.COM with subject: Meri Panchayat: Account Verification OTP
 [2026-02-01 18:51:55.834248] SUCCESS: Email sent to sadanandaa3571@GMAIL.COM
 [2026-02-01 18:55:33.296851] Sending html email to sadanandaa3571@GMAIL.COM with subject: Issue Reported Successfully: TRK-C54EC777
@@ -32,3 +33,27 @@
 [2026-02-02 20:18:35.603430] SUCCESS: Email sent to vedhshammi@gmail.com
 [2026-02-02 20:35:41.123489] Sending plain email to vedhshammi@gmail.com with subject: Update on your Issue #TRK-A12D2234
 [2026-02-02 20:35:44.954159] SUCCESS: Email sent to vedhshammi@gmail.com
+[2026-02-03 15:16:28.501142] Sending plain email to kulalharshith433@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-03 15:16:36.436574] SUCCESS: Email sent to kulalharshith433@gmail.com
+[2026-02-03 15:20:03.258153] Sending html email to kulalharshith433@gmail.com with subject: Issue Reported Successfully: TRK-06DFE70B
+[2026-02-03 15:20:10.042098] SUCCESS: Email sent to kulalharshith433@gmail.com
+[2026-02-03 15:27:09.513518] Sending plain email to kulalharshith433@gmail.com with subject: Update on your Issue #TRK-06DFE70B
+[2026-02-03 15:27:14.698598] SUCCESS: Email sent to kulalharshith433@gmail.com
+[2026-02-15 14:14:54.078789] Sending plain email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 14:14:58.708862] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 14:23:47.191307] Sending plain email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 14:23:51.622707] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 15:04:15.045755] Sending plain email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 15:04:43.155364] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 15:31:23.401170] Sending plain email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 15:31:23.408967] ERROR: [Errno 11001] getaddrinfo failed
+[2026-02-15 15:32:18.049571] Sending plain email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 15:32:45.599514] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 15:54:56.489285] Sending html email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 15:55:23.043506] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 15:55:52.111398] Sending html email to collegespacedrive@gmail.com with subject: Meri Panchayat: Account Verification OTP
+[2026-02-15 15:56:17.471562] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 16:29:10.317589] Sending html email to collegespacedrive@gmail.com with subject: Issue Reported Successfully: TRK-FA805552
+[2026-02-15 16:29:35.684115] SUCCESS: Email sent to collegespacedrive@gmail.com
+[2026-02-15 16:51:21.671756] Sending html email to collegespacedrive@gmail.com with subject: Issue Reported Successfully: TRK-ADCB25CE
+[2026-02-15 16:51:48.755827] SUCCESS: Email sent to collegespacedrive@gmail.com

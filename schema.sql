@@ -1,4 +1,3 @@
--- schema.sql (Updated to match current production structure)
 
 CREATE TABLE IF NOT EXISTS panchayath (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

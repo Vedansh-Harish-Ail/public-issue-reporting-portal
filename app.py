@@ -8,8 +8,7 @@ import re
 import time
 from datetime import datetime
 from translations import TRANSLATIONS # Import translations
-#---------------- SMS OTP IMPORT --------------------------
-
+from email_templates import EMAIL_TEMPLATES # Import HTML templates
 #---------------- EMAIL OTP IMPORT ------------------------
 import smtplib
 import random
@@ -30,9 +29,6 @@ CATEGORIES = [
 ]
 
 app = Flask(__name__)
-#---------------- SMS OTP CONFIGURATION -------------------
-
-
 #---------------- EMAIL OTP CONFIGURATION -----------------
 
 def generate_otp():
@@ -84,17 +80,16 @@ def send_email(to_email, subject, body, content_type="plain"):
         return False
 
 def send_email_otp(user_email, otp):
-    """Sends OTP email using the generic send_email function."""
+    """Sends OTP email using the templates from email_templates.py."""
     subject = _get_text("otp_email_subject")
-    body_template = _get_text("otp_email_body")
+    lang = session.get("lang", "en")
     
-    # Ensure template has placeholder, otherwise verify fallback
-    if "{}" in body_template:
-        body = body_template.format(otp)
-    else:
-        body = f"{body_template}: {otp}"
+    # Grab the HTML template for the current language
+    body_html_template = EMAIL_TEMPLATES.get(lang, EMAIL_TEMPLATES["en"])
+    email_content = body_html_template.format(otp)
+    content_type = "html"
         
-    if send_email(user_email, subject, body):
+    if send_email(user_email, subject, email_content, content_type=content_type):
         return True
     else:
         print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
@@ -259,6 +254,20 @@ def init_db():
         conn.execute("ALTER TABLE issues ADD COLUMN tracking_id TEXT")
         conn.commit()
 
+    # Add reporter_name to issues table if it doesn't exist
+    try:
+        conn.execute("SELECT reporter_name FROM issues LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE issues ADD COLUMN reporter_name TEXT")
+        conn.commit()
+        # Backfill existing names from users table
+        conn.execute("""
+            UPDATE issues 
+            SET reporter_name = (SELECT name FROM users WHERE users.id = issues.user_id)
+            WHERE reporter_name IS NULL
+        """)
+        conn.commit()
+
     # Add banner_path to notices table if it doesn't exist
     try:
         conn.execute("SELECT banner_path FROM notices LIMIT 1")
@@ -351,11 +360,43 @@ def report_issue():
             if other_cat:
                 category = other_cat
 
-        description = request.form["description"]
+        description = request.form["description"].strip()
         location = request.form["location"]
         user_id = session["user_id"]
+
+        # 1. Basic Cleaning & Content Check
+        description = request.form["description"].strip()
+        desc_len = len(description)
+        words = description.split()
+        word_count = len(words)
+        
+        # 2. Junk Check: Prevent repeating characters (e.g., "hhhhhh")
+        # Blocks 5 or more identical characters in a row
+        if re.search(r'(.)\1{4,}', description):
+            flash(_get_text("flash_description_junk"), "danger")
+            return redirect(url_for("report_issue"))
+
+        # 3. Absolute Minimum: 10 words
+        if word_count < 10:
+            flash(_get_text("flash_description_words"), "danger")
+            return redirect(url_for("report_issue"))
+            
+        # 4. Max Length: 500 chars
+        if desc_len > 500:
+            flash(_get_text("flash_description_len"), "danger")
+            return redirect(url_for("report_issue"))
         
         image = request.files.get("image")
+        
+        # 5. Conditional photo requirement: if words < 15 OR chars < 30, image is mandatory
+        # (Using the higher threshold for safety based on user feedback)
+        if (word_count < 15 or desc_len < 30) and (not image or image.filename == ""):
+            if word_count < 15:
+                flash(_get_text("flash_photo_required_words"), "danger")
+            else:
+                flash(_get_text("flash_photo_required_refined"), "danger")
+            return redirect(url_for("report_issue"))
+        
         image_filename = None
         
         if image and image.filename != "":
@@ -371,11 +412,12 @@ def report_issue():
             image_filename = f"uploads/{filename}"
 
         tracking_id = generate_tracking_id()
+        user_name = session.get("user_name", "Anonymous")
 
         conn.execute("""
-            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id))
+            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id, reporter_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id, user_name))
 
         conn.commit()
         
@@ -444,7 +486,7 @@ def track_issue():
 def public_track():
     conn = connect_db()
     issues = conn.execute("""
-        SELECT i.*, p.name AS panchayath_name, u.name AS user_name
+        SELECT i.*, p.name AS panchayath_name, COALESCE(i.reporter_name, u.name, 'Anonymous') AS user_name
         FROM issues i
         JOIN panchayath p ON p.id = i.panchayath_id
         LEFT JOIN users u ON u.id = i.user_id
@@ -488,6 +530,15 @@ def user_register():
         # Password: 8+ chars, 1 Upper, 1 Lower, 1 Number, 1 Special
         if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
             flash(_get_text("flash_password_weak"), "danger")
+            return redirect(url_for("user_register"))
+
+        # Check if user already exists BEFORE sending OTP
+        conn = connect_db()
+        existing_user = conn.execute("SELECT * FROM users WHERE email = ? OR mobile = ?", (email, mobile)).fetchone()
+        conn.close()
+        
+        if existing_user:
+            flash(_get_text("flash_user_exists"), "danger")
             return redirect(url_for("user_register"))
 
         # store data temporarily
@@ -634,7 +685,7 @@ def admin_dashboard():
     conn = connect_db()
 
     issues_rows = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status != 'Completed' AND i.status != 'Rejected'
@@ -674,7 +725,7 @@ def admin_completed_issues():
     conn = connect_db()
 
     issues = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status = 'Completed'
@@ -691,7 +742,7 @@ def admin_rejected_issues():
     conn = connect_db()
 
     issues = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status = 'Rejected'
@@ -790,9 +841,9 @@ def admin_issue_detail(issue_id):
     pid = session["panchayath_id"]
     conn = connect_db()
     issue = conn.execute("""
-        SELECT i.*, u.name as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile, p.name as panchayath_name
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile, p.name as panchayath_name
         FROM issues i
-        JOIN users u ON i.user_id = u.id
+        LEFT JOIN users u ON i.user_id = u.id
         JOIN panchayath p ON i.panchayath_id = p.id
         WHERE i.id = ? AND i.panchayath_id = ?
     """, (issue_id, pid)).fetchone()
