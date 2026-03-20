@@ -223,6 +223,16 @@ def init_db():
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS activities (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        panchayath_id INTEGER,
+        title TEXT,
+        description TEXT,
+        image_path TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (panchayath_id) REFERENCES panchayath(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
@@ -510,6 +520,19 @@ def notices():
     """).fetchall()
     conn.close()
     return render_template("citizen/notices.html", notices=notices)
+
+@app.route("/activities")
+def activities():
+    conn = connect_db()
+    activities = conn.execute("""
+        SELECT a.*, p.name AS panchayath_name
+        FROM activities a
+        JOIN panchayath p ON p.id = a.panchayath_id
+        ORDER BY a.created_at DESC
+    """).fetchall()
+    conn.close()
+    return render_template("citizen/activities.html", activities=activities)
+
 
 # ---------------- USER AUTH ROUTES ----------------
 
@@ -820,6 +843,71 @@ def delete_notice(notice_id):
         
     conn.close()
     return redirect(url_for("admin_notices"))
+
+@app.route("/admin/activities", methods=["GET", "POST"])
+@login_required
+def admin_activities():
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    if request.method == "POST":
+        title = request.form["title"]
+        description = request.form["description"]
+        
+        image = request.files.get("image")
+        image_filename = None
+        
+        if image and image.filename != "":
+            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
+            os.makedirs(upload_folder, exist_ok=True)
+            import time
+            ext = os.path.splitext(image.filename)[1]
+            filename = f"activity_{int(time.time())}{ext}"
+            image.save(os.path.join(upload_folder, filename))
+            image_filename = f"uploads/{filename}"
+
+        conn.execute("""
+            INSERT INTO activities (panchayath_id, title, description, image_path)
+            VALUES (?, ?, ?, ?)
+        """, (pid, title, description, image_filename))
+        conn.commit()
+        flash(_get_text("flash_activity_published"), "success")
+
+    activities = conn.execute("""
+        SELECT * FROM activities
+        WHERE panchayath_id = ?
+        ORDER BY created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/activities.html", activities=activities)
+
+@app.route("/admin/activities/delete/<int:activity_id>")
+@login_required
+def delete_activity(activity_id):
+    pid = session["panchayath_id"]
+    conn = connect_db()
+    
+    activity = conn.execute("SELECT * FROM activities WHERE id = ? AND panchayath_id = ?", (activity_id, pid)).fetchone()
+    
+    if activity:
+        if activity['image_path']:
+            file_path = os.path.join(BASE_DIR, "static", activity['image_path'])
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
+        conn.execute("DELETE FROM activities WHERE id = ?", (activity_id,))
+        conn.commit()
+        flash(_get_text("flash_activity_deleted"), "success")
+    else:
+        flash(_get_text("flash_notice_unauthorized"), "danger")
+        
+    conn.close()
+    return redirect(url_for("admin_activities"))
+
 
 @app.route("/profile")
 @user_login_required

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="padding-top: 40px; padding-bottom: 80px;">
+    <div class="hero-section text-center" style="margin-bottom: 50px;">
+        <h1 style="font-family: var(--font-serif); color: var(--primary-color); font-size: 3rem;">{{ get_text('our_activity') }}</h1>
+        <p class="lead text-muted">{{ get_text('about_hero_desc') }}</p>
+    </div>
+
+    {% if activities %}
+    <div class="activities-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px;">
+        {% for a in activities %}
+        <div class="activity-card" style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+            {% if a.image_path %}
+            <div class="activity-img" style="height: 200px; overflow: hidden;">
+                <img src="{{ url_for('static', filename=a.image_path) }}" alt="{{ a.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            {% endif %}
+            <div class="activity-content" style="padding: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 1px;">
+                        {{ a.panchayath_name }}
+                    </span>
+                    <span style="font-size: 12px; color: #888;">{{ a.created_at[:10] }}</span>
+                </div>
+                <h3 style="font-family: var(--font-serif); margin: 0 0 15px 0; color: #222;">{{ a.title }}</h3>
+                <p style="color: #666; line-height: 1.6; font-size: 15px;">{{ a.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 100px 0;">
+        <div style="font-size: 64px; margin-bottom: 20px;">🏃</div>
+        <h2 class="text-muted">{{ get_text('no_activities') }}</h2>
+        <p class="text-muted">Check back later for updates on our latest work.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .activity-card:hover {
+        transform: translateY(-10px);
+    }
+</style>
+{% endblock %}

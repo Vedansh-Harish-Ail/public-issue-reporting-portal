@@ -8,6 +8,9 @@ TRANSLATIONS = {
         "public_notices": "Public Notices",
         "manage_issues": "Manage Issues",
         "manage_notices": "Manage Notices",
+        "manage_activities": "Manage Activities",
+        "manage_activities_nav": "Manage Activities",
+        "our_activity": "Our Activity",
         "dashboard": "Dashboard",
         "logout": "Logout",
         "login": "Login",
@@ -171,6 +174,14 @@ TRANSLATIONS = {
         "public_notices_announcements": "Public Notices & Announcements",
         "issued_by": "Issued by",
         "no_notices": "No public notices available at the moment.",
+        "no_activities": "No activities available at the moment.",
+        "publish_activity": "Publish Activity",
+        "activity_title": "Activity Title",
+        "activity_desc": "Activity Description",
+        "activity_image": "Activity Image",
+        "confirm_delete_activity": "Are you sure you want to delete this activity?",
+        "flash_activity_published": "Activity published successfully",
+        "flash_activity_deleted": "Activity deleted successfully",
 
         # Profile Page
         "citizen_profile": "Citizen Profile",
@@ -321,7 +332,8 @@ TRANSLATIONS = {
         "notice_title": "Notice Title",
         "notice_desc": "Notice Description",
         "optional_banner": "Optional Banner Image",
-        "publish_btn": "Publish Notice"
+        "publish_btn": "Publish",
+        "manage_activities_title": "Manage Our Activities"
     },
     "kn": {
         "home": "ಮುಖಪುಟ",
@@ -332,6 +344,9 @@ TRANSLATIONS = {
         "public_notices": "ಸಾರ್ವಜನಿಕ ಸೂಚನೆಗಳು",
         "manage_issues": "ದೂರು ನಿರ್ವಹಣೆ",
         "manage_notices": "ಸೂಚನೆ ನಿರ್ವಹಣೆ",
+        "manage_activities": "ಚಟುವಟಿಕೆಗಳ ನಿರ್ವಹಣೆ",
+        "manage_activities_nav": "ಚಟುವಟಿಕೆಗಳ ನಿರ್ವಹಣೆ",
+        "our_activity": "ನಮ್ಮ ಚಟುವಟಿಕೆ",
         "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
         "logout": "ನಿರ್ಗಮಿಸಿ",
         "login": "ಪ್ರವೇಶಿಸಿ",
@@ -444,6 +459,14 @@ TRANSLATIONS = {
         "public_notices_announcements": "ಸಾರ್ವಜನಿಕ ಸೂಚನೆಗಳು ಮತ್ತು ಪ್ರಕಟಣೆಗಳು",
         "issued_by": "ನೀಡಿದವರು",
         "no_notices": "ಪ್ರಸ್ತುತ ಯಾವುದೇ ಸಾರ್ವಜನಿಕ ಸೂಚನೆಗಳು ಲಭ್ಯವಿಲ್ಲ.",
+        "no_activities": "ಪ್ರಸ್ತುತ ಯಾವುದೇ ಚಟುವಟಿಕೆಗಳು ಲಭ್ಯವಿಲ್ಲ.",
+        "publish_activity": "ಚಟುವಟಿಕೆಯನ್ನು ಪ್ರಕಟಿಸಿ",
+        "activity_title": "ಚಟುವಟಿಕೆಯ ಶೀರ್ಷಿಕೆ",
+        "activity_desc": "ಚಟುವಟಿಕೆಯ ವಿವರಣೆ",
+        "activity_image": "ಚಟುವಟಿಕೆಯ ಚಿತ್ರ",
+        "confirm_delete_activity": "ಈ ಚಟುವಟಿಕೆಯನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ?",
+        "flash_activity_published": "ಚಟುವಟಿಕೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ",
+        "flash_activity_deleted": "ಚಟುವಟಿಕೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಗಿದೆ",
 
         # Profile Page
         "citizen_profile": "ನಾಗರಿಕ ವಿವರ",
@@ -594,6 +617,7 @@ TRANSLATIONS = {
         "notice_title": "ಸೂಚನೆಯ ಶೀರ್ಷಿಕೆ",
         "notice_desc": "ಸೂಚನೆಯ ವಿವರಣೆ",
         "optional_banner": "ಐಚ್ಛಿಕ ಬ್ಯಾನರ್ ಚಿತ್ರ",
-        "publish_btn": "ಸೂಚನೆ ಪ್ರಕಟಿಸಿ"
+        "publish_btn": "ಪ್ರಕಟಿಸಿ",
+        "manage_activities_title": "ನಮ್ಮ ಚಟುವಟಿಕೆಗಳ ನಿರ್ವಹಣೆ"
     }
 }
