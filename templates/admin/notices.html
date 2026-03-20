@@ -81,6 +81,14 @@
 
           <div class="form-group">
             <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
+              get_text('expiry_date_label') }}</label>
+            <input type="datetime-local" name="expiry_date"
+              style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+            <small style="color: #888; display: block; margin-top: 5px;">{{ get_text('expiry_date_help') }}</small>
+          </div>
+
+          <div class="form-group">
+            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
               get_text('optional_banner') }}</label>
             <input type="file" name="banner" accept="image/*"
               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fdfdfd;">

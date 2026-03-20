@@ -120,7 +120,7 @@ TRANSLATIONS = {
         "govt_india": "Government of India",
         "address_line": "Krishi Bhawan, Padubidri - 110001",
         "official_admin_login": "Official / Admin Login",
-        "designed_by": "Designed & Developed by National Informatics Centre (NIC) | &copy; 2025 All Rights Reserved.",
+        "designed_by": "Designed & Developed by VK | &copy; 2025 All Rights Reserved.",
         "egram_swaraj": "eGramSwaraj",
         "service_plus": "ServicePlus",
 
@@ -331,6 +331,8 @@ TRANSLATIONS = {
         "publish_notice": "Publish Notice",
         "notice_title": "Notice Title",
         "notice_desc": "Notice Description",
+        "expiry_date_label": "Expiry Date & Time (Optional)",
+        "expiry_date_help": "Notice will move to Activities once this time passes.",
         "optional_banner": "Optional Banner Image",
         "publish_btn": "Publish",
         "manage_activities_title": "Manage Our Activities"
@@ -616,6 +618,8 @@ TRANSLATIONS = {
         "publish_notice": "ಸೂಚನೆಯನ್ನು ಪ್ರಕಟಿಸಿ",
         "notice_title": "ಸೂಚನೆಯ ಶೀರ್ಷಿಕೆ",
         "notice_desc": "ಸೂಚನೆಯ ವಿವರಣೆ",
+        "expiry_date_label": "ಮುಕ್ತಾಯ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ (ಐಚ್ಛಿಕ)",
+        "expiry_date_help": "ಈ ಸಮಯ ಕಳೆದ ನಂತರ ಸೂಚನೆಯು ಚಟುವಟಿಕೆಗಳಿಗೆ ಸ್ಥಳಾಂತರಗೊಳ್ಳುತ್ತದೆ.",
         "optional_banner": "ಐಚ್ಛಿಕ ಬ್ಯಾನರ್ ಚಿತ್ರ",
         "publish_btn": "ಪ್ರಕಟಿಸಿ",
         "manage_activities_title": "ನಮ್ಮ ಚಟುವಟಿಕೆಗಳ ನಿರ್ವಹಣೆ"
