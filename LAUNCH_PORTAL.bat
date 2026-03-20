@@ -26,7 +26,7 @@ echo and Python is allowed through Windows Firewall.
 echo.
 
 echo [3/4] Opening browser on THIS computer...
-start "" "http://127.0.0.1:5000"
+start "" cmd /c "ping 127.0.0.1 -n 4 > nul & start http://127.0.0.1:5000"
 
 echo [4/4] Launching server...
 echo.
