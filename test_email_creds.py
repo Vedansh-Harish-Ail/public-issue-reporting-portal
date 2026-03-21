@@ -25,7 +25,7 @@ def test_email():
         msg = MIMEMultipart('alternative')
         msg['From'] = sender_email
         msg['To'] = ", ".join(recipients)
-        msg['Subject'] = "Meri Panchayat: Account Verification OTP"
+        msg['Subject'] = "Meri Panchayat: Testing  OTP"
         msg.attach(MIMEText(html_template, 'html', 'utf-8'))
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
