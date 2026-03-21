@@ -75,3 +75,9 @@
 [2026-03-20 16:20:05.341293] SUCCESS: Email sent to kshamyaamin001@gmail.com
 [2026-03-20 16:20:13.679964] Sending html email to kshamyaamin001@gmail.com with subject: Meri Panchayat: Account Verification OTP
 [2026-03-20 16:20:17.202523] SUCCESS: Email sent to kshamyaamin001@gmail.com
+[2026-03-21 19:48:43.190969] Sending html email to ailvedansh@gmail.com with subject: Issue Reported Successfully: TRK-D5D36D35
+[2026-03-21 19:48:44.142760] Sending html email to ailvedansh@gmail.com with subject: Issue Reported Successfully: TRK-D122B8BA
+[2026-03-21 19:48:47.245308] SUCCESS: Email sent to ailvedansh@gmail.com
+[2026-03-21 19:48:47.678031] SUCCESS: Email sent to ailvedansh@gmail.com
+[2026-03-21 19:59:07.609703] Sending html email to kshamyaamin19@gmail.com with subject: Issue Reported Successfully: TRK-8ADD6302
+[2026-03-21 19:59:11.043508] SUCCESS: Email sent to kshamyaamin19@gmail.com
