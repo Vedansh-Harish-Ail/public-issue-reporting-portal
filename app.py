@@ -828,7 +828,14 @@ def admin_notices():
         description = request.form["description"]
         expiry_date = request.form.get("expiry_date")
         if expiry_date:
-            expiry_date = expiry_date.replace("T", " ") + ":00"
+            # Check if expiry_date (YYYY-MM-DD) is in the past
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            if expiry_date < current_date:
+                flash(_get_text("flash_expiry_past"), "danger")
+                return redirect(url_for("admin_notices"))
+            
+            # Save as end of day for database consistency
+            expiry_date = expiry_date + " 23:59:59"
         else:
             expiry_date = None
         

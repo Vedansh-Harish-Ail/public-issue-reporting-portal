@@ -82,7 +82,7 @@
           <div class="form-group">
             <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
               get_text('expiry_date_label') }}</label>
-            <input type="datetime-local" name="expiry_date"
+            <input type="date" name="expiry_date" id="expiry_date"
               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
             <small style="color: #888; display: block; margin-top: 5px;">{{ get_text('expiry_date_help') }}</small>
           </div>
@@ -198,6 +198,30 @@
     document.getElementById('noticeModal').classList.remove('active');
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
+  }
+
+  // Set minimum date for expiry_date input
+  function setMinExpiryDate() {
+    const now = new Date();
+    // Format: YYYY-MM-DD
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const minDate = `${year}-${month}-${day}`;
+
+    const expiryInput = document.getElementById('expiry_date');
+    if (expiryInput) {
+      expiryInput.min = minDate;
+    }
+  }
+
+  // Set min date on page load
+  window.addEventListener('DOMContentLoaded', setMinExpiryDate);
+
+  // Also refresh min date when the input is focused to be as accurate as possible
+  const expiryInput = document.getElementById('expiry_date');
+  if (expiryInput) {
+    expiryInput.addEventListener('focus', setMinExpiryDate);
   }
 </script>
 {% endblock %}
