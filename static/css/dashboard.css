@@ -110,6 +110,14 @@
     color: #ef4444;
 }
 
+.stat-card.info {
+    border-left-color: #1e429f;
+}
+
+.stat-card.info h3 {
+    color: #1e429f;
+}
+
 /* ================= TABLES & LISTS ================= */
 .recent-issues,
 .notice-list-container,
