@@ -313,7 +313,7 @@ def process_expired_notices():
             conn.execute("""
                 INSERT INTO activities (panchayath_id, title, description, image_path, created_at)
                 VALUES (?, ?, ?, ?, ?)
-            """, (notice['panchayath_id'], notice['title'], notice['description'], notice['banner_path'], notice['created_at']))
+            """, (notice['panchayath_id'], notice['title'], "", notice['banner_path'], notice['created_at']))
             
             # Delete from notices
             conn.execute("DELETE FROM notices WHERE id = ?", (notice['id'],))
@@ -903,7 +903,7 @@ def admin_activities():
 
     if request.method == "POST":
         title = request.form["title"]
-        description = request.form["description"]
+        description = ""
         
         image = request.files.get("image")
         image_filename = None
