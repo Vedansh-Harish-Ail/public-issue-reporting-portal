@@ -81,3 +81,5 @@
 [2026-03-21 19:48:47.678031] SUCCESS: Email sent to ailvedansh@gmail.com
 [2026-03-21 19:59:07.609703] Sending html email to kshamyaamin19@gmail.com with subject: Issue Reported Successfully: TRK-8ADD6302
 [2026-03-21 19:59:11.043508] SUCCESS: Email sent to kshamyaamin19@gmail.com
+[2026-03-22 20:41:02.511033] Sending html email to kulalharshith433@gmail.com with subject: Issue Reported Successfully: TRK-25BA2C3F
+[2026-03-22 20:41:06.836871] SUCCESS: Email sent to kulalharshith433@gmail.com
