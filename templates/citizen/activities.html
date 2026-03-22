@@ -7,13 +7,17 @@
 
 {% block content %}
 <div class="container" style="padding-top: 40px; padding-bottom: 80px;">
-    <div style="margin-bottom: 0px;">
-        {{ back_button(get_text) }}
-    </div>
-    <div class="hero-section text-center" style="margin-bottom: 50px;">
-        <h1 style="font-family: var(--font-serif); color: var(--primary-color); font-size: 3rem;">{{
-            get_text('our_activity') }}</h1>
-        <p class="lead text-muted">{{ get_text('about_hero_desc') }}</p>
+    <div class="hero-section" style="margin-bottom: 50px;">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px;">
+            <h1
+                style="font-family: var(--font-serif); color: var(--primary-color); font-size: 3rem; text-align: center; width: 100%; margin-bottom: 15px;">
+                {{
+                get_text('our_activity') }}</h1>
+            <div style="margin-left: -25px;">
+                {{ back_button(get_text) }}
+            </div>
+        </div>
+        <p class="lead text-muted text-center" style="text-align: center;">{{ get_text('about_hero_desc') }}</p>
     </div>
 
     {% if activities %}
