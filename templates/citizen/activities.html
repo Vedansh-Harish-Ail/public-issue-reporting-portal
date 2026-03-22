@@ -10,14 +10,14 @@
     <div class="hero-section" style="margin-bottom: 50px;">
         <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px;">
             <h1
-                style="font-family: var(--font-serif); color: var(--primary-color); font-size: 3rem; text-align: center; width: 100%; margin-bottom: 15px;">
+                style="font-family: var(--font-serif); color: var(--primary-color); font-size: 3rem; text-align: center; width: 100%; margin-bottom: 10px;">
                 {{
                 get_text('our_activity') }}</h1>
+            <p class="lead text-muted text-center" style="text-align: center; width: 100%; margin-bottom: 30px;">{{ get_text('about_hero_desc') }}</p>
             <div style="margin-left: -25px;">
                 {{ back_button(get_text) }}
             </div>
         </div>
-        <p class="lead text-muted text-center" style="text-align: center;">{{ get_text('about_hero_desc') }}</p>
     </div>
 
     {% if activities %}
