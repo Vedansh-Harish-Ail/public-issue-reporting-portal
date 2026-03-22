@@ -86,12 +86,7 @@
             <small style="color: #888; display: block; margin-top: 5px;">Upload a photo of the activity.</small>
           </div>
 
-          <div class="form-group">
-            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
-              get_text('activity_desc') }}</label>
-            <textarea name="description" rows="6" required placeholder="Enter activity details here..."
-              style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-family: inherit; box-sizing: border-box;"></textarea>
-          </div>
+
 
           <button type="submit" class="primary-btn" style="width: 100%; justify-content: center;">{{
             get_text('publish_btn') }}</button>
@@ -126,7 +121,7 @@
                 </a>
               </div>
             </div>
-            <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;">{{ a.description|truncate(100) }}</p>
+
           </div>
           {% else %}
           <p class="text-muted" style="text-align: center; padding: 20px;">{{ get_text('no_activities') }}</p>

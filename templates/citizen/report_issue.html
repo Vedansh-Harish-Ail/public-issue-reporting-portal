@@ -463,10 +463,45 @@
     }
   }
 
-  // Double Submit Prevention
+  // Double Submit Prevention and Description Validation
   const form = document.querySelector('form');
   if (form) {
-    form.addEventListener('submit', function () {
+    form.addEventListener('submit', function (e) {
+      const text = descriptionTextarea.value.trim();
+      const words = text ? text.split(/\s+/).filter(w => w.length > 0) : [];
+      const wordCount = words.length;
+      const hasJunk = /(.)\1{4,}/.test(text);
+
+      let errorMessage = '';
+
+      if (hasJunk) {
+        errorMessage = '{{ get_text("flash_description_junk") }}';
+      } else if (wordCount < 10) {
+        errorMessage = '{{ get_text("flash_description_words") }}';
+      }
+
+      if (errorMessage) {
+        e.preventDefault(); // Stop submission
+        if (typeof createPopup === 'function') {
+          createPopup(errorMessage, 'danger');
+        } else {
+          alert(errorMessage);
+        }
+
+        // Highlight and focus the description textarea
+        descriptionTextarea.style.border = '2px solid #e53e3e';
+        descriptionTextarea.style.backgroundColor = '#fff5f5';
+        descriptionTextarea.focus();
+
+        // Remove highlight when the user starts typing again
+        descriptionTextarea.addEventListener('input', function() {
+          descriptionTextarea.style.border = '';
+          descriptionTextarea.style.backgroundColor = '';
+        }, {once: true});
+
+        return false;
+      }
+
       const btn = this.querySelector('button[type="submit"]');
       if (btn) {
         setTimeout(() => {
