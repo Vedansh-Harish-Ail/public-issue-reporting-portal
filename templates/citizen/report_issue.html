@@ -494,10 +494,10 @@
         descriptionTextarea.focus();
 
         // Remove highlight when the user starts typing again
-        descriptionTextarea.addEventListener('input', function() {
+        descriptionTextarea.addEventListener('input', function () {
           descriptionTextarea.style.border = '';
           descriptionTextarea.style.backgroundColor = '';
-        }, {once: true});
+        }, { once: true });
 
         return false;
       }
