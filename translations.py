@@ -120,7 +120,7 @@ TRANSLATIONS = {
         "govt_india": "Government of Karnataka",
         "address_line": "Padubidri, Kaup Taluk, Udupi District - 574111.",
         "official_admin_login": "Official / Admin Login",
-        "designed_by": "Designed & Developed by VK | &copy; 2025 All Rights Reserved.",
+        "designed_by": "Designed & Developed by VK | &copy; 2026 All Rights Reserved.",
         "egram_swaraj": "eGramSwaraj",
         "service_plus": "ServicePlus",
 
@@ -406,7 +406,7 @@ TRANSLATIONS = {
         "govt_india": "ಕರ್ನಾಟಕ ಸರ್ಕಾರ",
         "address_line": "ಪಡುಬಿದ್ರಿ,ಕಾಪು ತಾಲೂಕು, ಉಡುಪಿ ಜಿಲ್ಲೆ - 574111",
         "official_admin_login": "ಅಧಿಕೃತ / ನಿರ್ವಾಹಕ ಪ್ರವೇಶ",
-        "designed_by": "VK ವಿನ್ಯಾಸಗೊಳಿಸಿದ ಮತ್ತು ಅಭಿವೃದ್ಧಿಪಡಿಸಿದ | &copy; 2025 ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.",
+        "designed_by": "VK ವಿನ್ಯಾಸಗೊಳಿಸಿದ ಮತ್ತು ಅಭಿವೃದ್ಧಿಪಡಿಸಿದ | &copy; 2026 ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.",
         "egram_swaraj": "ಇ-ಗ್ರಾಮ ಸ್ವರಾಜ್",
         "service_plus": "ಸರ್ವಿಸ್ ಪ್ಲಸ್",
 
