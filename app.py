@@ -173,8 +173,13 @@ if not os.environ.get("DATABASE_URL") and not os.environ.get("POSTGRES_URL"):
 
 def connect_db():
     # Check for Postgres (Production) or SQLite (Local)
-    # Vercel Postgres usually uses 'POSTGRES_URL'
-    db_url = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+    # Priority order: Panchayat_... (user's specific name), DATABASE_URL (Standard), POSTGRES_URL (Vercel)
+    db_url = (
+        os.environ.get("Panchayat_DATABASE_URL") or 
+        os.environ.get("Panchayat_POSTGRES_URL") or 
+        os.environ.get("DATABASE_URL") or 
+        os.environ.get("POSTGRES_URL")
+    )
     
     if db_url and db_url.startswith("postgres"):
         if psycopg2 is None:
