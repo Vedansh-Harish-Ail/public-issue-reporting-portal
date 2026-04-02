@@ -39,7 +39,7 @@
                         style="font-size: 12px; font-weight: 700; color: var(--secondary-color); text-transform: uppercase; letter-spacing: 1px;">
                         {{ a.panchayath_name }}
                     </span>
-                    <span style="font-size: 12px; color: #888;">{{ a.created_at[:10] }}</span>
+                    <span style="font-size: 12px; color: #888;">{{ a.created_at.strftime('%Y-%m-%d') if a.created_at else '' }}</span>
                 </div>
                 <h3 style="font-family: var(--font-serif); margin: 0 0 15px 0; color: #222;">{{ a.title }}</h3>
             </div>

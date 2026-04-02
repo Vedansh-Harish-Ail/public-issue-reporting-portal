@@ -122,7 +122,7 @@
               <div class="dept-issue-content">
                 <span class="dept-issue-title">#{{ i.id }} - {{ i.location }}</span>
                 <div class="dept-issue-meta">
-                  <span>{{ i.created_at[:10] }}</span>
+                  <span>{{ i.created_at.strftime('%Y-%m-%d') if i.created_at else '' }}</span>
                   <span style="display: flex; align-items: center;">
                     <span class="status-dot" style="
                       {% if i.status == 'Completed' %} background: #047857;

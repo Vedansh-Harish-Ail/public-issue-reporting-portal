@@ -63,7 +63,7 @@
         <div>
           <h2 style="margin: 0; color: var(--primary-color); font-family: var(--font-serif);">{{
             get_text('issue_suffix') }} #{{ issue.id }}</h2>
-          <span style="color: #666; font-size: 14px;">{{ get_text('reported_on') }} {{ issue.created_at[:10] }}</span>
+          <span style="color: #666; font-size: 14px;">{{ get_text('reported_on') }} {{ issue.created_at.strftime('%Y-%m-%d') if issue.created_at else '' }}</span>
         </div>
 
         <span class="status-badge" style="padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 14px;

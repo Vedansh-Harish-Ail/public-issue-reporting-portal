@@ -20,7 +20,7 @@
     <ul class="notices-grid">
       {% for n in notices %}
       <li class="notice-card" onclick="openNoticeModal(this)" data-title="{{ n.title }}"
-        data-date="{{ n.created_at[:10] }}" data-panchayat="{{ n.panchayath_name }}"
+        data-date="{{ n.created_at.strftime('%Y-%m-%d') }}" data-panchayat="{{ n.panchayath_name }}"
         data-description="{{ n.description }}"
         data-image="{{ url_for('static', filename=n.banner_path) if n.banner_path else '' }}">
 
@@ -28,13 +28,13 @@
         <div class="notice-banner"
           style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('/static/{{ n.banner_path }}');">
           <strong style="font-size: 24px;">{{ n.title }}</strong>
-          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at[:10] }}</small>
+          <small style="opacity: 0.9; margin-top: 5px;">{{ n.created_at.strftime('%Y-%m-%d') }}</small>
         </div>
         {% else %}
         <div style="padding: 30px; flex-grow: 1; display: flex; flex-direction: column;">
           <div style="margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;">
             <strong style="font-size: 20px; color: var(--primary-color);">{{ n.title }}</strong>
-            <small style="color: #666; display: block; margin-top: 5px;">{{ n.created_at[:10] }}</small>
+            <small style="color: #666; display: block; margin-top: 5px;">{{ n.created_at.strftime('%Y-%m-%d') }}</small>
           </div>
           <p
             style="color: #444; line-height: 1.6; font-size: 16px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;">

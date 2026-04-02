@@ -115,12 +115,12 @@
         <div class="notice-list" style="max-height: 600px; overflow-y: auto;">
           {% for n in notices %}
           <div class="notice-item" style="cursor: pointer;" onclick="openNoticeModal(this)" data-title="{{ n.title }}"
-            data-date="{{ n.created_at[:10] }}" data-description="{{ n.description }}"
+            data-date="{{ n.created_at.strftime('%Y-%m-%d') if n.created_at else '' }}" data-description="{{ n.description }}"
             data-image="{{ url_for('static', filename=n.banner_path) if n.banner_path else '' }}">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <strong style="font-size: 16px; color: var(--primary-color);">{{ n.title }}</strong>
               <div style="display: flex; align-items: center; gap: 15px;" onclick="event.stopPropagation()">
-                <small style="color: #888; font-size: 12px;">{{ n.created_at[:10] }}</small>
+                <small style="color: #888; font-size: 12px;">{{ n.created_at.strftime('%Y-%m-%d') if n.created_at else '' }}</small>
                 <a href="{{ url_for('delete_notice', notice_id=n.id) }}"
                   onclick="return confirm('{{ get_text('confirm_delete_notice') }}');"
                   style="color: #c53030; display: flex; align-items: center; padding: 4px; border-radius: 4px; transition: background 0.2s;"

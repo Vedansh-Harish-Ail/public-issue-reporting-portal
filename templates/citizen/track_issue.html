@@ -63,7 +63,7 @@
       </div>
       <h3 style="margin: 15px 0 5px; color: var(--primary-color);">{{ get_text(tracked_issue.category) }} {{
         get_text('issue_suffix') }}</h3>
-      <p style="margin: 0; color: #666;">{{ get_text('reported_on') }} {{ tracked_issue.created_at[:10] }}</p>
+      <p style="margin: 0; color: #666;">{{ get_text('reported_on') }} {{ tracked_issue.created_at.strftime('%Y-%m-%d') }}</p>
     </div>
 
     <!-- Logic for Steps -->
