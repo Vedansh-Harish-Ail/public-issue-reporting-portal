@@ -22,7 +22,7 @@
       <li class="notice-card" onclick="openNoticeModal(this)" data-title="{{ n.title }}"
         data-date="{{ n.created_at.strftime('%Y-%m-%d') }}" data-panchayat="{{ n.panchayath_name }}"
         data-description="{{ n.description }}"
-        data-image="{{ url_for('static', filename=n.banner_path) if n.banner_path else '' }}">
+        data-image="{{ get_image_url(n.banner_path) if n.banner_path else '' }}">
 
         {% if n.banner_path %}
         <div class="notice-banner"

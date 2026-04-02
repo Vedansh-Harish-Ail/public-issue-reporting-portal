@@ -116,7 +116,7 @@
           {% for n in notices %}
           <div class="notice-item" style="cursor: pointer;" onclick="openNoticeModal(this)" data-title="{{ n.title }}"
             data-date="{{ n.created_at.strftime('%Y-%m-%d') if n.created_at else '' }}" data-description="{{ n.description }}"
-            data-image="{{ url_for('static', filename=n.banner_path) if n.banner_path else '' }}">
+            data-image="{{ get_image_url(n.banner_path) if n.banner_path else '' }}">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <strong style="font-size: 16px; color: var(--primary-color);">{{ n.title }}</strong>
               <div style="display: flex; align-items: center; gap: 15px;" onclick="event.stopPropagation()">

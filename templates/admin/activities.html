@@ -101,7 +101,7 @@
           {% for a in activities %}
           <div class="notice-item" style="cursor: pointer;" onclick="openActivityModal(this)" data-title="{{ a.title }}"
             data-date="{{ a.created_at.strftime('%Y-%m-%d') if a.created_at else '' }}" data-description="{{ a.description }}"
-            data-image="{{ url_for('static', filename=a.image_path) if a.image_path else '' }}">
+            data-image="{{ get_image_url(a.image_path) if a.image_path else '' }}">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <strong style="font-size: 16px; color: var(--primary-color);">{{ a.title }}</strong>
               <div style="display: flex; align-items: center; gap: 15px;" onclick="event.stopPropagation()">

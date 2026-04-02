@@ -443,6 +443,18 @@ def generate_tracking_id():
     # Generate a short unique ID (e.g., TRK-1A2B3C)
     return "TRK-" + str(uuid.uuid4())[:8].upper()
 
+
+@app.context_processor
+def utility_processor():
+    def get_image_url(path):
+        if not path:
+            return ""
+        if path.startswith("http://") or path.startswith("https://"):
+            return path
+        from flask import url_for
+        return url_for('static', filename=path)
+    return dict(get_image_url=get_image_url)
+
 # ---------------- CITIZEN ROUTES --------------
 
 @app.route("/")

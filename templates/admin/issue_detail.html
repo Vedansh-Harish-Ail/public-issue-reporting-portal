@@ -166,9 +166,9 @@
               style="margin-top: 0; color: #444; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">
               {{ get_text('attachment') }}</h5>
             <div style="position: relative; display: inline-block; width: 100%;">
-              <img src="{{ url_for('static', filename=issue.photo_path) }}"
+              <img src="{{ get_image_url(issue.photo_path) }}"
                 style="width: 100%; border-radius: 8px; border: 1px solid #eee; cursor: pointer;"
-                onclick="openImageModal('{{ url_for('static', filename=issue.photo_path) }}')"
+                onclick="openImageModal('{{ get_image_url(issue.photo_path) }}')"
                 title="Click to view full size">
             </div>
           </div>
