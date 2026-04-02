@@ -5,3 +5,4 @@ flask-limiter
 flask-talisman
 psycopg2-binary
 python-dotenv
+requests

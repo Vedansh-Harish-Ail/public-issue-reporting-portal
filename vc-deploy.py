@@ -25,25 +25,32 @@ def migrate():
         with open(schema_path, "r") as f:
             sql_script = f.read()
 
-        # TRANSFORM SQLITE TO POSTGRES
-        print("Transforming SQLite schema to Postgres...")
-        # 1. PRIMARY KEY AUTOINCREMENT -> SERIAL PRIMARY KEY
-        sql_script = sql_script.replace("INTEGER PRIMARY KEY AUTOINCREMENT", "SERIAL PRIMARY KEY")
-        # 2. DATETIME -> TIMESTAMP
-        sql_script = sql_script.replace("DATETIME", "TIMESTAMP")
-        # 3. Handle multiple statements (split by semicolon)
-        statements = sql_script.split(";")
+        def add_column_if_missing(table, column, type_def):
+            cur.execute(f"""
+                SELECT count(*) FROM information_schema.columns 
+                WHERE table_name='{table}' AND column_name='{column}';
+            """)
+            if cur.fetchone()[0] == 0:
+                print(f"Adding column {column} to {table}...")
+                cur.execute(f"ALTER TABLE {table} ADD COLUMN {column} {type_def};")
 
-        print("Executing schema...")
+        # 1. Ensure new tables exist
+        print("Ensuring all tables exist...")
+        # (Running the updated schema.sql with "IF NOT EXISTS" handles this safely)
+        statements = sql_script.split(";")
         for stmt in statements:
             stmt = stmt.strip()
             if stmt and not stmt.startswith("--"):
-                try:
-                    cur.execute(stmt)
-                except Exception as e:
-                    # Ignore "Already exists" errors for safe re-runs
-                    if "already exists" not in str(e).lower():
-                        raise e
+                cur.execute(stmt)
+
+        # 2. Add missing columns to existing tables
+        print("Checking for missing columns in existing tables...")
+        add_column_if_missing("issues", "tracking_id", "TEXT UNIQUE")
+        add_column_if_missing("issues", "rejection_reason", "TEXT")
+        add_column_if_missing("issues", "reporter_name", "TEXT")
+        add_column_if_missing("notices", "banner_path", "TEXT")
+        add_column_if_missing("notices", "expiry_date", "TIMESTAMP")
+        
         conn.commit()
         
         # Seed default data
