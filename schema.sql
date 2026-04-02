@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE,
     mobile TEXT,
     password_hash TEXT,
+    aadhaar_number TEXT,
+    is_verified INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
