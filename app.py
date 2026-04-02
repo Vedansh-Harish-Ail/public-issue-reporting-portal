@@ -23,6 +23,8 @@ try:
     from psycopg2.extras import DictCursor
 except ImportError:
     psycopg2 = None
+import requests
+import urllib.parse
 
 # Define Base Directory for Absolute Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -54,6 +56,26 @@ limiter = Limiter(
 
 def generate_otp():
     return str(random.randint(100000, 999999))
+
+def upload_to_blob(file_obj, filename):
+    """Uploads a file to Vercel Blob and returns the public URL."""
+    token = os.environ.get("BLOB_READ_WRITE_TOKEN")
+    if not token:
+        return None
+    
+    # Clean filename for URL safety
+    filename = urllib.parse.quote(filename)
+    url = f"https://blob.vercel-storage.com/{filename}"
+    headers = {"Authorization": f"Bearer {token}", "x-api-version": "1"}
+    
+    try:
+        file_obj.seek(0)
+        resp = requests.put(url, data=file_obj.read(), headers=headers)
+        if resp.status_code in [200, 201]:
+            return resp.json().get("url")
+    except Exception as e:
+        print(f"Blob upload error: {e}")
+    return None
 
 def send_email(to_email, subject, body, content_type="plain"):
     """Generic function to send emails. Supports 'plain' and 'html'."""
@@ -500,31 +522,38 @@ def report_issue():
         
         image = request.files.get("image")
         
-        # 5. Conditional photo requirement: if words < 15 OR chars < 30, image is mandatory
-        # (Using the higher threshold for safety based on user feedback)
+        # Restore: Conditional photo requirement: if words < 15 OR chars < 30, image is mandatory
         if (word_count < 15 or desc_len < 30) and (not image or image.filename == ""):
             if word_count < 15:
                 flash(_get_text("flash_photo_required_words"), "danger")
             else:
                 flash(_get_text("flash_photo_required_refined"), "danger")
             return redirect(url_for("report_issue"))
-        
+
         image_filename = None
+        tracking_id = generate_tracking_id()
         
         if image and image.filename != "":
-            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
-            os.makedirs(upload_folder, exist_ok=True)
-            import time
-            from werkzeug.utils import secure_filename
-            ext = os.path.splitext(image.filename)[1]
-            filename = f"issue_{int(time.time())}{ext}"
-            image.save(os.path.join(upload_folder, filename))
-            
-            # Store relative path for URL generation
-            image_filename = f"uploads/{filename}"
+            # Try Vercel Blob
+            blob_url = upload_to_blob(image, f"issue_{tracking_id}_{image.filename}")
+            if blob_url:
+                image_filename = blob_url
+            else:
+                # Fallback
+                upload_folder = os.path.join(BASE_DIR, "static", "uploads")
+                if not os.environ.get("DATABASE_URL") and not os.environ.get("Panchayat_DATABASE_URL"):
+                     os.makedirs(upload_folder, exist_ok=True)
+                ext = os.path.splitext(image.filename)[1]
+                filename = f"issue_{tracking_id}{ext}"
+                try:
+                    image.save(os.path.join(upload_folder, filename))
+                    image_filename = f"uploads/{filename}"
+                except:
+                    image_filename = None
 
-        tracking_id = generate_tracking_id()
         user_name = session.get("user_name", "Anonymous")
+        user_id = session.get("user_id")
+        location = request.form.get("location", "")
 
         conn.execute("""
             INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id, reporter_name)
@@ -915,13 +944,20 @@ def admin_notices():
         banner_filename = None
         
         if banner and banner.filename != "":
-            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
-            os.makedirs(upload_folder, exist_ok=True)
-            import time
-            ext = os.path.splitext(banner.filename)[1]
-            filename = f"notice_{int(time.time())}{ext}"
-            banner.save(os.path.join(upload_folder, filename))
-            banner_filename = f"uploads/{filename}"
+            blob_url = upload_to_blob(banner, f"notice_{int(time.time())}_{banner.filename}")
+            if blob_url:
+                banner_filename = blob_url
+            else:
+                upload_folder = os.path.join(BASE_DIR, "static", "uploads")
+                if not os.environ.get("DATABASE_URL") and not os.environ.get("Panchayat_DATABASE_URL"):
+                    os.makedirs(upload_folder, exist_ok=True)
+                ext = os.path.splitext(banner.filename)[1]
+                filename = f"notice_{int(time.time())}{ext}"
+                try:
+                    banner.save(os.path.join(upload_folder, filename))
+                    banner_filename = f"uploads/{filename}"
+                except:
+                    banner_filename = None
 
         conn.execute("""
             INSERT INTO notices (panchayath_id, title, description, banner_path, expiry_date)
@@ -981,13 +1017,20 @@ def admin_activities():
         image_filename = None
         
         if image and image.filename != "":
-            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
-            os.makedirs(upload_folder, exist_ok=True)
-            import time
-            ext = os.path.splitext(image.filename)[1]
-            filename = f"activity_{int(time.time())}{ext}"
-            image.save(os.path.join(upload_folder, filename))
-            image_filename = f"uploads/{filename}"
+            blob_url = upload_to_blob(image, f"activity_{int(time.time())}_{image.filename}")
+            if blob_url:
+                image_filename = blob_url
+            else:
+                upload_folder = os.path.join(BASE_DIR, "static", "uploads")
+                if not os.environ.get("DATABASE_URL") and not os.environ.get("Panchayat_DATABASE_URL"):
+                    os.makedirs(upload_folder, exist_ok=True)
+                ext = os.path.splitext(image.filename)[1]
+                filename = f"activity_{int(time.time())}{ext}"
+                try:
+                    image.save(os.path.join(upload_folder, filename))
+                    image_filename = f"uploads/{filename}"
+                except:
+                    image_filename = None
 
         conn.execute("""
             INSERT INTO activities (panchayath_id, title, description, image_path)
