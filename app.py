@@ -157,13 +157,17 @@ def send_issue_confirmation_email(user_email, user_name, tracking_id, category, 
 # ---------------- CONFIGURATION ----------------
 app.secret_key = os.environ.get("SECRET_KEY", "new_secure_random_key_2025")
 
-# Ensure the database directory exists
+# Ensure the database directory exists (Only if using SQLite/Local)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_DIR = os.path.join(BASE_DIR, "database")
 DB_NAME = os.path.join(DB_DIR, "panchayath.db")
 
-if not os.path.exists(DB_DIR):
-    os.makedirs(DB_DIR)
+if not os.environ.get("DATABASE_URL") and not os.environ.get("POSTGRES_URL"):
+    try:
+        if not os.path.exists(DB_DIR):
+            os.makedirs(DB_DIR)
+    except Exception as e:
+        print(f"Skipping DB_DIR creation: {e}")
 
 # ---------------- DATABASE CONNECTION ----------------
 
