@@ -188,29 +188,31 @@ def connect_db():
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
         
+        # Wrapper class to make Postgres behave like SQLite
+        class PostgresWrapper:
+            def __init__(self, conn):
+                self.conn = conn
+            def cursor(self, *args, **kwargs):
+                cursor = self.conn.cursor(*args, cursor_factory=DictCursor, **kwargs)
+                original_execute = cursor.execute
+                def wrapped_execute(query, params=None):
+                    if params and isinstance(query, str):
+                        query = query.replace("?", "%s")
+                    return original_execute(query, params)
+                cursor.execute = wrapped_execute
+                return cursor
+            def execute(self, query, params=None):
+                cur = self.cursor()
+                cur.execute(query, params)
+                return cur
+            def commit(self): return self.conn.commit()
+            def rollback(self): return self.conn.rollback()
+            def close(self): return self.conn.close()
+            def __getattr__(self, name): return getattr(self.conn, name)
+
         conn = psycopg2.connect(db_url)
-        # Make Postgres behave like sqlite3.Row (DictCursor supports both index and name)
         conn.autocommit = True
-        # Overwrite cursor to return DictRow objects
-        original_cursor = conn.cursor
-        def compat_cursor(*args, **kwargs):
-            cursor = original_cursor(*args, cursor_factory=DictCursor, **kwargs)
-            original_execute = cursor.execute
-            def wrapped_execute(query, params=None):
-                if params and isinstance(query, str):
-                    query = query.replace("?", "%s")
-                return original_execute(query, params)
-            cursor.execute = wrapped_execute
-            return cursor
-        conn.cursor = compat_cursor
-        
-        # Also need a top-level execute for conn.execute calls
-        def conn_execute(query, params=None):
-            cur = conn.cursor()
-            cur.execute(query, params)
-            return cur
-        conn.execute = conn_execute
-        return conn
+        return PostgresWrapper(conn)
     else:
         # Fallback to local SQLite
         conn = sqlite3.connect(DB_NAME, timeout=10)
