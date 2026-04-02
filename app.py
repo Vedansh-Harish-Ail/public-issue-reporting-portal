@@ -162,7 +162,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_DIR = os.path.join(BASE_DIR, "database")
 DB_NAME = os.path.join(DB_DIR, "panchayath.db")
 
-if not os.environ.get("DATABASE_URL") and not os.environ.get("POSTGRES_URL"):
+if not any(os.environ.get(k) for k in ["Panchayat_DATABASE_URL", "Panchayat_POSTGRES_URL", "DATABASE_URL", "POSTGRES_URL"]):
     try:
         if not os.path.exists(DB_DIR):
             os.makedirs(DB_DIR)
