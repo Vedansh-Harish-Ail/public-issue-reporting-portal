@@ -69,7 +69,10 @@ def send_email(to_email, subject, body, content_type="plain"):
 
     print(f"[{datetime.now()}] Attempting to send email to {to_email}...")
     
-    debug_file = os.path.join(BASE_DIR, "debug_email.txt")
+    if os.environ.get("DATABASE_URL") or os.environ.get("Panchayat_DATABASE_URL"):
+        debug_file = os.path.join("/tmp", "debug_email.txt")
+    else:
+        debug_file = os.path.join(BASE_DIR, "debug_email.txt")
     
     try:
         msg = MIMEMultipart()
