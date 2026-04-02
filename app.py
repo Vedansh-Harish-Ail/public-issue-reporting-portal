@@ -20,7 +20,7 @@ from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 try:
     import psycopg2
-    from psycopg2.extras import RealDictRow, RealDictCursor
+    from psycopg2.extras import DictCursor
 except ImportError:
     psycopg2 = None
 
@@ -180,12 +180,12 @@ def connect_db():
             db_url = db_url.replace("postgres://", "postgresql://", 1)
         
         conn = psycopg2.connect(db_url)
-        # Make Postgres behave like sqlite3.Row (RealDictCursor)
+        # Make Postgres behave like sqlite3.Row (DictCursor supports both index and name)
         conn.autocommit = True
-        # Overwrite cursor to handle '?' -> '%s' translation for compatibility
+        # Overwrite cursor to return DictRow objects
         original_cursor = conn.cursor
         def compat_cursor(*args, **kwargs):
-            cursor = original_cursor(*args, cursor_factory=RealDictCursor, **kwargs)
+            cursor = original_cursor(*args, cursor_factory=DictCursor, **kwargs)
             original_execute = cursor.execute
             def wrapped_execute(query, params=None):
                 if params and isinstance(query, str):

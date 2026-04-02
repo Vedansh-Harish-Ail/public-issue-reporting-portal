@@ -25,11 +25,25 @@ def migrate():
         with open(schema_path, "r") as f:
             sql_script = f.read()
 
-        print("Executing schema.sql...")
-        # psycopg2 doesn't have executescript like sqlite3, so we split or just execute
-        # Caution: Split by semicolon might be naive if semicolons are inside strings
-        # But for standard schema.sql it's usually okay.
-        cur.execute(sql_script)
+        # TRANSFORM SQLITE TO POSTGRES
+        print("Transforming SQLite schema to Postgres...")
+        # 1. PRIMARY KEY AUTOINCREMENT -> SERIAL PRIMARY KEY
+        sql_script = sql_script.replace("INTEGER PRIMARY KEY AUTOINCREMENT", "SERIAL PRIMARY KEY")
+        # 2. DATETIME -> TIMESTAMP
+        sql_script = sql_script.replace("DATETIME", "TIMESTAMP")
+        # 3. Handle multiple statements (split by semicolon)
+        statements = sql_script.split(";")
+
+        print("Executing schema...")
+        for stmt in statements:
+            stmt = stmt.strip()
+            if stmt and not stmt.startswith("--"):
+                try:
+                    cur.execute(stmt)
+                except Exception as e:
+                    # Ignore "Already exists" errors for safe re-runs
+                    if "already exists" not in str(e).lower():
+                        raise e
         conn.commit()
         
         # Seed default data
