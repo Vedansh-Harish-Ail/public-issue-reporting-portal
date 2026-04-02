@@ -39,6 +39,11 @@
             📢 {{ get_text('manage_notices_nav') }}
           </a>
         </li>
+        <li>
+          <a href="{{ url_for('admin_activities') }}">
+            🏃 {{ get_text('manage_activities_nav') }}
+          </a>
+        </li>
         <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
             🚪 {{ get_text('logout') }}
@@ -69,6 +74,12 @@
       <div class="stat-card secondary">
         <h3>{{ stats.pending }}</h3>
         <p>{{ get_text('pending_actions') }}</p>
+      </div>
+
+      <!-- Under Review -->
+      <div class="stat-card info">
+        <h3>{{ stats.under_review }}</h3>
+        <p>{{ get_text('under_review') }}</p>
       </div>
 
       <!-- Resolved -->

@@ -8,15 +8,21 @@ import re
 import time
 from datetime import datetime
 from translations import TRANSLATIONS # Import translations
-#---------------- SMS OTP IMPORT --------------------------
-
-#---------------- EMAIL OTP IMPORT ------------------------
+from email_templates import EMAIL_TEMPLATES # Import HTML templates
 #---------------- EMAIL OTP IMPORT ------------------------
 import smtplib
 import random
 import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
+try:
+    import psycopg2
+    from psycopg2.extras import DictCursor
+except ImportError:
+    psycopg2 = None
 
 # Define Base Directory for Absolute Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,9 +37,20 @@ CATEGORIES = [
 ]
 
 app = Flask(__name__)
-#---------------- SMS OTP CONFIGURATION -------------------
 
-#---------------- EMAIL OTP CONFIGURATION -----------------
+# ---------------- SECURITY CONFIGURATION -----------------
+# Talisman adds security headers and enforces HTTPS
+Talisman(app, content_security_policy=None) # CSP can be restrictive, set to None for MVP
+
+# Limiter prevents brute-force attacks on sensitive routes
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
+
+# ---------------- EMAIL OTP CONFIGURATION -----------------
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -84,17 +101,16 @@ def send_email(to_email, subject, body, content_type="plain"):
         return False
 
 def send_email_otp(user_email, otp):
-    """Sends OTP email using the generic send_email function."""
+    """Sends OTP email using the templates from email_templates.py."""
     subject = _get_text("otp_email_subject")
-    body_template = _get_text("otp_email_body")
+    lang = session.get("lang", "en")
     
-    # Ensure template has placeholder, otherwise verify fallback
-    if "{}" in body_template:
-        body = body_template.format(otp)
-    else:
-        body = f"{body_template}: {otp}"
+    # Grab the HTML template for the current language
+    body_html_template = EMAIL_TEMPLATES.get(lang, EMAIL_TEMPLATES["en"])
+    email_content = body_html_template.format(otp)
+    content_type = "html"
         
-    if send_email(user_email, subject, body):
+    if send_email(user_email, subject, email_content, content_type=content_type):
         return True
     else:
         print(f"\n[FALLBACK] Email failed. Enter this OTP: {otp}\n")
@@ -152,11 +168,46 @@ if not os.path.exists(DB_DIR):
 # ---------------- DATABASE CONNECTION ----------------
 
 def connect_db():
-    conn = sqlite3.connect(DB_NAME, timeout=10) # Added timeout
-    conn.row_factory = sqlite3.Row
-    # Enable WAL mode for better concurrency and stability
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
+    # Check for Postgres (Production) or SQLite (Local)
+    # Vercel Postgres usually uses 'POSTGRES_URL'
+    db_url = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+    
+    if db_url and db_url.startswith("postgres"):
+        if psycopg2 is None:
+            raise ImportError("psycopg2-binary is required for Postgres connection")
+        # Handle "postgres://" vs "postgresql://" for SQLAlchemy compatibility if needed
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        
+        conn = psycopg2.connect(db_url)
+        # Make Postgres behave like sqlite3.Row (DictCursor supports both index and name)
+        conn.autocommit = True
+        # Overwrite cursor to return DictRow objects
+        original_cursor = conn.cursor
+        def compat_cursor(*args, **kwargs):
+            cursor = original_cursor(*args, cursor_factory=DictCursor, **kwargs)
+            original_execute = cursor.execute
+            def wrapped_execute(query, params=None):
+                if params and isinstance(query, str):
+                    query = query.replace("?", "%s")
+                return original_execute(query, params)
+            cursor.execute = wrapped_execute
+            return cursor
+        conn.cursor = compat_cursor
+        
+        # Also need a top-level execute for conn.execute calls
+        def conn_execute(query, params=None):
+            cur = conn.cursor()
+            cur.execute(query, params)
+            return cur
+        conn.execute = conn_execute
+        return conn
+    else:
+        # Fallback to local SQLite
+        conn = sqlite3.connect(DB_NAME, timeout=10)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL;")
+        return conn
 
 # ---------------- I18N UTILS ----------------
 
@@ -225,7 +276,18 @@ def init_db():
         title TEXT,
         description TEXT,
         banner_path TEXT,
+        expiry_date DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS activities (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        panchayath_id INTEGER,
+        title TEXT,
+        description TEXT,
+        image_path TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (panchayath_id) REFERENCES panchayath(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS users (
@@ -259,6 +321,20 @@ def init_db():
         conn.execute("ALTER TABLE issues ADD COLUMN tracking_id TEXT")
         conn.commit()
 
+    # Add reporter_name to issues table if it doesn't exist
+    try:
+        conn.execute("SELECT reporter_name FROM issues LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE issues ADD COLUMN reporter_name TEXT")
+        conn.commit()
+        # Backfill existing names from users table
+        conn.execute("""
+            UPDATE issues 
+            SET reporter_name = (SELECT name FROM users WHERE users.id = issues.user_id)
+            WHERE reporter_name IS NULL
+        """)
+        conn.commit()
+
     # Add banner_path to notices table if it doesn't exist
     try:
         conn.execute("SELECT banner_path FROM notices LIMIT 1")
@@ -266,8 +342,43 @@ def init_db():
         conn.execute("ALTER TABLE notices ADD COLUMN banner_path TEXT")
         conn.commit()
 
+    # Add expiry_date to notices table if it doesn't exist
+    try:
+        conn.execute("SELECT expiry_date FROM notices LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE notices ADD COLUMN expiry_date DATETIME")
+        conn.commit()
+
     conn.commit()
     conn.close()
+
+def process_expired_notices():
+    conn = connect_db()
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Get expired notices
+    try:
+        conn.row_factory = sqlite3.Row
+        expired_notices = conn.execute("""
+            SELECT * FROM notices 
+            WHERE expiry_date IS NOT NULL AND expiry_date <= ?
+        """, (current_time,)).fetchall()
+        
+        for notice in expired_notices:
+            # Move to activities
+            conn.execute("""
+                INSERT INTO activities (panchayath_id, title, description, image_path, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            """, (notice['panchayath_id'], notice['title'], "", notice['banner_path'], notice['created_at']))
+            
+            # Delete from notices
+            conn.execute("DELETE FROM notices WHERE id = ?", (notice['id'],))
+        
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass # Column might not exist yet
+    finally:
+        conn.close()
 
 # ---------------- SEED DEFAULT DATA ----------------
 
@@ -350,12 +461,40 @@ def report_issue():
             other_cat = request.form.get("other_category_name", "").strip()
             if other_cat:
                 category = other_cat
+        
+        # 1. Basic Cleaning & Content Check
+        description = request.form["description"].strip()
+        desc_len = len(description)
+        words = description.split()
+        word_count = len(words)
+        
+        # 2. Junk Check: Prevent repeating characters (e.g., "hhhhhh")
+        # Blocks 5 or more identical characters in a row
+        if re.search(r'(.)\1{4,}', description):
+            flash(_get_text("flash_description_junk"), "danger")
+            return redirect(url_for("report_issue"))
 
-        description = request.form["description"]
-        location = request.form["location"]
-        user_id = session["user_id"]
+        # 3. Absolute Minimum: 10 words
+        if word_count < 10:
+            flash(_get_text("flash_description_words"), "danger")
+            return redirect(url_for("report_issue"))
+            
+        # 4. Max Length: 500 chars
+        if desc_len > 500:
+            flash(_get_text("flash_description_len"), "danger")
+            return redirect(url_for("report_issue"))
         
         image = request.files.get("image")
+        
+        # 5. Conditional photo requirement: if words < 15 OR chars < 30, image is mandatory
+        # (Using the higher threshold for safety based on user feedback)
+        if (word_count < 15 or desc_len < 30) and (not image or image.filename == ""):
+            if word_count < 15:
+                flash(_get_text("flash_photo_required_words"), "danger")
+            else:
+                flash(_get_text("flash_photo_required_refined"), "danger")
+            return redirect(url_for("report_issue"))
+        
         image_filename = None
         
         if image and image.filename != "":
@@ -371,11 +510,12 @@ def report_issue():
             image_filename = f"uploads/{filename}"
 
         tracking_id = generate_tracking_id()
+        user_name = session.get("user_name", "Anonymous")
 
         conn.execute("""
-            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id))
+            INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id, reporter_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (panchayath_id, category, description, location, image_filename, user_id, tracking_id, user_name))
 
         conn.commit()
         
@@ -444,7 +584,7 @@ def track_issue():
 def public_track():
     conn = connect_db()
     issues = conn.execute("""
-        SELECT i.*, p.name AS panchayath_name, u.name AS user_name
+        SELECT i.*, p.name AS panchayath_name, COALESCE(i.reporter_name, u.name, 'Anonymous') AS user_name
         FROM issues i
         JOIN panchayath p ON p.id = i.panchayath_id
         LEFT JOIN users u ON u.id = i.user_id
@@ -459,6 +599,7 @@ def about():
 
 @app.route("/notices")
 def notices():
+    process_expired_notices()
     conn = connect_db()
     notices = conn.execute("""
         SELECT n.*, p.name AS panchayath_name
@@ -469,9 +610,24 @@ def notices():
     conn.close()
     return render_template("citizen/notices.html", notices=notices)
 
+@app.route("/activities")
+def activities():
+    process_expired_notices()
+    conn = connect_db()
+    activities = conn.execute("""
+        SELECT a.*, p.name AS panchayath_name
+        FROM activities a
+        JOIN panchayath p ON p.id = a.panchayath_id
+        ORDER BY a.created_at DESC
+    """).fetchall()
+    conn.close()
+    return render_template("citizen/activities.html", activities=activities)
+
+
 # ---------------- USER AUTH ROUTES ----------------
 
 @app.route("/register", methods=["GET", "POST"])
+@limiter.limit("5 per hour")
 def user_register():
     if request.method == "POST":
         name = request.form["name"]
@@ -488,6 +644,15 @@ def user_register():
         # Password: 8+ chars, 1 Upper, 1 Lower, 1 Number, 1 Special
         if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
             flash(_get_text("flash_password_weak"), "danger")
+            return redirect(url_for("user_register"))
+
+        # Check if user already exists BEFORE sending OTP
+        conn = connect_db()
+        existing_user = conn.execute("SELECT * FROM users WHERE email = ? OR mobile = ?", (email, mobile)).fetchone()
+        conn.close()
+        
+        if existing_user:
+            flash(_get_text("flash_user_exists"), "danger")
             return redirect(url_for("user_register"))
 
         # store data temporarily
@@ -513,6 +678,7 @@ def user_register():
     return render_template("citizen/register.html")
 
 @app.route("/verify-otp", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def verify_otp():
     if request.method == "POST":
         entered_otp = request.form["otp"]
@@ -556,6 +722,7 @@ def verify_otp():
     return render_template("citizen/verify_otp.html")
 
 @app.route("/resend-otp")
+@limiter.limit("3 per hour")
 def resend_otp():
     if "temp_user" not in session:
         flash(_get_text("flash_session_expired"), "warning")
@@ -575,6 +742,7 @@ def resend_otp():
     return redirect(url_for("verify_otp"))
 
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def user_login():
     if request.method == "POST":
         email = request.form["email"]
@@ -604,6 +772,7 @@ def user_logout():
 # ---------------- ADMIN ROUTES ----------------
 
 @app.route("/admin/login", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def admin_login():
     if request.method == "POST":
         username = request.form["username"]
@@ -634,7 +803,7 @@ def admin_dashboard():
     conn = connect_db()
 
     issues_rows = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status != 'Completed' AND i.status != 'Rejected'
@@ -661,6 +830,7 @@ def admin_dashboard():
         "total": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ?", (pid,)).fetchone()[0],
         "resolved": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Completed'", (pid,)).fetchone()[0],
         "pending": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Pending'", (pid,)).fetchone()[0],
+        "under_review": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Under Review'", (pid,)).fetchone()[0],
         "rejected": conn.execute("SELECT COUNT(*) FROM issues WHERE panchayath_id = ? AND status = 'Rejected'", (pid,)).fetchone()[0]
     }
 
@@ -674,7 +844,7 @@ def admin_completed_issues():
     conn = connect_db()
 
     issues = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status = 'Completed'
@@ -691,7 +861,7 @@ def admin_rejected_issues():
     conn = connect_db()
 
     issues = conn.execute("""
-        SELECT i.*, u.name as reporter_name 
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name 
         FROM issues i
         LEFT JOIN users u ON i.user_id = u.id
         WHERE i.panchayath_id = ? AND i.status = 'Rejected'
@@ -711,8 +881,21 @@ def admin_notices():
     conn = connect_db()
 
     if request.method == "POST":
+        process_expired_notices()
         title = request.form["title"]
         description = request.form["description"]
+        expiry_date = request.form.get("expiry_date")
+        if expiry_date:
+            # Check if expiry_date (YYYY-MM-DD) is in the past
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            if expiry_date < current_date:
+                flash(_get_text("flash_expiry_past"), "danger")
+                return redirect(url_for("admin_notices"))
+            
+            # Save as end of day for database consistency
+            expiry_date = expiry_date + " 23:59:59"
+        else:
+            expiry_date = None
         
         banner = request.files.get("banner")
         banner_filename = None
@@ -727,9 +910,9 @@ def admin_notices():
             banner_filename = f"uploads/{filename}"
 
         conn.execute("""
-            INSERT INTO notices (panchayath_id, title, description, banner_path)
-            VALUES (?, ?, ?, ?)
-        """, (pid, title, description, banner_filename))
+            INSERT INTO notices (panchayath_id, title, description, banner_path, expiry_date)
+            VALUES (?, ?, ?, ?, ?)
+        """, (pid, title, description, banner_filename, expiry_date))
         conn.commit()
         flash(_get_text("flash_notice_published"), "success")
 
@@ -770,6 +953,71 @@ def delete_notice(notice_id):
     conn.close()
     return redirect(url_for("admin_notices"))
 
+@app.route("/admin/activities", methods=["GET", "POST"])
+@login_required
+def admin_activities():
+    pid = session["panchayath_id"]
+    conn = connect_db()
+
+    if request.method == "POST":
+        title = request.form["title"]
+        description = ""
+        
+        image = request.files.get("image")
+        image_filename = None
+        
+        if image and image.filename != "":
+            upload_folder = os.path.join(BASE_DIR, "static", "uploads")
+            os.makedirs(upload_folder, exist_ok=True)
+            import time
+            ext = os.path.splitext(image.filename)[1]
+            filename = f"activity_{int(time.time())}{ext}"
+            image.save(os.path.join(upload_folder, filename))
+            image_filename = f"uploads/{filename}"
+
+        conn.execute("""
+            INSERT INTO activities (panchayath_id, title, description, image_path)
+            VALUES (?, ?, ?, ?)
+        """, (pid, title, description, image_filename))
+        conn.commit()
+        flash(_get_text("flash_activity_published"), "success")
+
+    activities = conn.execute("""
+        SELECT * FROM activities
+        WHERE panchayath_id = ?
+        ORDER BY created_at DESC
+    """, (pid,)).fetchall()
+
+    conn.close()
+    return render_template("admin/activities.html", activities=activities)
+
+@app.route("/admin/activities/delete/<int:activity_id>")
+@login_required
+def delete_activity(activity_id):
+    pid = session["panchayath_id"]
+    conn = connect_db()
+    
+    activity = conn.execute("SELECT * FROM activities WHERE id = ? AND panchayath_id = ?", (activity_id, pid)).fetchone()
+    
+    if activity:
+        if activity['image_path']:
+            file_path = os.path.join(BASE_DIR, "static", activity['image_path'])
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
+        conn.execute("DELETE FROM activities WHERE id = ?", (activity_id,))
+        conn.commit()
+        flash(_get_text("flash_activity_deleted"), "success")
+    else:
+        flash(_get_text("flash_notice_unauthorized"), "danger")
+        
+    conn.close()
+    return redirect(url_for("admin_activities"))
+
+
 @app.route("/profile")
 @user_login_required
 def user_profile():
@@ -790,9 +1038,9 @@ def admin_issue_detail(issue_id):
     pid = session["panchayath_id"]
     conn = connect_db()
     issue = conn.execute("""
-        SELECT i.*, u.name as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile, p.name as panchayath_name
+        SELECT i.*, COALESCE(i.reporter_name, u.name, 'Anonymous') as reporter_name, u.email as reporter_email, u.mobile as reporter_mobile, p.name as panchayath_name
         FROM issues i
-        JOIN users u ON i.user_id = u.id
+        LEFT JOIN users u ON i.user_id = u.id
         JOIN panchayath p ON i.panchayath_id = p.id
         WHERE i.id = ? AND i.panchayath_id = ?
     """, (issue_id, pid)).fetchone()

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="admin-dashboard-container">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3 style="color: var(--primary-color); margin: 0; font-family: var(--font-serif);">{{ get_text('admin_panel') }}
+      </h3>
+      <small style="color: #777;">{{ get_text('manage_activities_nav') }}</small>
+    </div>
+
+    <nav class="admin-nav">
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="{{ url_for('admin_dashboard') }}">
+            📊 {{ get_text('dashboard') }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin_completed_issues') }}">
+            ✅ Resolved Issues
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin_rejected_issues') }}">
+            ❌ Rejected Issues
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin_notices') }}">
+            📢 {{ get_text('manage_notices_nav') }}
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin_activities') }}" class="active">
+            🏃 {{ get_text('manage_activities_nav') }}
+          </a>
+        </li>
+        <li style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+          <a href="{{ url_for('admin_logout') }}" style="color: #c53030;">
+            🚪 {{ get_text('logout') }}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Hero Banner -->
+    <div class="notices-hero"
+      style="background-image: linear-gradient(rgba(1, 41, 112, 0.7), rgba(1, 41, 112, 0.7)), url('/static/image/admin_notices_banner_bg.png'); 
+             height: 180px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 30px; 
+             display: flex; flex-direction: column; justify-content: center; padding: 0 40px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+      <h2 style="margin: 0; font-family: var(--font-serif); font-size: 32px; color: white;">{{ get_text('our_activity') }}</h2>
+      <p style="margin: 5px 0 0; opacity: 0.9; font-size: 16px;">{{ get_text('manage_activities_title') }}</p>
+    </div>
+
+    <div class="notices-grid">
+
+      <!-- Create Activity Form -->
+      <div class="notice-create">
+        <h4 style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);">{{ get_text('publish_activity') }}
+        </h4>
+
+        <form method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
+              get_text('activity_title') }}</label>
+            <input type="text" name="title" required placeholder="Ex. Road Repair Activity..."
+              style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+
+          <div class="form-group">
+            <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; display: block;">{{
+              get_text('activity_image') }}</label>
+            <input type="file" name="image" accept="image/*"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fdfdfd;">
+            <small style="color: #888; display: block; margin-top: 5px;">Upload a photo of the activity.</small>
+          </div>
+
+
+
+          <button type="submit" class="primary-btn" style="width: 100%; justify-content: center;">{{
+            get_text('publish_btn') }}</button>
+        </form>
+      </div>
+
+      <!-- Activity History -->
+      <div class="notice-list-container">
+        <h4 style="margin-top: 0; margin-bottom: 20px; color: #333;">Past Activities</h4>
+
+        <div class="notice-list" style="max-height: 600px; overflow-y: auto;">
+          {% for a in activities %}
+          <div class="notice-item" style="cursor: pointer;" onclick="openActivityModal(this)" data-title="{{ a.title }}"
+            data-date="{{ a.created_at[:10] }}" data-description="{{ a.description }}"
+            data-image="{{ url_for('static', filename=a.image_path) if a.image_path else '' }}">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <strong style="font-size: 16px; color: var(--primary-color);">{{ a.title }}</strong>
+              <div style="display: flex; align-items: center; gap: 15px;" onclick="event.stopPropagation()">
+                <small style="color: #888; font-size: 12px;">{{ a.created_at[:10] }}</small>
+                <a href="{{ url_for('delete_activity', activity_id=a.id) }}"
+                  onclick="return confirm('{{ get_text('confirm_delete_activity') }}');"
+                  style="color: #c53030; display: flex; align-items: center; padding: 4px; border-radius: 4px; transition: background 0.2s;"
+                  onmouseover="this.style.backgroundColor='#fff5f5'"
+                  onmouseout="this.style.backgroundColor='transparent'" title="{{ get_text('delete') }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+          </div>
+          {% else %}
+          <p class="text-muted" style="text-align: center; padding: 20px;">{{ get_text('no_activities') }}</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+{% endblock %}
+
+{% block modals %}
+<!-- Activity Modal -->
+<div id="activityModal" class="modal-overlay" onclick="closeActivityModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeActivityModal()">
+      &times;
+    </button>
+    <div class="modal-body">
+      <img id="activityModalImage" class="modal-image" src="" alt="Activity Image" style="display: none;">
+      <div class="modal-text">
+        <h3 id="modalTitle" class="modal-title"></h3>
+        <div class="modal-meta">
+          <span id="modalDate"></span>
+        </div>
+        <div id="modalDesc" class="modal-desc"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openActivityModal(card) {
+    const title = card.getAttribute('data-title');
+    const date = card.getAttribute('data-date');
+    const desc = card.getAttribute('data-description');
+    const image = card.getAttribute('data-image');
+
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDate').textContent = date;
+    document.getElementById('modalDesc').textContent = desc;
+
+    const imgElem = document.getElementById('activityModalImage');
+    if (image) {
+      imgElem.src = image;
+      imgElem.style.display = 'block';
+    } else {
+      imgElem.style.display = 'none';
+    }
+
+    document.getElementById('activityModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  function closeActivityModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('activityModal').classList.remove('active');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+  }
+</script>
+{% endblock %}
