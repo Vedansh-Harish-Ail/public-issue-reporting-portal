@@ -15,6 +15,14 @@ import random
 import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictRow, RealDictCursor
+except ImportError:
+    psycopg2 = None
 
 # Define Base Directory for Absolute Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,7 +37,20 @@ CATEGORIES = [
 ]
 
 app = Flask(__name__)
-#---------------- EMAIL OTP CONFIGURATION -----------------
+
+# ---------------- SECURITY CONFIGURATION -----------------
+# Talisman adds security headers and enforces HTTPS
+Talisman(app, content_security_policy=None) # CSP can be restrictive, set to None for MVP
+
+# Limiter prevents brute-force attacks on sensitive routes
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
+
+# ---------------- EMAIL OTP CONFIGURATION -----------------
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -147,11 +168,46 @@ if not os.path.exists(DB_DIR):
 # ---------------- DATABASE CONNECTION ----------------
 
 def connect_db():
-    conn = sqlite3.connect(DB_NAME, timeout=10) # Added timeout
-    conn.row_factory = sqlite3.Row
-    # Enable WAL mode for better concurrency and stability
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
+    # Check for Postgres (Production) or SQLite (Local)
+    # Vercel Postgres usually uses 'POSTGRES_URL'
+    db_url = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+    
+    if db_url and db_url.startswith("postgres"):
+        if psycopg2 is None:
+            raise ImportError("psycopg2-binary is required for Postgres connection")
+        # Handle "postgres://" vs "postgresql://" for SQLAlchemy compatibility if needed
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        
+        conn = psycopg2.connect(db_url)
+        # Make Postgres behave like sqlite3.Row (RealDictCursor)
+        conn.autocommit = True
+        # Overwrite cursor to handle '?' -> '%s' translation for compatibility
+        original_cursor = conn.cursor
+        def compat_cursor(*args, **kwargs):
+            cursor = original_cursor(*args, cursor_factory=RealDictCursor, **kwargs)
+            original_execute = cursor.execute
+            def wrapped_execute(query, params=None):
+                if params and isinstance(query, str):
+                    query = query.replace("?", "%s")
+                return original_execute(query, params)
+            cursor.execute = wrapped_execute
+            return cursor
+        conn.cursor = compat_cursor
+        
+        # Also need a top-level execute for conn.execute calls
+        def conn_execute(query, params=None):
+            cur = conn.cursor()
+            cur.execute(query, params)
+            return cur
+        conn.execute = conn_execute
+        return conn
+    else:
+        # Fallback to local SQLite
+        conn = sqlite3.connect(DB_NAME, timeout=10)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL;")
+        return conn
 
 # ---------------- I18N UTILS ----------------
 
@@ -405,11 +461,7 @@ def report_issue():
             other_cat = request.form.get("other_category_name", "").strip()
             if other_cat:
                 category = other_cat
-
-        description = request.form["description"].strip()
-        location = request.form["location"]
-        user_id = session["user_id"]
-
+        
         # 1. Basic Cleaning & Content Check
         description = request.form["description"].strip()
         desc_len = len(description)
@@ -575,6 +627,7 @@ def activities():
 # ---------------- USER AUTH ROUTES ----------------
 
 @app.route("/register", methods=["GET", "POST"])
+@limiter.limit("5 per hour")
 def user_register():
     if request.method == "POST":
         name = request.form["name"]
@@ -625,6 +678,7 @@ def user_register():
     return render_template("citizen/register.html")
 
 @app.route("/verify-otp", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def verify_otp():
     if request.method == "POST":
         entered_otp = request.form["otp"]
@@ -668,6 +722,7 @@ def verify_otp():
     return render_template("citizen/verify_otp.html")
 
 @app.route("/resend-otp")
+@limiter.limit("3 per hour")
 def resend_otp():
     if "temp_user" not in session:
         flash(_get_text("flash_session_expired"), "warning")
@@ -687,6 +742,7 @@ def resend_otp():
     return redirect(url_for("verify_otp"))
 
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def user_login():
     if request.method == "POST":
         email = request.form["email"]
@@ -716,6 +772,7 @@ def user_logout():
 # ---------------- ADMIN ROUTES ----------------
 
 @app.route("/admin/login", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def admin_login():
     if request.method == "POST":
         username = request.form["username"]
