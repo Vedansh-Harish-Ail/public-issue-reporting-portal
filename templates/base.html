@@ -18,6 +18,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
     {% block css %}{% endblock %}
+    <!-- Vercel Web Analytics -->
+    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 
 <body class="lang-{{ session.get('lang', 'en') }}" id="top">
