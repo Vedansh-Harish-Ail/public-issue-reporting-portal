@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
+
 import sqlite3
 from urllib import response
 from flask import Flask, render_template, request, redirect, url_for, flash, session
@@ -65,28 +70,27 @@ def upload_to_blob(file_obj, filename):
     
     # Clean filename for URL safety
     filename = urllib.parse.quote(filename)
-    url = f"https://blob.vercel-storage.com/{filename}"
-    headers = {"Authorization": f"Bearer {token}", "x-api-version": "1"}
+    url = f"https://blob.vercel-storage.com?filename={filename}"
+    headers = {"Authorization": f"Bearer {token}", "x-api-version": "7"}
     
     try:
         file_obj.seek(0)
         resp = requests.put(url, data=file_obj.read(), headers=headers)
         if resp.status_code in [200, 201]:
             return resp.json().get("url")
+        print(f"Blob upload failed with status {resp.status_code}: {resp.text}")
     except Exception as e:
         print(f"Blob upload error: {e}")
     return None
 
 def send_email(to_email, subject, body, content_type="plain"):
     """Generic function to send emails. Supports 'plain' and 'html'."""
-    # Use provided credentials as defaults if env vars are missing
-    env_user = os.environ.get("MAIL_USERNAME")
-    env_pass = os.environ.get("MAIL_PASSWORD")
-    sender_email = env_user or "panchayatseva1@gmail.com"
-    app_password = env_pass or "tkao zyic hwog dxnd"
+    sender_email = os.environ.get("MAIL_USERNAME")
+    app_password = os.environ.get("MAIL_PASSWORD")
     
     if not sender_email or not app_password:
-        print("Error: Email credentials not found in environment variables.")
+        print("Error: EMAIL OTP credentials NOT FOUND.")
+        print("Please set MAIL_USERNAME and MAIL_PASSWORD in your environment variables or .env file.")
         return False
 
     print(f"[{datetime.now()}] Attempting to send email to {to_email}...")
