@@ -467,7 +467,7 @@ def home():
     
     conn.close()
     
-    return render_template("citizen/home.html", panchayaths=panchayaths, stats=stats)
+    return render_template("citizen/index.html", panchayaths=panchayaths, stats=stats)
 
 @app.route("/debug")
 def debug():
