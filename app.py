@@ -1,6 +1,5 @@
 import os
 import sqlite3
-from urllib import response
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -174,7 +173,8 @@ def connect_db():
     
     if db_url and db_url.startswith("postgres"):
         if psycopg2 is None:
-            raise ImportError("psycopg2-binary is required for Postgres connection")
+            print("CRITICAL ERROR: 'psycopg2-binary' is missing but DATABASE_URL is set to Postgres.")
+            raise ImportError("psycopg2-binary is required for Postgres connection. Run: pip install psycopg2-binary")
         # Handle "postgres://" vs "postgresql://" for SQLAlchemy compatibility if needed
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -201,6 +201,13 @@ def connect_db():
             cur.execute(query, params)
             return cur
         conn.execute = conn_execute
+        
+        def conn_executescript(script):
+            cur = conn.cursor()
+            # Postgres can execute multiple statements in one execute() call
+            cur.execute(script)
+            return cur
+        conn.executescript = conn_executescript
         return conn
     else:
         # Fallback to local SQLite
@@ -249,7 +256,18 @@ def user_login_required(f):
 
 def init_db():
     conn = connect_db()
-    conn.executescript("""
+    
+    # Check if we are on Postgres to handle syntax differences
+    is_postgres = False
+    try:
+        import psycopg2
+        # If it's our wrapped psycopg2 connection, it has 'cursor_factory' or we check type
+        if hasattr(conn, 'autocommit'):
+            is_postgres = True
+    except Exception:
+        pass
+
+    sql_script = """
     CREATE TABLE IF NOT EXISTS panchayath (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
@@ -305,47 +323,50 @@ def init_db():
         password_hash TEXT,
         panchayath_id INTEGER
     );
-    """)
+    """
+
+    if is_postgres:
+        # Transform SQLite syntax to Postgres for compatibility
+        sql_script = sql_script.replace("INTEGER PRIMARY KEY AUTOINCREMENT", "SERIAL PRIMARY KEY")
+        sql_script = sql_script.replace("DATETIME", "TIMESTAMP")
+
+    conn.executescript(sql_script)
     
-    # Add user_id to issues table if it doesn't exist
-    try:
-        conn.execute("SELECT user_id FROM issues LIMIT 1")
-    except sqlite3.OperationalError:
+    # Helper to check if column exists
+    def column_exists(table, column):
+        try:
+            conn.execute(f"SELECT {column} FROM {table} LIMIT 1")
+            return True
+        except Exception:
+            return False
+
+    if not column_exists("issues", "user_id"):
         conn.execute("ALTER TABLE issues ADD COLUMN user_id INTEGER")
         conn.commit()
 
-    # Add tracking_id to issues table if it doesn't exist
-    try:
-        conn.execute("SELECT tracking_id FROM issues LIMIT 1")
-    except sqlite3.OperationalError:
+    if not column_exists("issues", "tracking_id"):
         conn.execute("ALTER TABLE issues ADD COLUMN tracking_id TEXT")
         conn.commit()
 
-    # Add reporter_name to issues table if it doesn't exist
-    try:
-        conn.execute("SELECT reporter_name FROM issues LIMIT 1")
-    except sqlite3.OperationalError:
+    if not column_exists("issues", "reporter_name"):
         conn.execute("ALTER TABLE issues ADD COLUMN reporter_name TEXT")
         conn.commit()
         # Backfill existing names from users table
-        conn.execute("""
-            UPDATE issues 
-            SET reporter_name = (SELECT name FROM users WHERE users.id = issues.user_id)
-            WHERE reporter_name IS NULL
-        """)
-        conn.commit()
+        try:
+            conn.execute("""
+                UPDATE issues 
+                SET reporter_name = (SELECT name FROM users WHERE users.id = issues.user_id)
+                WHERE reporter_name IS NULL
+            """)
+            conn.commit()
+        except Exception:
+            pass
 
-    # Add banner_path to notices table if it doesn't exist
-    try:
-        conn.execute("SELECT banner_path FROM notices LIMIT 1")
-    except sqlite3.OperationalError:
+    if not column_exists("notices", "banner_path"):
         conn.execute("ALTER TABLE notices ADD COLUMN banner_path TEXT")
         conn.commit()
 
-    # Add expiry_date to notices table if it doesn't exist
-    try:
-        conn.execute("SELECT expiry_date FROM notices LIMIT 1")
-    except sqlite3.OperationalError:
+    if not column_exists("notices", "expiry_date"):
         conn.execute("ALTER TABLE notices ADD COLUMN expiry_date DATETIME")
         conn.commit()
 
@@ -401,6 +422,13 @@ def seed_data():
     conn.commit()
     conn.close()
 
+# ---------------- INITIALIZE AT STARTUP (For Vercel/Production) ----------------
+try:
+    init_db()
+    seed_data()
+except Exception as e:
+    print(f"Startup Database Error: {e}")
+
 # ---------------- HELPERS ----------------
 def generate_tracking_id():
     import uuid
@@ -455,6 +483,7 @@ def report_issue():
     if request.method == "POST":
         panchayath_id = request.form["panchayath_id"]
         category = request.form["category"]
+        location = request.form.get("location", "").strip()
         
         # If "Others" is selected, use the custom name provided
         if category == "Others":
@@ -511,6 +540,7 @@ def report_issue():
 
         tracking_id = generate_tracking_id()
         user_name = session.get("user_name", "Anonymous")
+        user_id = session.get("user_id")
 
         conn.execute("""
             INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id, reporter_name)
