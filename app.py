@@ -217,29 +217,35 @@ def connect_db():
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
         
+        # Wrapper class to make Postgres behave like SQLite
+        class PostgresWrapper:
+            def __init__(self, conn):
+                self.conn = conn
+            def cursor(self, *args, **kwargs):
+                cursor = self.conn.cursor(*args, cursor_factory=DictCursor, **kwargs)
+                original_execute = cursor.execute
+                def wrapped_execute(query, params=None):
+                    if params and isinstance(query, str):
+                        query = query.replace("?", "%s")
+                    return original_execute(query, params)
+                cursor.execute = wrapped_execute
+                return cursor
+            def execute(self, query, params=None):
+                cur = self.cursor()
+                cur.execute(query, params)
+                return cur
+            def commit(self): return self.conn.commit()
+            def rollback(self): return self.conn.rollback()
+            def close(self): return self.conn.close()
+            def executescript(self, script):
+                cur = self.cursor()
+                cur.execute(script)
+                return cur
+            def __getattr__(self, name): return getattr(self.conn, name)
+
         conn = psycopg2.connect(db_url)
-        # Make Postgres behave like sqlite3.Row (DictCursor supports both index and name)
         conn.autocommit = True
-        # Overwrite cursor to return DictRow objects
-        original_cursor = conn.cursor
-        def compat_cursor(*args, **kwargs):
-            cursor = original_cursor(*args, cursor_factory=DictCursor, **kwargs)
-            original_execute = cursor.execute
-            def wrapped_execute(query, params=None):
-                if params and isinstance(query, str):
-                    query = query.replace("?", "%s")
-                return original_execute(query, params)
-            cursor.execute = wrapped_execute
-            return cursor
-        conn.cursor = compat_cursor
-        
-        # Also need a top-level execute for conn.execute calls
-        def conn_execute(query, params=None):
-            cur = conn.cursor()
-            cur.execute(query, params)
-            return cur
-        conn.execute = conn_execute
-        return conn
+        return PostgresWrapper(conn)
     else:
         # Fallback to local SQLite
         conn = sqlite3.connect(DB_NAME, timeout=10)
@@ -292,8 +298,8 @@ def init_db():
     is_postgres = False
     try:
         import psycopg2
-        # If it's our wrapped psycopg2 connection, it has 'cursor_factory' or we check type
-        if hasattr(conn, 'autocommit'):
+        # If it's our wrapped psycopg2 connection, it has 'autocommit' or we check type
+        if hasattr(conn, 'autocommit') or hasattr(conn, 'conn'):
             is_postgres = True
     except Exception:
         pass
@@ -410,7 +416,8 @@ def process_expired_notices():
     
     # Get expired notices
     try:
-        conn.row_factory = sqlite3.Row
+        if hasattr(conn, 'row_factory'):
+            conn.row_factory = sqlite3.Row
         expired_notices = conn.execute("""
             SELECT * FROM notices 
             WHERE expiry_date IS NOT NULL AND expiry_date <= ?
@@ -427,7 +434,7 @@ def process_expired_notices():
             conn.execute("DELETE FROM notices WHERE id = ?", (notice['id'],))
         
         conn.commit()
-    except sqlite3.OperationalError:
+    except Exception:
         pass # Column might not exist yet
     finally:
         conn.close()
@@ -504,7 +511,30 @@ def home():
     }
     
     conn.close()
+    
     return render_template("citizen/index.html", panchayaths=panchayaths, stats=stats)
+
+@app.route("/debug")
+def debug():
+    info = {
+        "DATABASE_URL_PRESENT": bool(os.environ.get("DATABASE_URL")),
+        "POSTGRES_URL_PRESENT": bool(os.environ.get("POSTGRES_URL")),
+        "PANCHAYAT_DB_URL_PRESENT": bool(os.environ.get("Panchayat_DATABASE_URL")),
+        "PYTHON_VERSION": os.sys.version,
+        "PSYCOPG2_LOADED": psycopg2 is not None,
+    }
+    
+    db_status = "Not Checked"
+    try:
+        conn = connect_db()
+        conn.execute("SELECT 1")
+        db_status = "Connected Successfully"
+        conn.close()
+    except Exception as e:
+        db_status = f"Connection Failed: {str(e)}"
+        
+    info["DB_STATUS"] = db_status
+    return info
 
 @app.route("/report", methods=["GET", "POST"])
 @user_login_required
@@ -519,9 +549,11 @@ def report_issue():
     # Check/Add photo_path column if not exists (already handled in migration above but safe to keep)
     try:
         conn.execute("SELECT photo_path FROM issues LIMIT 1")
-    except sqlite3.OperationalError:
-        conn.execute("ALTER TABLE issues ADD COLUMN photo_path TEXT")
-        conn.commit()
+    except Exception:
+        try:
+            conn.execute("ALTER TABLE issues ADD COLUMN photo_path TEXT")
+            conn.commit()
+        except: pass
 
     if request.method == "POST":
         panchayath_id = request.form["panchayath_id"]
@@ -588,6 +620,7 @@ def report_issue():
                     image_filename = None
 
         user_name = session.get("user_name", "Anonymous")
+        user_id = session.get("user_id")
 
         conn.execute("""
             INSERT INTO issues (panchayath_id, category, description, location, photo_path, user_id, tracking_id, reporter_name)
@@ -725,10 +758,10 @@ def user_register():
 
         # Check if user already exists BEFORE sending OTP
         conn = connect_db()
-        existing_user = conn.execute("SELECT * FROM users WHERE email = ? OR mobile = ?", (email, mobile)).fetchone()
+        user_row = conn.execute("SELECT * FROM users WHERE email = ? OR mobile = ?", (email, mobile)).fetchone()
         conn.close()
         
-        if existing_user:
+        if user_row:
             flash(_get_text("flash_user_exists"), "danger")
             return redirect(url_for("user_register"))
 
@@ -780,7 +813,7 @@ def verify_otp():
                     user["password"]
                 )) 
                 conn.commit()
-            except sqlite3.IntegrityError:
+            except Exception:
                 flash(_get_text("flash_user_exists"), "danger")
                 return redirect(url_for("user_register"))
             finally:
@@ -876,7 +909,6 @@ def admin_login():
 def admin_dashboard():
     # if "admin_id" not in session: check handled by decorator
     pid = session.get("panchayath_id")
-    print(f"DEBUG ADMIN DASHBOARD: Session PID = {pid}")
     conn = connect_db()
 
     issues_rows = conn.execute("""
@@ -887,19 +919,15 @@ def admin_dashboard():
         ORDER BY i.created_at DESC
     """, (pid,)).fetchall()
     
-    print(f"DEBUG ADMIN DASHBOARD: Found {len(issues_rows)} active rows in DB for PID {pid}")
-    
     issues = [dict(row) for row in issues_rows]
 
     # Pre-group issues by category for robust template rendering
     grouped_issues = {cat: [] for cat in CATEGORIES}
     for issue in issues:
         cat = issue.get('category')
-        print(f"DEBUG ADMIN DASHBOARD: Processing issue {issue['id']} with category '{cat}'")
         if cat in grouped_issues:
             grouped_issues[cat].append(issue)
         else:
-            print(f"DEBUG ADMIN DASHBOARD: Category '{cat}' not found in CATEGORIES list!")
             grouped_issues.setdefault("Others", []).append(issue)
 
     # Calculate stats for dashboard cards
@@ -1020,7 +1048,7 @@ def delete_notice(notice_id):
     
     if notice:
         # Delete the physical file if it exists
-        if notice['banner_path']:
+        if notice['banner_path'] and not notice['banner_path'].startswith("http"):
             file_path = os.path.join(BASE_DIR, "static", notice['banner_path'])
             if os.path.exists(file_path):
                 try:
@@ -1091,7 +1119,7 @@ def delete_activity(activity_id):
     activity = conn.execute("SELECT * FROM activities WHERE id = ? AND panchayath_id = ?", (activity_id, pid)).fetchone()
     
     if activity:
-        if activity['image_path']:
+        if activity['image_path'] and not activity['image_path'].startswith("http"):
             file_path = os.path.join(BASE_DIR, "static", activity['image_path'])
             if os.path.exists(file_path):
                 try:
@@ -1152,7 +1180,7 @@ def delete_issue(issue_id):
     
     if issue:
         # Delete the physical file if it exists
-        if issue['photo_path']:
+        if issue['photo_path'] and not issue['photo_path'].startswith("http"):
             file_path = os.path.join(BASE_DIR, "static", issue['photo_path'])
             if os.path.exists(file_path):
                 try:
@@ -1222,4 +1250,3 @@ if __name__ == "__main__":
     seed_data()
     # Host '0.0.0.0' allows external access on the local network
     app.run(debug=True, host='0.0.0.0')
-
