@@ -168,8 +168,13 @@ if not os.path.exists(DB_DIR):
 
 def connect_db():
     # Check for Postgres (Production) or SQLite (Local)
-    # Vercel Postgres usually uses 'POSTGRES_URL'
-    db_url = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+    # Support standard names and the prefixed names seen in your configuration
+    db_url = (
+        os.environ.get("DATABASE_URL") or 
+        os.environ.get("POSTGRES_URL") or 
+        os.environ.get("Panchayat_DATABASE_URL") or 
+        os.environ.get("Panchayat_POSTGRES_URL")
+    )
     
     if db_url and db_url.startswith("postgres"):
         if psycopg2 is None:
@@ -461,7 +466,30 @@ def home():
     }
     
     conn.close()
-    return render_template("citizen/index.html", panchayaths=panchayaths, stats=stats)
+    
+    return render_template("citizen/home.html", panchayaths=panchayaths, stats=stats)
+
+@app.route("/debug")
+def debug():
+    info = {
+        "DATABASE_URL_PRESENT": bool(os.environ.get("DATABASE_URL")),
+        "POSTGRES_URL_PRESENT": bool(os.environ.get("POSTGRES_URL")),
+        "PANCHAYAT_DB_URL_PRESENT": bool(os.environ.get("Panchayat_DATABASE_URL")),
+        "PYTHON_VERSION": os.sys.version,
+        "PSYCOPG2_LOADED": psycopg2 is not None,
+    }
+    
+    db_status = "Not Checked"
+    try:
+        conn = connect_db()
+        conn.execute("SELECT 1")
+        db_status = "Connected Successfully"
+        conn.close()
+    except Exception as e:
+        db_status = f"Connection Failed: {str(e)}"
+        
+    info["DB_STATUS"] = db_status
+    return info
 
 @app.route("/report", methods=["GET", "POST"])
 @user_login_required
