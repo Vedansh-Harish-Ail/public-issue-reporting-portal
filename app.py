@@ -205,9 +205,19 @@ def connect_db():
     db_url = (
         os.environ.get("Panchayat_DATABASE_URL") or 
         os.environ.get("Panchayat_POSTGRES_URL") or 
+        os.environ.get("Panchayat_POSTGRES_URL_NON_POOLING") or
         os.environ.get("DATABASE_URL") or 
         os.environ.get("POSTGRES_URL")
     )
+    
+    # Fallback: Construct URL from individual Panchayat_ components if URL is missing
+    if not db_url and os.environ.get("Panchayat_POSTGRES_HOST"):
+        user = os.environ.get("Panchayat_PGUSER")
+        password = os.environ.get("Panchayat_POSTGRES_PASSWORD")
+        host = os.environ.get("Panchayat_POSTGRES_HOST")
+        database = os.environ.get("Panchayat_PGDATABASE")
+        if all([user, password, host, database]):
+            db_url = f"postgresql://{user}:{password}@{host}/{database}"
     
     if db_url and db_url.startswith("postgres"):
         if psycopg2 is None:
