@@ -46,7 +46,7 @@ app = Flask(__name__)
 
 # ---------------- SECURITY CONFIGURATION -----------------
 # Talisman adds security headers and enforces HTTPS
-Talisman(app, content_security_policy=None) # CSP can be restrictive, set to None for MVP
+# Talisman(app, content_security_policy=None) # CSP can be restrictive, set to None for MVP
 
 # Limiter prevents brute-force attacks on sensitive routes
 limiter = Limiter(
@@ -530,6 +530,9 @@ def debug():
         "DATABASE_URL_PRESENT": bool(os.environ.get("DATABASE_URL")),
         "POSTGRES_URL_PRESENT": bool(os.environ.get("POSTGRES_URL")),
         "PANCHAYAT_DB_URL_PRESENT": bool(os.environ.get("Panchayat_DATABASE_URL")),
+        "PANCHAYAT_POSTGRES_URL_PRESENT": bool(os.environ.get("Panchayat_POSTGRES_URL")),
+        "PANCHAYAT_NON_POOLING_PRESENT": bool(os.environ.get("Panchayat_POSTGRES_URL_NON_POOLING")),
+        "PANCHAYAT_HOST_PRESENT": bool(os.environ.get("Panchayat_POSTGRES_HOST")),
         "PYTHON_VERSION": os.sys.version,
         "PSYCOPG2_LOADED": psycopg2 is not None,
     }
